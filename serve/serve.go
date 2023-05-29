@@ -2,11 +2,25 @@ package serve
 
 import (
 	"fmt"
-	"io"
 	"net/http"
+
+	"github.com/gin-gonic/gin"
+	"github.com/redis/go-redis/v9"
 )
 
-func GetSmartContractData(w http.ResponseWriter, r *http.Request) {
-	fmt.Printf("got / request\n")
-	io.WriteString(w, "Hello World")
+func GetSmartContractData(ctx *gin.Context) {
+	rdb := redis.NewClient(&redis.Options{
+		Addr:     "localhost:6379",
+		Password: "", // no password set
+		DB:       0,  // use default DB
+	})
+
+	val, err := rdb.Get(ctx, "key").Result()
+	if err != nil {
+		panic(err)
+	}
+	fmt.Println("key", val)
+	ctx.JSON(http.StatusOK, gin.H{
+		"message": val,
+	})
 }

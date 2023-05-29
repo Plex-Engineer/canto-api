@@ -1,20 +1,21 @@
 package main
 
 import (
-	"fmt"
-	"net/http"
+	"context"
 
 	"canto-api/query"
 	"canto-api/serve"
+
+	"github.com/gin-gonic/gin"
 )
 
+var ctx = context.Background()
+
 func main() {
-	go query.Tick() // run query engine in background
+	go query.Run(ctx) // run query engine in background
 
-	http.HandleFunc("/", serve.GetSmartContractData)
+	router := gin.Default()
+	router.GET("/get", serve.GetSmartContractData)
 
-	err := http.ListenAndServe(":8080", nil)
-	if err != nil {
-		fmt.Println(err)
-	}
+	router.Run()
 }
