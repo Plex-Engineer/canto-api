@@ -6,8 +6,8 @@ import (
 	"log"
 	"time"
 
+	"canto-api/config"
 	pair "canto-api/contracts"
-	redisclient "canto-api/redisclient"
 
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/ethclient"
@@ -24,14 +24,9 @@ type QueryEngine struct {
 
 // Returns a QueryEngine instance with redis client, eth client, and interval.
 func NewQueryEngine() *QueryEngine {
-	ethclient, err := ethclient.Dial("https://mainnode.plexnode.org:8545")
-	if err != nil {
-		log.Fatal(err)
-	}
-
 	return &QueryEngine{
-		redisclient: redisclient.RDB,
-		ethclient:   ethclient,
+		redisclient: config.RDB,
+		ethclient:   config.EthClient,
 		interval:    5,
 	}
 }

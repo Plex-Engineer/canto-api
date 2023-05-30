@@ -6,11 +6,11 @@ import (
 
 	"github.com/gin-gonic/gin"
 
-	redisclient "canto-api/redisclient"
+	"canto-api/config"
 )
 
 func GetSmartContractData(ctx *gin.Context) {
-	rdb := redisclient.RDB
+	rdb := config.RDB
 
 	val, err := rdb.Get(ctx, "key").Result()
 	if err != nil {
