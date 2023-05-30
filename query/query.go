@@ -7,6 +7,7 @@ import (
 	"time"
 
 	pair "canto-api/contracts"
+	redisclient "canto-api/redisclient"
 
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/ethclient"
@@ -29,13 +30,9 @@ func NewQueryEngine() *QueryEngine {
 	}
 
 	return &QueryEngine{
-		redisclient: redis.NewClient(&redis.Options{
-			Addr:     "localhost:6379",
-			Password: "",
-			DB:       0, // use default DB
-		}),
-		ethclient: ethclient,
-		interval:  5,
+		redisclient: redisclient.RDB,
+		ethclient:   ethclient,
+		interval:    5,
 	}
 }
 
