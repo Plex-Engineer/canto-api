@@ -7,7 +7,7 @@ import (
 	"time"
 
 	"canto-api/config"
-	pair "canto-api/contracts"
+	"canto-api/contracts"
 
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/ethclient"
@@ -33,16 +33,31 @@ func NewQueryEngine() *QueryEngine {
 
 func (qe *QueryEngine) StartQueryEngine(ctx context.Context) {
 
-	// canto note pair address
-	address := common.HexToAddress("0x1D20635535307208919f0b67c3B2065965A85aA9")
-
-	pairInstance, err := pair.NewPair(address, qe.ethclient)
+	// multicall contract address
+	mcaddress := common.HexToAddress("0xcA11bde05977b3631167028862bE2a173976CA11")
+	multicallInstance, err := multicall.NewMulticall(mcaddress, qe.ethclient)
 	if err != nil {
 		log.Fatal(err)
 	}
 
+	// canto note pair address
+	address := common.HexToAddress("0x1D20635535307208919f0b67c3B2065965A85aA9")
+
+	pairInstance, err := multicall.NewPair(address, qe.ethclient)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	MulticallCall{
+		Target: address,
+		CallData: ,
+	}
+
 	ticker := time.NewTicker(qe.interval * time.Second)
 	for range ticker.C {
+		// call functions in multicall contract
+		// returndata, err := multicallInstance.Aggregate(nil, [][]byte{
+
 		// get reserves from pair contract
 		reserves, err := pairInstance.GetReserves(nil)
 		if err != nil {
