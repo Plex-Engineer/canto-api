@@ -48,7 +48,7 @@ func (qe *QueryEngine) StartQueryEngine(ctx context.Context) {
 		log.Fatal(err)
 	}
 
-	MulticallCall{
+	getReserve := MulticallCall{
 		Target: address,
 		CallData: ,
 	}
@@ -56,7 +56,7 @@ func (qe *QueryEngine) StartQueryEngine(ctx context.Context) {
 	ticker := time.NewTicker(qe.interval * time.Second)
 	for range ticker.C {
 		// call functions in multicall contract
-		// returndata, err := multicallInstance.Aggregate(nil, [][]byte{
+		returndata, err := multicallInstance.Aggregate(nil, [getReserve])
 
 		// get reserves from pair contract
 		reserves, err := pairInstance.GetReserves(nil)
