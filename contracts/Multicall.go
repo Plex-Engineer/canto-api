@@ -517,26 +517,62 @@ func (_Multicall *MulticallCallerSession) GetLastBlockHash() ([32]byte, error) {
 	return _Multicall.Contract.GetLastBlockHash(&_Multicall.CallOpts)
 }
 
-// Aggregate is a paid mutator transaction binding the contract method 0x252dba42.
-//
-// Solidity: function aggregate((address,bytes)[] calls) payable returns(uint256 blockNumber, bytes[] returnData)
-func (_Multicall *MulticallTransactor) Aggregate(opts *bind.TransactOpts, calls []Multicall3Call) (*types.Transaction, error) {
-	return _Multicall.contract.Transact(opts, "aggregate", calls)
+// Aggregate caller
+func (_Multicall *MulticallCaller) Aggregate(opts *bind.CallOpts, calls []Multicall3Call) (struct {
+	BlockNumber *big.Int
+	ReturnData  [][]byte
+}, error) {
+	var out []interface{}
+	err := _Multicall.contract.Call(opts, &out, "aggregate", calls)
+
+	if err != nil {
+		return *new(struct {
+			BlockNumber *big.Int
+			ReturnData  [][]byte
+		}), err
+	}
+
+	out0 := *abi.ConvertType(out[0], new(*big.Int)).(**big.Int)
+	out1 := *abi.ConvertType(out[1], new([][]byte)).(*[][]byte)
+
+	return struct {
+		BlockNumber *big.Int
+		ReturnData  [][]byte
+	}{out0, out1}, err
+
 }
 
 // Aggregate is a paid mutator transaction binding the contract method 0x252dba42.
 //
 // Solidity: function aggregate((address,bytes)[] calls) payable returns(uint256 blockNumber, bytes[] returnData)
-func (_Multicall *MulticallSession) Aggregate(calls []Multicall3Call) (*types.Transaction, error) {
-	return _Multicall.Contract.Aggregate(&_Multicall.TransactOpts, calls)
+// func (_Multicall *MulticallTransactor) Aggregate(opts *bind.TransactOpts, calls []Multicall3Call) (*types.Transaction, error) {
+// 	return _Multicall.contract.Transact(opts, "aggregate", calls)
+// }
+
+// Aggregate is a paid mutator transaction binding the contract method 0x252dba42.
+//
+// Solidity: function aggregate((address,bytes)[] calls) payable returns(uint256 blockNumber, bytes[] returnData)
+func (_Multicall *MulticallSession) Aggregate(calls []Multicall3Call) (struct {
+	BlockNumber *big.Int
+	ReturnData  [][]byte
+}, error) {
+	return _Multicall.Contract.Aggregate(&_Multicall.CallOpts, calls)
+}
+
+func (_Multicall *MulticallCallerSession) Aggregate(calls []Multicall3Call) (struct {
+	BlockNumber *big.Int
+	ReturnData  [][]byte
+}, error) {
+	return _Multicall.Contract.Aggregate(&_Multicall.CallOpts, calls)
 }
 
 // Aggregate is a paid mutator transaction binding the contract method 0x252dba42.
 //
 // Solidity: function aggregate((address,bytes)[] calls) payable returns(uint256 blockNumber, bytes[] returnData)
-func (_Multicall *MulticallTransactorSession) Aggregate(calls []Multicall3Call) (*types.Transaction, error) {
-	return _Multicall.Contract.Aggregate(&_Multicall.TransactOpts, calls)
-}
+// func (_Multicall *MulticallTransactorSession) Aggregate(calls []Multicall3Call) (*types.Transaction, error) {
+// 	return _Multicall.Contract.Aggregate(&_Multicall.TransactOpts, calls)
+// }
+/////////////////////////////////
 
 // Aggregate3 is a paid mutator transaction binding the contract method 0x82ad56cb.
 //
