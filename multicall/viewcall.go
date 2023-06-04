@@ -14,17 +14,28 @@ import (
 )
 
 type ViewCall struct {
+	target    string
 	method    string
 	arguments []interface{}
 }
 
 type ViewCalls []ViewCall
 
+type CallResult struct {
+	Decoded []interface{}
+}
+
+type Result struct {
+	BlockNumber uint64
+	Calls       map[int]CallResult
+}
+
 var insideParens = regexp.MustCompile("\\(.*?\\)")
 var numericArg = regexp.MustCompile("u?int(256)|(8)")
 
-func NewViewCall(method string, arguments []interface{}) ViewCall {
+func NewViewCall(target string, method string, arguments []interface{}) ViewCall {
 	return ViewCall{
+		target:    target,
 		method:    method,
 		arguments: arguments,
 	}
@@ -52,7 +63,7 @@ func (call ViewCall) argumentTypes() []string {
 	return args
 }
 
-func (call ViewCall) CallData() ([]byte, error) {
+func (call ViewCall) callData() ([]byte, error) {
 	argsSuffix, err := call.argsCallData()
 	if err != nil {
 		return nil, err
@@ -153,4 +164,91 @@ func toByteArray(address string) ([20]byte, error) {
 
 	copy(addressBytes[:], addressBytesSlice[:])
 	return addressBytes, nil
+}
+
+func (calls ViewCalls) GetCallData() ([]Multicall3Call, error) {
+	payloadArgs := make([]Multicall3Call, 0, len(calls))
+	for _, call := range calls {
+		callData, err := call.callData()
+		if err != nil {
+			return nil, err
+		}
+		targetBytes, err := toByteArray(call.target)
+		if err != nil {
+			return nil, err
+		}
+		payloadArgs = append(payloadArgs, Multicall3Call{targetBytes, callData})
+	}
+
+	return payloadArgs, nil
+}
+
+func (call ViewCall) returnTypes() []string {
+	rawArgs := insideParens.FindAllString(call.method, -1)[1]
+	rawArgs = strings.Replace(rawArgs, "(", "", -1)
+	rawArgs = strings.Replace(rawArgs, ")", "", -1)
+	args := strings.Split(rawArgs, ",")
+	for index, arg := range args {
+		args[index] = strings.Trim(arg, " ")
+	}
+	return args
+}
+
+func (call ViewCall) decode(raw []byte) ([]interface{}, error) {
+	retTypes := call.returnTypes()
+	args := make(abi.Arguments, 0)
+	for index, retTypeStr := range retTypes {
+		retType, err := abi.NewType(retTypeStr, "", nil)
+		if err != nil {
+			return nil, err
+		}
+		args = append(args, abi.Argument{Name: fmt.Sprintf("ret%d", index), Type: retType})
+
+	}
+
+	decoded := make(map[string]interface{})
+
+	err := args.UnpackIntoMap(decoded, raw)
+
+	if err != nil {
+		return nil, err
+	}
+	returns := make([]interface{}, len(retTypes))
+	for index := range retTypes {
+		key := fmt.Sprintf("ret%d", index)
+		item := decoded[key]
+
+		// if bigint, ok := item.(*big.Int); ok {
+		// 	// fmt.Println("Big int-----------", item, bigint, (*BigIntJSONString)(bigint))
+		// 	returns[index] = (*BigIntJSONString)(bigint)
+		// } else {
+		// 	returns[index] = decoded[key]
+		// }
+
+		returns[index] = item
+	}
+	return returns, nil
+}
+
+func (calls ViewCalls) Decode(raw struct {
+	BlockNumber *big.Int
+	ReturnData  [][]byte
+}) (*Result, error) {
+
+	result := &Result{}
+	result.BlockNumber = raw.BlockNumber.Uint64()
+	result.Calls = make(map[int]CallResult)
+	for index, call := range calls {
+		callResult := CallResult{}
+		if raw.ReturnData[index] != nil {
+			returnValues, err := call.decode(raw.ReturnData[index])
+			if err != nil {
+				return nil, err
+			}
+			callResult.Decoded = returnValues
+		}
+		result.Calls[index] = callResult
+	}
+
+	return result, nil
 }

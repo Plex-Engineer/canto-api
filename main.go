@@ -5,7 +5,7 @@ import (
 
 	"canto-api/config"
 	queryengine "canto-api/query"
-	"canto-api/serve"
+	requestengine "canto-api/serve"
 
 	"github.com/gin-gonic/gin"
 )
@@ -16,7 +16,6 @@ func main() {
 	go queryengine.Run(ctx) // run query engine in background
 
 	router := gin.Default()
-	router.GET("/get", serve.GetSmartContractData)
-
+	router.GET("/get", requestengine.GetSmartContractData)
 	router.Run()
 }
