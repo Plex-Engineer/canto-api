@@ -105,13 +105,8 @@ func (call ViewCall) argsCallData() ([]byte, error) {
 		if err != nil {
 			return nil, err
 		}
-
-		fmt.Println("arg type: ", argType)
-
 		arguments[index] = abi.Argument{Type: argType}
 		argumentValues[index], err = call.getArgument(index, argTypeStr)
-
-		fmt.Println("arg values: ", argumentValues[index])
 		if err != nil {
 			return nil, err
 		}
