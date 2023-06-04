@@ -15,13 +15,11 @@ func main() {
 	ctx := context.Background()
 	go queryengine.Run(ctx) // run query engine in background
 
-	// router := gin.Default()
-	// router.GET("/get", requestengine.GetSmartContractData)
-	// router.Run()
+	server := "fiber"
 
-	app := fiber.New()
-
-	app.Get("/", requestengine.GetSmartContractDataFiber)
-
-	app.Listen(":3000")
+	if server == "fiber" {
+		app := fiber.New()
+		app.Get("/", requestengine.GetSmartContractDataFiber)
+		app.Listen(":3000")
+	}
 }
