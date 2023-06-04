@@ -14,6 +14,7 @@ import (
 )
 
 type ViewCall struct {
+	name      string
 	target    string
 	method    string
 	arguments []interface{}
@@ -27,14 +28,15 @@ type CallResult struct {
 
 type Result struct {
 	BlockNumber uint64
-	Calls       map[int]CallResult
+	Calls       map[string]CallResult
 }
 
 var insideParens = regexp.MustCompile("\\(.*?\\)")
 var numericArg = regexp.MustCompile("u?int(256)|(8)")
 
-func NewViewCall(target string, method string, arguments []interface{}) ViewCall {
+func NewViewCall(name string, target string, method string, arguments []interface{}) ViewCall {
 	return ViewCall{
+		name:      name,
 		target:    target,
 		method:    method,
 		arguments: arguments,
@@ -95,7 +97,7 @@ func (call ViewCall) methodCallData() ([]byte, error) {
 func (call ViewCall) argsCallData() ([]byte, error) {
 	argTypes := call.argumentTypes()
 	if len(argTypes) != len(call.arguments) {
-		return nil, fmt.Errorf("number of argument types doesn't match with number of arguments with method %s", call.method)
+		return nil, fmt.Errorf("number of argument types doesn't match with number of arguments for %s with method %s", call.name, call.method)
 	}
 	argumentValues := make([]interface{}, len(call.arguments))
 	arguments := make(abi.Arguments, len(call.arguments))
@@ -232,7 +234,7 @@ func (calls ViewCalls) Decode(raw struct {
 
 	result := &Result{}
 	result.BlockNumber = raw.BlockNumber.Uint64()
-	result.Calls = make(map[int]CallResult)
+	result.Calls = make(map[string]CallResult)
 	for index, call := range calls {
 		callResult := CallResult{}
 		if raw.ReturnData[index] != nil {
@@ -242,7 +244,7 @@ func (calls ViewCalls) Decode(raw struct {
 			}
 			callResult.Decoded = returnValues
 		}
-		result.Calls[index] = callResult
+		result.Calls[call.name] = callResult
 	}
 
 	return result, nil
