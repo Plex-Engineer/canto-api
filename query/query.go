@@ -24,7 +24,6 @@ type QueryEngine struct {
 // Returns a QueryEngine instance with all necessary objects for
 // query engine to run.
 func NewQueryEngine() *QueryEngine {
-
 	mc, err := multicall.NewMulticall(config.MulticallAddress, config.EthClient)
 	if err != nil {
 		log.Fatal(err)
@@ -34,7 +33,6 @@ func NewQueryEngine() *QueryEngine {
 	if err != nil {
 		log.Fatal(err)
 	}
-
 	return &QueryEngine{
 		redisclient: config.RDB,
 		interval:    time.Duration(config.QueryInterval),
@@ -43,8 +41,10 @@ func NewQueryEngine() *QueryEngine {
 	}
 }
 
+// SetCacheWithResult sets the result of a multicall query in Redis
+// and returns an error if any occur.
 func (qe *QueryEngine) SetCacheWithResult(ctx context.Context, redisclient *redis.Client, results *multicall.Result) error {
-
+	// convert result slice to string
 	ret := ResultToString(results)
 
 	// set key in redis
@@ -52,10 +52,11 @@ func (qe *QueryEngine) SetCacheWithResult(ctx context.Context, redisclient *redi
 	if err != nil {
 		return errors.New("QueryEngine::SetCacheWithResult - " + err.Error())
 	}
-
 	return nil
 }
 
+// StartQueryEngine starts the query engine and runs the ticker
+// on the interval specified in config .
 func (qe *QueryEngine) StartQueryEngine(ctx context.Context) {
 	calldata, err := GetCallData(qe.viewcalls)
 	if err != nil {
@@ -70,11 +71,13 @@ func (qe *QueryEngine) StartQueryEngine(ctx context.Context) {
 			log.Fatal(err)
 		}
 
+		// decode results
 		ret, err := qe.viewcalls.Decode(res)
 		if err != nil {
 			log.Fatal(err)
 		}
 
+		// set results to redis cache
 		err = qe.SetCacheWithResult(ctx, qe.redisclient, ret)
 		if err != nil {
 			log.Fatal(err)
@@ -82,6 +85,7 @@ func (qe *QueryEngine) StartQueryEngine(ctx context.Context) {
 	}
 }
 
+// Run initializes a QueryEngine instance and starts it.
 func Run(ctx context.Context) {
 	qe := NewQueryEngine()
 	qe.StartQueryEngine(ctx)
