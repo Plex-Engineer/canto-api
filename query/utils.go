@@ -3,11 +3,9 @@ package query
 import (
 	"canto-api/config"
 	"canto-api/multicall"
-	"context"
 	"encoding/json"
-	"log"
-
-	"github.com/redis/go-redis/v9"
+	"errors"
+	"regexp"
 )
 
 func ProcessContractCalls(contracts []config.Contract) (multicall.ViewCalls, error) {
@@ -16,6 +14,10 @@ func ProcessContractCalls(contracts []config.Contract) (multicall.ViewCalls, err
 
 	for _, contract := range contracts {
 		for index, method := range contract.Methods {
+			// validate address
+			if err := validateAddress(contract.Address); err != nil {
+				return nil, err
+			}
 			vc := multicall.NewViewCall(
 				contract.Address,
 				method,
@@ -33,28 +35,23 @@ func ProcessContractCalls(contracts []config.Contract) (multicall.ViewCalls, err
 	return vcs, nil
 }
 
-func SetCacheWithResult(ctx context.Context, redisclient *redis.Client, results *multicall.Result) error {
-
-	ret := ResultToString(results)
-
-	// set key in redis
-	err := redisclient.Set(ctx, "key", string(ret), 0).Err()
-	if err != nil {
-		panic(err)
-	}
-
-	return nil
-}
-
 func ResultToString(results *multicall.Result) string {
 	ret, _ := json.Marshal(results)
 	return string(ret)
 }
 
-func GetCallData(vcs multicall.ViewCalls) []multicall.Multicall3Call {
+func GetCallData(vcs multicall.ViewCalls) ([]multicall.Multicall3Call, error) {
 	payload, err := vcs.GetCallData()
 	if err != nil {
-		log.Fatal(err)
+		return nil, errors.New("QueryEngine::GetCallData - " + err.Error())
 	}
-	return payload
+	return payload, nil
+}
+
+func validateAddress(address string) error {
+	re := regexp.MustCompile("^0x[0-9a-fA-F]{40}$")
+	if !re.MatchString(address) {
+		return errors.New("QueryEngine::ValidateAddress - invalid address")
+	}
+	return nil
 }

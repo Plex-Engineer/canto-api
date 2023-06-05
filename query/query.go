@@ -2,6 +2,7 @@ package query
 
 import (
 	"context"
+	"errors"
 	"log"
 	"time"
 
@@ -42,8 +43,24 @@ func NewQueryEngine() *QueryEngine {
 	}
 }
 
+func (qe *QueryEngine) SetCacheWithResult(ctx context.Context, redisclient *redis.Client, results *multicall.Result) error {
+
+	ret := ResultToString(results)
+
+	// set key in redis
+	err := redisclient.Set(ctx, "key", string(ret), 0).Err()
+	if err != nil {
+		return errors.New("QueryEngine::SetCacheWithResult - " + err.Error())
+	}
+
+	return nil
+}
+
 func (qe *QueryEngine) StartQueryEngine(ctx context.Context) {
-	calldata := GetCallData(qe.viewcalls)
+	calldata, err := GetCallData(qe.viewcalls)
+	if err != nil {
+		log.Fatal(err)
+	}
 
 	ticker := time.NewTicker(qe.interval * time.Second)
 	for range ticker.C {
@@ -58,7 +75,10 @@ func (qe *QueryEngine) StartQueryEngine(ctx context.Context) {
 			log.Fatal(err)
 		}
 
-		SetCacheWithResult(ctx, qe.redisclient, ret)
+		err = qe.SetCacheWithResult(ctx, qe.redisclient, ret)
+		if err != nil {
+			log.Fatal(err)
+		}
 	}
 }
 
