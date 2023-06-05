@@ -63,6 +63,7 @@ func (call ViewCall) argumentTypes() []string {
 	return args
 }
 
+// Returns the calldata by concatenating the method signature and the arguments
 func (call ViewCall) callData() ([]byte, error) {
 	argsSuffix, err := call.argsCallData()
 	if err != nil {
@@ -80,6 +81,7 @@ func (call ViewCall) callData() ([]byte, error) {
 	return payload, nil
 }
 
+// Returns first 4 bytes of method signature
 func (call ViewCall) methodCallData() ([]byte, error) {
 	methodParts := strings.Split(call.method, ")(")
 	var method string
@@ -92,6 +94,7 @@ func (call ViewCall) methodCallData() ([]byte, error) {
 	return hash[0:4], nil
 }
 
+// Returns calldata for arguments, with each argument being padded to 32 bytes
 func (call ViewCall) argsCallData() ([]byte, error) {
 	argTypes := call.argumentTypes()
 	if len(argTypes) != len(call.arguments) {
