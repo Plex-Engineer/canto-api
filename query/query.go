@@ -8,8 +8,6 @@ import (
 	"canto-api/config"
 	"canto-api/multicall"
 
-	"github.com/ethereum/go-ethereum/common"
-	"github.com/ethereum/go-ethereum/ethclient"
 	"github.com/redis/go-redis/v9"
 )
 
@@ -17,15 +15,19 @@ import (
 // and stores the data in a Redis database on a regular interval.
 type QueryEngine struct {
 	redisclient *redis.Client
-	ethclient   *ethclient.Client
 	interval    time.Duration
-	mcaddress   common.Address // multicall contract address
-	vcs         multicall.ViewCalls
+	mcinstance  *multicall.Multicall
+	viewcalls   multicall.ViewCalls
 }
 
 // Returns a QueryEngine instance with all necessary objects for
 // query engine to run.
 func NewQueryEngine() *QueryEngine {
+
+	mc, err := multicall.NewMulticall(config.MulticallAddress, config.EthClient)
+	if err != nil {
+		log.Fatal(err)
+	}
 
 	vcs, err := ProcessContractCalls(config.ContractCalls)
 	if err != nil {
@@ -34,34 +36,24 @@ func NewQueryEngine() *QueryEngine {
 
 	return &QueryEngine{
 		redisclient: config.RDB,
-		ethclient:   config.EthClient,
 		interval:    time.Duration(config.QueryInterval),
-		mcaddress:   config.MulticallAddress,
-		vcs:         vcs,
+		mcinstance:  mc,
+		viewcalls:   vcs,
 	}
 }
 
 func (qe *QueryEngine) StartQueryEngine(ctx context.Context) {
-
-	multicallInstance, err := multicall.NewMulticall(qe.mcaddress, qe.ethclient)
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	payload, err := qe.vcs.GetCallData()
-	if err != nil {
-		log.Fatal(err)
-	}
+	calldata := GetCallData(qe.viewcalls)
 
 	ticker := time.NewTicker(qe.interval * time.Second)
 	for range ticker.C {
 		// call functions in multicall contract
-		res, err := multicallInstance.Aggregate(nil, payload)
+		res, err := qe.mcinstance.Aggregate(nil, calldata)
 		if err != nil {
 			log.Fatal(err)
 		}
 
-		ret, err := qe.vcs.Decode(res)
+		ret, err := qe.viewcalls.Decode(res)
 		if err != nil {
 			log.Fatal(err)
 		}

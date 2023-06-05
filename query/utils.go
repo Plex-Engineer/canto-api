@@ -5,6 +5,7 @@ import (
 	"canto-api/multicall"
 	"context"
 	"encoding/json"
+	"log"
 
 	"github.com/redis/go-redis/v9"
 )
@@ -48,4 +49,12 @@ func SetCacheWithResult(ctx context.Context, redisclient *redis.Client, results 
 func ResultToString(results *multicall.Result) string {
 	ret, _ := json.Marshal(results)
 	return string(ret)
+}
+
+func GetCallData(vcs multicall.ViewCalls) []multicall.Multicall3Call {
+	payload, err := vcs.GetCallData()
+	if err != nil {
+		log.Fatal(err)
+	}
+	return payload
 }
