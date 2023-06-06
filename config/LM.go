@@ -35,120 +35,50 @@ func getMainnetLendingMarketCalls() []Contract {
 	calls := make([]Contract, 0)
 	for _, token := range MAIN_C_TOKENS {
 
-		// calls = append(calls, Contract{
-		// 	Name:    "Call 1",
-		// 	Address: token.Address,
-		// 	Methods: []string{
-		// 		"getCash()(uint256)",
-		// 		"exchangeRateStored()(uint256)",
-		// 		"supplyRatePerBlock()(uint256)",
-		// 		"borrowRatePerBlock()(uint256)",
-		// 	},
-		// 	Args: [][]interface{}{
-		// 		{},
-		// 		{},
-		// 		{},
-		// 		{},
-		// 	},
-		// })
-
-		// calls = append(calls, Contract{
-		// 	Name:    "Call 2",
-		// 	Address: ADDRESSES.CantoMainnet.Comptroller,
-		// 	Methods: []string{
-		// 		"markets(address)(bool, uint256, bool)",
-		// 		"getUnderlyingPrice(address)(uint256)",
-		// 		"compSupplySpeeds(address)(uint256)",
-		// 		"borrowCaps(address)(uint256)",
-		// 	},
-		// 	Args: [][]interface{}{
-		// 		{token.Address},
-		// 		{token.Address},
-		// 		{token.Address},
-		// 		{token.Address},
-		// 	},
-		// })
-
 		calls = append(calls, Contract{
-			Name:    "Cash",
 			Address: token.Address,
+			Names: []string{
+				"Cash/" + token.Address,
+				"ExchangeRate/" + token.Address,
+				"SupplyRate/" + token.Address,
+				"BorrowRate/" + token.Address,
+			},
 			Methods: []string{
 				"getCash()(uint256)",
-			},
-			Args: [][]interface{}{
-				{},
-			},
-		})
-		calls = append(calls, Contract{
-			Name:    "ExchangeRate",
-			Address: token.Address,
-			Methods: []string{
 				"exchangeRateStored()(uint256)",
-			},
-			Args: [][]interface{}{
-				{},
-			},
-		})
-		calls = append(calls, Contract{
-			Name:    "SupplyRate",
-			Address: token.Address,
-			Methods: []string{
 				"supplyRatePerBlock()(uint256)",
-			},
-			Args: [][]interface{}{
-				{},
-			},
-		})
-		calls = append(calls, Contract{
-			Name:    "Borrow Rate",
-			Address: token.Address,
-			Methods: []string{
 				"borrowRatePerBlock()(uint256)",
 			},
 			Args: [][]interface{}{
 				{},
+				{},
+				{},
+				{},
 			},
 		})
+
 		calls = append(calls, Contract{
-			Name:    "Markets",
 			Address: ADDRESSES.CantoMainnet.Comptroller,
+			Names: []string{
+				"Markets/" + token.Address,
+				// "UnderlyingPrice/" + token.Address,
+				"SupplySpeed/" + token.Address,
+				"BorrowCaps/" + token.Address,
+			},
 			Methods: []string{
 				"markets(address)(bool, uint256, bool)",
-			},
-			Args: [][]interface{}{
-				{token.Address},
-			},
-		})
-		calls = append(calls, Contract{
-			Name:    "UnderlyingPrice",
-			Address: ADDRESSES.CantoMainnet.PriceFeed,
-			Methods: []string{
-				"getUnderlyingPrice(address)(uint256)",
-			},
-			Args: [][]interface{}{
-				{token.Address},
-			},
-		})
-		calls = append(calls, Contract{
-			Name:    "SupplySpeed",
-			Address: ADDRESSES.CantoMainnet.Comptroller,
-			Methods: []string{
+				// "getUnderlyingPrice(address)(uint256)",
 				"compSupplySpeeds(address)(uint256)",
-			},
-			Args: [][]interface{}{
-				{token.Address},
-			},
-		})
-		calls = append(calls, Contract{
-			Name:    "BorrowCaps",
-			Address: ADDRESSES.CantoMainnet.Comptroller,
-			Methods: []string{
 				"borrowCaps(address)(uint256)",
 			},
 			Args: [][]interface{}{
 				{token.Address},
+				// {token.Address},
+				{token.Address},
+				{token.Address},
 			},
 		})
+
 	}
 	return calls
 }

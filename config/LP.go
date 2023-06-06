@@ -262,37 +262,11 @@ func getMainnetLiquidityPoolCalls() []Contract {
 	calls := make([]Contract, 0)
 	for _, pair := range MAIN_PAIRS {
 
-		// calls = append(calls, Contract{
-		// 	Name:    "Call 3",
-		// 	Address: pair.address,
-		// 	Methods: []string{
-		// 		"totalSupply()(uint256)",
-		// 	},
-		// 	Args: [][]interface{}{
-		// 		{},
-		// 	},
-		// })
-
-		// calls = append(calls, Contract{
-		// 	Name:    "Call 4",
-		// 	Address: ADDRESSES.CantoMainnet.PriceFeed,
-		// 	Methods: []string{
-		// 		"getReserves(address,address,bool)(uint256)",
-		// 		"getUnderlyingPrice(address)(uint256)",
-		// 		"getUnderlyingPrice(address)(uint256)",
-		// 		"getUnderlyingPrice(address)(uint256)",
-		// 	},
-		// 	Args: [][]interface{}{
-		// 		{pair.token1.Address, pair.token2.Address, pair.stable},
-		// 		{cTokenAddress(pair.token1.Address)},
-		// 		{cTokenAddress(pair.token2.Address)},
-		// 		{pair.cLPaddress},
-		// 	},
-		// })
-
 		calls = append(calls, Contract{
-			Name:    "Total Supply",
 			Address: pair.address,
+			Names: []string{
+				"TotalSupply/" + pair.address,
+			},
 			Methods: []string{
 				"totalSupply()(uint256)",
 			},
@@ -300,46 +274,29 @@ func getMainnetLiquidityPoolCalls() []Contract {
 				{},
 			},
 		})
+
 		calls = append(calls, Contract{
-			Name:    "Reserves",
 			Address: ADDRESSES.CantoMainnet.PriceFeed,
+			Names: []string{
+				"Reserves/" + pair.address,
+				"TokenOneUnderlyingPrice/" + pair.address,
+				"TokenOneUnderlyingPrice/" + pair.address,
+				"LPUnderlyingPrice/" + pair.address,
+			},
 			Methods: []string{
 				"getReserves(address,address,bool)(uint256)",
+				"getUnderlyingPrice(address)(uint256)",
+				"getUnderlyingPrice(address)(uint256)",
+				"getUnderlyingPrice(address)(uint256)",
 			},
 			Args: [][]interface{}{
 				{pair.token1.Address, pair.token2.Address, pair.stable},
-			},
-		})
-		calls = append(calls, Contract{
-			Name:    "Token 1 Underlying Price",
-			Address: ADDRESSES.CantoMainnet.PriceFeed,
-			Methods: []string{
-				"getUnderlyingPrice(address)(uint256)",
-			},
-			Args: [][]interface{}{
 				{cTokenAddress(pair.token1.Address)},
-			},
-		})
-		calls = append(calls, Contract{
-			Name:    "Token 2 Underlying Price",
-			Address: ADDRESSES.CantoMainnet.PriceFeed,
-			Methods: []string{
-				"getUnderlyingPrice(address)(uint256)",
-			},
-			Args: [][]interface{}{
 				{cTokenAddress(pair.token2.Address)},
-			},
-		})
-		calls = append(calls, Contract{
-			Name:    "LP Underlying Price",
-			Address: ADDRESSES.CantoMainnet.PriceFeed,
-			Methods: []string{
-				"getUnderlyingPrice(address)(uint256)",
-			},
-			Args: [][]interface{}{
 				{pair.cLPaddress},
 			},
 		})
+
 	}
 	return calls
 }

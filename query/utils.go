@@ -14,20 +14,18 @@ func ProcessContractCalls(contracts []config.Contract) (multicall.ViewCalls, err
 
 	vcs := multicall.ViewCalls{}
 
-	// fmt.Printf("Utils Contract calls-----------\n", len(contracts))
 	for _, contract := range contracts {
-		// fmt.Printf("Process-----------\n", contract)
 		for index, method := range contract.Methods {
 			vc := multicall.NewViewCall(
-				contract.Name,
+				contract.Names[index],
 				contract.Address,
 				method,
 				contract.Args[index],
 			)
 
-			// if err := vc.Validate(); err != nil {
-			// 	return nil, err
-			// }
+			if err := vc.Validate(); err != nil {
+				return nil, err
+			}
 
 			vcs = append(vcs, vc)
 		}
@@ -40,7 +38,7 @@ func SetCacheWithResult(ctx context.Context, redisclient *redis.Client, results 
 
 	ret := ResultToString(results)
 
-	fmt.Println("Json response data is ---------\n", ret)
+	fmt.Println("Json response data is ----------------------------------------------------------------------------------------------------------------------------------------------------------------------\n", ret)
 
 	// set key in redis
 	// err := redisclient.Set(ctx, "key", string(ret), 0).Err()

@@ -1,8 +1,8 @@
 package config
 
 type Contract struct {
-	Name    string
 	Address string
+	Names   []string
 	Methods []string
 	Args    [][]interface{}
 }

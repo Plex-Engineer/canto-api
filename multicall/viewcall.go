@@ -232,7 +232,6 @@ func (calls ViewCalls) Decode(raw struct {
 	BlockNumber *big.Int
 	ReturnData  [][]byte
 }) (*Result, error) {
-	// fmt.Println("Entered Decode---------------")
 	result := &Result{}
 	result.BlockNumber = raw.BlockNumber.Uint64()
 	result.Calls = make(map[string][]interface{})
@@ -251,6 +250,5 @@ func (calls ViewCalls) Decode(raw struct {
 		}
 		result.Calls[call.name] = callResult
 	}
-	// fmt.Println("Retuned from Decode---------------")
 	return result, nil
 }
