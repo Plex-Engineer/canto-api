@@ -52,7 +52,7 @@ func (qe *QueryEngine) StartQueryEngine(ctx context.Context) {
 	if err != nil {
 		log.Fatal(err)
 	}
-
+	// fmt.Println("Payload-------------", payload)
 	ticker := time.NewTicker(qe.interval * time.Second)
 	for range ticker.C {
 		// call functions in multicall contract
@@ -66,6 +66,7 @@ func (qe *QueryEngine) StartQueryEngine(ctx context.Context) {
 			log.Fatal(err)
 		}
 
+		// fmt.Println("Response data is--------------", ret)
 		SetCacheWithResult(ctx, qe.redisclient, ret)
 	}
 }

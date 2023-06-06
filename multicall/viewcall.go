@@ -22,13 +22,14 @@ type ViewCall struct {
 
 type ViewCalls []ViewCall
 
-type CallResult struct {
-	Decoded []interface{}
-}
+// type CallResult struct {
+// 	Decoded []interface{}
+// }
 
 type Result struct {
 	BlockNumber uint64
-	Calls       map[string]CallResult
+	// Calls       map[string]CallResult
+	Calls map[string][]interface{}
 }
 
 var insideParens = regexp.MustCompile("\\(.*?\\)")
@@ -231,21 +232,25 @@ func (calls ViewCalls) Decode(raw struct {
 	BlockNumber *big.Int
 	ReturnData  [][]byte
 }) (*Result, error) {
-
+	// fmt.Println("Entered Decode---------------")
 	result := &Result{}
 	result.BlockNumber = raw.BlockNumber.Uint64()
-	result.Calls = make(map[string]CallResult)
+	result.Calls = make(map[string][]interface{})
 	for index, call := range calls {
-		callResult := CallResult{}
+		// callResult := CallResult{}
+		callResult := []interface{}{}
 		if raw.ReturnData[index] != nil {
+			// fmt.Println("Raw Return Data---------------", call.name, raw.ReturnData[index])
 			returnValues, err := call.decode(raw.ReturnData[index])
 			if err != nil {
 				return nil, err
 			}
-			callResult.Decoded = returnValues
+			// callResult.Decoded = returnValues
+			callResult = returnValues
+
 		}
 		result.Calls[call.name] = callResult
 	}
-
+	// fmt.Println("Retuned from Decode---------------")
 	return result, nil
 }
