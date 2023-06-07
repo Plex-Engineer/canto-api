@@ -28,7 +28,6 @@ func NewQueryEngine() *QueryEngine {
 	if err != nil {
 		log.Fatal(err)
 	}
-
 	vcs, err := ProcessContractCalls(config.ContractCalls)
 	if err != nil {
 		log.Fatal(err)
@@ -62,7 +61,7 @@ func (qe *QueryEngine) StartQueryEngine(ctx context.Context) {
 	if err != nil {
 		log.Fatal(err)
 	}
-	// fmt.Println("Payload-------------", payload)
+	// fmt.Println("Payload-------------", calldata)
 	ticker := time.NewTicker(qe.interval * time.Second)
 	for range ticker.C {
 		// call functions in multicall contract
