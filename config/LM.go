@@ -58,22 +58,32 @@ func getMainnetLendingMarketCalls() []Contract {
 		})
 
 		calls = append(calls, Contract{
+			Address: ADDRESSES.CantoMainnet.PriceFeed,
+			Names: []string{
+				"UnderlyingPrice/" + token.Address,
+			},
+			Methods: []string{
+				"getUnderlyingPrice(address)(uint256)",
+			},
+			Args: [][]interface{}{
+				{token.Address},
+			},
+		})
+
+		calls = append(calls, Contract{
 			Address: ADDRESSES.CantoMainnet.Comptroller,
 			Names: []string{
 				"Markets/" + token.Address,
-				// "UnderlyingPrice/" + token.Address,
 				"SupplySpeed/" + token.Address,
 				"BorrowCaps/" + token.Address,
 			},
 			Methods: []string{
 				"markets(address)(bool, uint256, bool)",
-				// "getUnderlyingPrice(address)(uint256)",
 				"compSupplySpeeds(address)(uint256)",
 				"borrowCaps(address)(uint256)",
 			},
 			Args: [][]interface{}{
 				{token.Address},
-				// {token.Address},
 				{token.Address},
 				{token.Address},
 			},

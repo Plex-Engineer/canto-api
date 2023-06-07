@@ -7,36 +7,36 @@ type Contract struct {
 	Args    [][]interface{} `json:"Args"`
 }
 
-func getAllContractCalls() []Contract {
-	calls := make([]Contract, 0)
-	mainnetLmCalls := getMainnetLendingMarketCalls()
-	mainnetLPCalls := getMainnetLiquidityPoolCalls()
+// func getAllContractCalls() []Contract {
+// 	calls := make([]Contract, 0)
+// 	mainnetLmCalls := getMainnetLendingMarketCalls()
+// 	mainnetLPCalls := getMainnetLiquidityPoolCalls()
 
-	calls = append(calls, mainnetLmCalls...)
-	calls = append(calls, mainnetLPCalls...)
+// 	calls = append(calls, mainnetLmCalls...)
+// 	calls = append(calls, mainnetLPCalls...)
 
-	// fmt.Println("Contracts-----------", calls)
+// 	// fmt.Println("Contracts-----------", calls)
 
-	// file, err := os.Create("output.json")
-	// if err != nil {
-	// 	fmt.Println("Error creating file:", err)
-	// 	return calls
-	// }
-	// defer file.Close()
+// 	file, err := os.Create("output.json")
+// 	if err != nil {
+// 		fmt.Println("Error creating file:", err)
+// 		return calls
+// 	}
+// 	defer file.Close()
 
-	// encoder := json.NewEncoder(file)
-	// encoder.SetIndent("", "  ")
+// 	encoder := json.NewEncoder(file)
+// 	encoder.SetIndent("", "  ")
 
-	// err = encoder.Encode(calls)
-	// if err != nil {
-	// 	fmt.Println("Error encoding JSON:", err)
-	// 	return calls
-	// }
+// 	err = encoder.Encode(calls)
+// 	if err != nil {
+// 		fmt.Println("Error encoding JSON:", err)
+// 		return calls
+// 	}
 
-	// fmt.Println("Data written to output.json")
+// 	fmt.Println("Data written to output.json")
 
-	return calls
-}
+// 	return calls
+// }
 
 // var calls []Contract = []Contract{
 // {
@@ -88,6 +88,20 @@ var calls []Contract = []Contract{
 		},
 	},
 	{
+		Address: "0xa252eEE9BDe830Ca4793F054B506587027825a8e",
+		Names: []string{
+			"UnderlyingPrice/0xB65Ec550ff356EcA6150F733bA9B954b2e0Ca488",
+		},
+		Methods: []string{
+			"getUnderlyingPrice(address)(uint256)",
+		},
+		Args: [][]interface{}{
+			{
+				"0xB65Ec550ff356EcA6150F733bA9B954b2e0Ca488",
+			},
+		},
+	},
+	{
 		Address: "0x5E23dC409Fc2F832f83CEc191E245A191a4bCc5C",
 		Names: []string{
 			"Markets/0xB65Ec550ff356EcA6150F733bA9B954b2e0Ca488",
@@ -130,6 +144,20 @@ var calls []Contract = []Contract{
 			{},
 			{},
 			{},
+		},
+	},
+	{
+		Address: "0xa252eEE9BDe830Ca4793F054B506587027825a8e",
+		Names: []string{
+			"UnderlyingPrice/0xEe602429Ef7eCe0a13e4FfE8dBC16e101049504C",
+		},
+		Methods: []string{
+			"getUnderlyingPrice(address)(uint256)",
+		},
+		Args: [][]interface{}{
+			{
+				"0xEe602429Ef7eCe0a13e4FfE8dBC16e101049504C",
+			},
 		},
 	},
 	{
@@ -178,6 +206,20 @@ var calls []Contract = []Contract{
 		},
 	},
 	{
+		Address: "0xa252eEE9BDe830Ca4793F054B506587027825a8e",
+		Names: []string{
+			"UnderlyingPrice/0x830b9849e7d79b92408a86a557e7baaacbec6030",
+		},
+		Methods: []string{
+			"getUnderlyingPrice(address)(uint256)",
+		},
+		Args: [][]interface{}{
+			{
+				"0x830b9849e7d79b92408a86a557e7baaacbec6030",
+			},
+		},
+	},
+	{
 		Address: "0x5E23dC409Fc2F832f83CEc191E245A191a4bCc5C",
 		Names: []string{
 			"Markets/0x830b9849e7d79b92408a86a557e7baaacbec6030",
@@ -220,6 +262,20 @@ var calls []Contract = []Contract{
 			{},
 			{},
 			{},
+		},
+	},
+	{
+		Address: "0xa252eEE9BDe830Ca4793F054B506587027825a8e",
+		Names: []string{
+			"UnderlyingPrice/0x617383F201076e7cE0f6E625D1a983b3D1bd277A",
+		},
+		Methods: []string{
+			"getUnderlyingPrice(address)(uint256)",
+		},
+		Args: [][]interface{}{
+			{
+				"0x617383F201076e7cE0f6E625D1a983b3D1bd277A",
+			},
 		},
 	},
 	{
@@ -268,6 +324,20 @@ var calls []Contract = []Contract{
 		},
 	},
 	{
+		Address: "0xa252eEE9BDe830Ca4793F054B506587027825a8e",
+		Names: []string{
+			"UnderlyingPrice/0xdE59F060D7ee2b612E7360E6C1B97c4d8289Ca2e",
+		},
+		Methods: []string{
+			"getUnderlyingPrice(address)(uint256)",
+		},
+		Args: [][]interface{}{
+			{
+				"0xdE59F060D7ee2b612E7360E6C1B97c4d8289Ca2e",
+			},
+		},
+	},
+	{
 		Address: "0x5E23dC409Fc2F832f83CEc191E245A191a4bCc5C",
 		Names: []string{
 			"Markets/0xdE59F060D7ee2b612E7360E6C1B97c4d8289Ca2e",
@@ -310,6 +380,20 @@ var calls []Contract = []Contract{
 			{},
 			{},
 			{},
+		},
+	},
+	{
+		Address: "0xa252eEE9BDe830Ca4793F054B506587027825a8e",
+		Names: []string{
+			"UnderlyingPrice/0x6b46ba92d7e94FfA658698764f5b8dfD537315A9",
+		},
+		Methods: []string{
+			"getUnderlyingPrice(address)(uint256)",
+		},
+		Args: [][]interface{}{
+			{
+				"0x6b46ba92d7e94FfA658698764f5b8dfD537315A9",
+			},
 		},
 	},
 	{
@@ -358,6 +442,20 @@ var calls []Contract = []Contract{
 		},
 	},
 	{
+		Address: "0xa252eEE9BDe830Ca4793F054B506587027825a8e",
+		Names: []string{
+			"UnderlyingPrice/0x3C96dCfd875253A37acB3D2B102b6f328349b16B",
+		},
+		Methods: []string{
+			"getUnderlyingPrice(address)(uint256)",
+		},
+		Args: [][]interface{}{
+			{
+				"0x3C96dCfd875253A37acB3D2B102b6f328349b16B",
+			},
+		},
+	},
+	{
 		Address: "0x5E23dC409Fc2F832f83CEc191E245A191a4bCc5C",
 		Names: []string{
 			"Markets/0x3C96dCfd875253A37acB3D2B102b6f328349b16B",
@@ -400,6 +498,20 @@ var calls []Contract = []Contract{
 			{},
 			{},
 			{},
+		},
+	},
+	{
+		Address: "0xa252eEE9BDe830Ca4793F054B506587027825a8e",
+		Names: []string{
+			"UnderlyingPrice/0xC0D6574b2fe71eED8Cd305df0DA2323237322557",
+		},
+		Methods: []string{
+			"getUnderlyingPrice(address)(uint256)",
+		},
+		Args: [][]interface{}{
+			{
+				"0xC0D6574b2fe71eED8Cd305df0DA2323237322557",
+			},
 		},
 	},
 	{
@@ -448,6 +560,20 @@ var calls []Contract = []Contract{
 		},
 	},
 	{
+		Address: "0xa252eEE9BDe830Ca4793F054B506587027825a8e",
+		Names: []string{
+			"UnderlyingPrice/0xD6a97e43FC885A83E97d599796458A331E580800",
+		},
+		Methods: []string{
+			"getUnderlyingPrice(address)(uint256)",
+		},
+		Args: [][]interface{}{
+			{
+				"0xD6a97e43FC885A83E97d599796458A331E580800",
+			},
+		},
+	},
+	{
 		Address: "0x5E23dC409Fc2F832f83CEc191E245A191a4bCc5C",
 		Names: []string{
 			"Markets/0xD6a97e43FC885A83E97d599796458A331E580800",
@@ -493,6 +619,20 @@ var calls []Contract = []Contract{
 		},
 	},
 	{
+		Address: "0xa252eEE9BDe830Ca4793F054B506587027825a8e",
+		Names: []string{
+			"UnderlyingPrice/0xf0cd6b5cE8A01D1B81F1d8B76643866c5816b49F",
+		},
+		Methods: []string{
+			"getUnderlyingPrice(address)(uint256)",
+		},
+		Args: [][]interface{}{
+			{
+				"0xf0cd6b5cE8A01D1B81F1d8B76643866c5816b49F",
+			},
+		},
+	},
+	{
 		Address: "0x5E23dC409Fc2F832f83CEc191E245A191a4bCc5C",
 		Names: []string{
 			"Markets/0xf0cd6b5cE8A01D1B81F1d8B76643866c5816b49F",
@@ -535,6 +675,20 @@ var calls []Contract = []Contract{
 			{},
 			{},
 			{},
+		},
+	},
+	{
+		Address: "0xa252eEE9BDe830Ca4793F054B506587027825a8e",
+		Names: []string{
+			"UnderlyingPrice/0xb49A395B39A0b410675406bEE7bD06330CB503E3",
+		},
+		Methods: []string{
+			"getUnderlyingPrice(address)(uint256)",
+		},
+		Args: [][]interface{}{
+			{
+				"0xb49A395B39A0b410675406bEE7bD06330CB503E3",
+			},
 		},
 	},
 	{
