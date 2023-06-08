@@ -46,7 +46,7 @@ func NewQueryEngine() *QueryEngine {
 func (qe *QueryEngine) SetCacheWithResult(ctx context.Context, redisclient *redis.Client, results *multicall.Result) error {
 	// convert result slice to string
 	ret := ResultToString(results)
-	fmt.Println("Reponse Data------------------------------------------------------------------------------------------------------", ret)
+	fmt.Println("Reponse Data--------------------------------------------------------------------------------------------------------------------------------------------", ret)
 	// set key in redis
 	// err := redisclient.Set(ctx, "key", string(ret), 0).Err()
 	// if err != nil {
