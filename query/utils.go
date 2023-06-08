@@ -19,8 +19,14 @@ func ProcessContractCalls(contracts []config.Contract) (multicall.ViewCalls, err
 			if err := validateAddress(contract.Address); err != nil {
 				return nil, err
 			}
+			// vc := multicall.NewViewCall(
+			// 	contract.Names[index],
+			// 	contract.Address,
+			// 	method,
+			// 	contract.Args[index],
+			// )
+
 			vc := multicall.NewViewCall(
-				contract.Names[index],
 				contract.Address,
 				method,
 				contract.Args[index],
