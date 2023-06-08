@@ -27,6 +27,7 @@ func ProcessContractCalls(contracts []config.Contract) (multicall.ViewCalls, err
 			// )
 
 			vc := multicall.NewViewCall(
+				contract.Keys[index],
 				contract.Address,
 				method,
 				contract.Args[index],

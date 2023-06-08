@@ -44,6 +44,12 @@ func getMainnetLendingMarketCalls() []Contract {
 			// Name:    "ccanto token",
 			Name:    fmt.Sprintf("%s token", strings.ToLower(token.Name)),
 			Address: token.Address,
+			Keys: []string{
+				fmt.Sprintf("cash:%s", strings.ToLower(token.Name)),
+				fmt.Sprintf("exchangerate:%s", strings.ToLower(token.Name)),
+				fmt.Sprintf("supplyrate:%s", strings.ToLower(token.Name)),
+				fmt.Sprintf("borrowrate:%s", strings.ToLower(token.Name)),
+			},
 			Methods: []string{
 				"getCash()(uint256)",
 				"exchangeRateStored()(uint256)",
@@ -62,6 +68,9 @@ func getMainnetLendingMarketCalls() []Contract {
 			// Name:    "ccanto pricefeed",
 			Name:    fmt.Sprintf("%s pricefeed", strings.ToLower(token.Name)),
 			Address: ADDRESSES.CantoMainnet.PriceFeed,
+			Keys: []string{
+				fmt.Sprintf("pricefeed:%s", strings.ToLower(token.Name)),
+			},
 			Methods: []string{
 				"getUnderlyingPrice(address)(uint256)",
 			},
@@ -74,6 +83,11 @@ func getMainnetLendingMarketCalls() []Contract {
 			// Name:    "ccanto comptroller",
 			Name:    fmt.Sprintf("%s comptroller", strings.ToLower(token.Name)),
 			Address: ADDRESSES.CantoMainnet.Comptroller,
+			Keys: []string{
+				fmt.Sprintf("markets:%s", strings.ToLower(token.Name)),
+				fmt.Sprintf("supplyspeeds:%s", strings.ToLower(token.Name)),
+				fmt.Sprintf("borrowcaps:%s", strings.ToLower(token.Name)),
+			},
 			Methods: []string{
 				"markets(address)(bool, uint256, bool)",
 				"compSupplySpeeds(address)(uint256)",

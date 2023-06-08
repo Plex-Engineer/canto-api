@@ -271,6 +271,9 @@ func getMainnetLiquidityPoolCalls() []Contract {
 			// Name:    "usdc/note pair",
 			Name:    fmt.Sprintf("%s/%s pair", strings.ToLower(pair.token1.Name), strings.ToLower(pair.token2.Name)),
 			Address: pair.address,
+			Keys: []string{
+				fmt.Sprintf("lptotalsupply:%s/%s", strings.ToLower(pair.token1.Name), strings.ToLower(pair.token2.Name)),
+			},
 			Methods: []string{
 				"totalSupply()(uint256)",
 			},
@@ -283,6 +286,12 @@ func getMainnetLiquidityPoolCalls() []Contract {
 			// Name:    "usdc/note pricefeed",
 			Name:    fmt.Sprintf("%s/%s pricefeed", strings.ToLower(pair.token1.Name), strings.ToLower(pair.token2.Name)),
 			Address: ADDRESSES.CantoMainnet.PriceFeed,
+			Keys: []string{
+				fmt.Sprintf("reserves:%s/%s", strings.ToLower(pair.token1.Name), strings.ToLower(pair.token2.Name)),
+				fmt.Sprintf("underlyingprice:%s", strings.ToLower(pair.token1.Name)),
+				fmt.Sprintf("underlyingprice:%s", strings.ToLower(pair.token2.Name)),
+				fmt.Sprintf("underlyingprice:%s:%s", strings.ToLower(pair.token1.Name), strings.ToLower(pair.token2.Name)),
+			},
 			Methods: []string{
 				"getReserves(address,address,bool)(uint256)",
 				"getUnderlyingPrice(address)(uint256)",

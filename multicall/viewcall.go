@@ -13,18 +13,18 @@ import (
 	"github.com/ethereum/go-ethereum/crypto"
 )
 
-type ViewCall struct {
-	target    string
-	method    string
-	arguments []interface{}
-}
-
 // type ViewCall struct {
-// 	name      string
 // 	target    string
 // 	method    string
 // 	arguments []interface{}
 // }
+
+type ViewCall struct {
+	key       string
+	target    string
+	method    string
+	arguments []interface{}
+}
 
 type ViewCalls []ViewCall
 
@@ -32,39 +32,39 @@ type ViewCalls []ViewCall
 // 	Decoded []interface{}
 // }
 
-type Result struct {
-	BlockNumber uint64
-	// Calls       map[string]CallResult
-	Calls [][]interface{}
-}
-
 // type Result struct {
 // 	BlockNumber uint64
 // 	// Calls       map[string]CallResult
-// 	Calls map[string][]interface{}
+// 	Calls [][]interface{}
 // }
+
+type Result struct {
+	BlockNumber uint64
+	// Calls       map[string]CallResult
+	Calls map[string][]interface{}
+}
 
 var insideParens = regexp.MustCompile("\\(.*?\\)")
 var numericArg = regexp.MustCompile("u?int(256)|(8)")
 
-func NewViewCall(target string, method string, arguments []interface{}) ViewCall {
-	return ViewCall{
-		target:    target,
-		method:    method,
-		arguments: arguments,
-	}
-
-}
-
-// func NewViewCall(name string, target string, method string, arguments []interface{}) ViewCall {
+// func NewViewCall(target string, method string, arguments []interface{}) ViewCall {
 // 	return ViewCall{
-// 		name:      name,
 // 		target:    target,
 // 		method:    method,
 // 		arguments: arguments,
 // 	}
 
 // }
+
+func NewViewCall(key string, target string, method string, arguments []interface{}) ViewCall {
+	return ViewCall{
+		key:       key,
+		target:    target,
+		method:    method,
+		arguments: arguments,
+	}
+
+}
 
 func (call ViewCall) Validate() error {
 	if _, err := call.argsCallData(); err != nil {
@@ -122,8 +122,8 @@ func (call ViewCall) methodCallData() ([]byte, error) {
 func (call ViewCall) argsCallData() ([]byte, error) {
 	argTypes := call.argumentTypes()
 	if len(argTypes) != len(call.arguments) {
-		return nil, fmt.Errorf("number of argument types doesn't match with number of arguments with method %s", call.method)
-		// return nil, fmt.Errorf("number of argument types doesn't match with number of arguments for %s with method %s", call.name, call.method)
+		// return nil, fmt.Errorf("number of argument types doesn't match with number of arguments with method %s", call.method)
+		return nil, fmt.Errorf("number of argument types doesn't match with number of arguments for %s with method %s", call.key, call.method)
 	}
 	argumentValues := make([]interface{}, len(call.arguments))
 	arguments := make(abi.Arguments, len(call.arguments))
@@ -259,14 +259,14 @@ func (calls ViewCalls) Decode(raw struct {
 }) (*Result, error) {
 	result := &Result{}
 	result.BlockNumber = raw.BlockNumber.Uint64()
-	result.Calls = make([][]interface{}, 0)
-	// result.Calls = make(map[string][]interface{})
+	// result.Calls = make([][]interface{}, 0)
+	result.Calls = make(map[string][]interface{})
 	for index, call := range calls {
 		// callResult := CallResult{}
 		callResult := []interface{}{}
 		if raw.ReturnData[index] != nil {
 			// fmt.Println("Raw Return Data---------------", raw.ReturnData[index])
-			// fmt.Println("Raw Return Data---------------", call.name, raw.ReturnData[index])
+			// fmt.Println("Raw Return Data---------------", call.key, raw.ReturnData[index])
 			returnValues, err := call.decode(raw.ReturnData[index])
 			if err != nil {
 				return nil, err
@@ -275,8 +275,8 @@ func (calls ViewCalls) Decode(raw struct {
 			callResult = returnValues
 
 		}
-		result.Calls = append(result.Calls, callResult)
-		// result.Calls[call.name] = callResult
+		// result.Calls = append(result.Calls, callResult)
+		result.Calls[call.key] = callResult
 	}
 	return result, nil
 }
