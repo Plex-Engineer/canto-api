@@ -7,7 +7,7 @@ type Contract struct {
 	Args    [][]interface{}
 }
 
-var calls = []Contract{
+var calls []Contract = []Contract{
 	{
 		Name:    "ccanto token",
 		Address: "0xB65Ec550ff356EcA6150F733bA9B954b2e0Ca488",

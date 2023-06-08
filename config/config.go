@@ -20,14 +20,8 @@ func NewConfig() {
 		Password: "",
 		DB:       0,
 	})
-
-	// EthClient, _ = ethclient.Dial("https://canto-testnet.plexnode.wtf")
-	// MulticallAddress = common.HexToAddress("0x75c8e3eFA6f1B797f75141c0aecfDc83b83e4bF6")
-
 	EthClient, _ = ethclient.Dial("https://mainnode.plexnode.org:8545")
-	MulticallAddress = common.HexToAddress("0xcA11bde05977b3631167028862bE2a173976CA11")
-
 	ContractCalls = calls
-
+	MulticallAddress = common.HexToAddress("0xcA11bde05977b3631167028862bE2a173976CA11")
 	QueryInterval = 5
 }

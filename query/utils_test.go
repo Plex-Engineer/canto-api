@@ -27,6 +27,7 @@ func TestProcessContractCalls(t *testing.T) {
 			args: args{
 				contracts: []config.Contract{
 					{
+						Name:    "base contract",
 						Address: "0x00",
 						Methods: []string{
 							"decimals()",

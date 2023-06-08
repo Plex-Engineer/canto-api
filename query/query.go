@@ -2,7 +2,7 @@ package query
 
 import (
 	"context"
-	"fmt"
+	"errors"
 	"log"
 	"time"
 
@@ -46,12 +46,12 @@ func NewQueryEngine() *QueryEngine {
 func (qe *QueryEngine) SetCacheWithResult(ctx context.Context, redisclient *redis.Client, results *multicall.Result) error {
 	// convert result slice to string
 	ret := ResultToString(results)
-	fmt.Println("Reponse Data--------------------------------------------------------------------------------------------------------------------------------------------", ret)
+
 	// set key in redis
-	// err := redisclient.Set(ctx, "key", string(ret), 0).Err()
-	// if err != nil {
-	// 	return errors.New("QueryEngine::SetCacheWithResult - " + err.Error())
-	// }
+	err := redisclient.Set(ctx, "key", string(ret), 0).Err()
+	if err != nil {
+		return errors.New("QueryEngine::SetCacheWithResult - " + err.Error())
+	}
 	return nil
 }
 
@@ -62,7 +62,7 @@ func (qe *QueryEngine) StartQueryEngine(ctx context.Context) {
 	if err != nil {
 		log.Fatal(err)
 	}
-	// fmt.Println("Payload-------------", payload)
+
 	ticker := time.NewTicker(qe.interval * time.Second)
 	for range ticker.C {
 		// call functions in multicall contract
@@ -77,7 +77,6 @@ func (qe *QueryEngine) StartQueryEngine(ctx context.Context) {
 			log.Fatal(err)
 		}
 
-		// fmt.Println("Response data is--------------", ret)
 		// set results to redis cache
 		err = qe.SetCacheWithResult(ctx, qe.redisclient, ret)
 		if err != nil {
