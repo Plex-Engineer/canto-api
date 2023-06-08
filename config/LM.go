@@ -1,5 +1,10 @@
 package config
 
+import (
+	"fmt"
+	"strings"
+)
+
 var TEST_C_TOKENS = []CToken{
 	CTOKENS["CantoTestnet"]["CCANTO"],
 	CTOKENS["CantoTestnet"]["CNOTE"],
@@ -36,13 +41,9 @@ func getMainnetLendingMarketCalls() []Contract {
 	for _, token := range MAIN_C_TOKENS {
 
 		calls = append(calls, Contract{
+			// Name:    "ccanto token",
+			Name:    fmt.Sprintf("%s token", strings.ToLower(token.Name)),
 			Address: token.Address,
-			Names: []string{
-				"Cash/" + token.Address,
-				"ExchangeRate/" + token.Address,
-				"SupplyRate/" + token.Address,
-				"BorrowRate/" + token.Address,
-			},
 			Methods: []string{
 				"getCash()(uint256)",
 				"exchangeRateStored()(uint256)",
@@ -58,10 +59,9 @@ func getMainnetLendingMarketCalls() []Contract {
 		})
 
 		calls = append(calls, Contract{
+			// Name:    "ccanto pricefeed",
+			Name:    fmt.Sprintf("%s pricefeed", strings.ToLower(token.Name)),
 			Address: ADDRESSES.CantoMainnet.PriceFeed,
-			Names: []string{
-				"UnderlyingPrice/" + token.Address,
-			},
 			Methods: []string{
 				"getUnderlyingPrice(address)(uint256)",
 			},
@@ -71,12 +71,9 @@ func getMainnetLendingMarketCalls() []Contract {
 		})
 
 		calls = append(calls, Contract{
+			// Name:    "ccanto comptroller",
+			Name:    fmt.Sprintf("%s comptroller", strings.ToLower(token.Name)),
 			Address: ADDRESSES.CantoMainnet.Comptroller,
-			Names: []string{
-				"Markets/" + token.Address,
-				"SupplySpeed/" + token.Address,
-				"BorrowCaps/" + token.Address,
-			},
 			Methods: []string{
 				"markets(address)(bool, uint256, bool)",
 				"compSupplySpeeds(address)(uint256)",

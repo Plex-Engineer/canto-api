@@ -1,5 +1,10 @@
 package config
 
+import (
+	"fmt"
+	"strings"
+)
+
 type Pair struct {
 	address    string
 	cLPaddress string
@@ -263,10 +268,9 @@ func getMainnetLiquidityPoolCalls() []Contract {
 	for _, pair := range MAIN_PAIRS {
 
 		calls = append(calls, Contract{
+			// Name:    "usdc/note pair",
+			Name:    fmt.Sprintf("%s/%s pair", strings.ToLower(pair.token1.Name), strings.ToLower(pair.token2.Name)),
 			Address: pair.address,
-			Names: []string{
-				"TotalSupply/" + pair.address,
-			},
 			Methods: []string{
 				"totalSupply()(uint256)",
 			},
@@ -276,13 +280,9 @@ func getMainnetLiquidityPoolCalls() []Contract {
 		})
 
 		calls = append(calls, Contract{
+			// Name:    "usdc/note pricefeed",
+			Name:    fmt.Sprintf("%s/%s pricefeed", strings.ToLower(pair.token1.Name), strings.ToLower(pair.token2.Name)),
 			Address: ADDRESSES.CantoMainnet.PriceFeed,
-			Names: []string{
-				"Reserves/" + pair.address,
-				"TokenOneUnderlyingPrice/" + pair.address,
-				"TokenOneUnderlyingPrice/" + pair.address,
-				"LPUnderlyingPrice/" + pair.address,
-			},
 			Methods: []string{
 				"getReserves(address,address,bool)(uint256)",
 				"getUnderlyingPrice(address)(uint256)",
