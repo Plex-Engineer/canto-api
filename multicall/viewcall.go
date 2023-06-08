@@ -14,7 +14,6 @@ import (
 )
 
 type ViewCall struct {
-	name      string
 	target    string
 	method    string
 	arguments []interface{}
@@ -95,7 +94,7 @@ func (call ViewCall) methodCallData() ([]byte, error) {
 func (call ViewCall) argsCallData() ([]byte, error) {
 	argTypes := call.argumentTypes()
 	if len(argTypes) != len(call.arguments) {
-		return nil, fmt.Errorf("number of argument types doesn't match with number of arguments for %s with method %s", call.name, call.method)
+		return nil, fmt.Errorf("number of argument types doesn't match with number of arguments with method %s", call.method)
 	}
 	argumentValues := make([]interface{}, len(call.arguments))
 	arguments := make(abi.Arguments, len(call.arguments))
