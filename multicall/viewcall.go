@@ -21,13 +21,9 @@ type ViewCall struct {
 
 type ViewCalls []ViewCall
 
-type CallResult struct {
-	Decoded []interface{}
-}
-
 type Result struct {
 	BlockNumber uint64
-	Calls       map[int]CallResult
+	Calls       [][]interface{}
 }
 
 var insideParens = regexp.MustCompile("\\(.*?\\)")
@@ -215,14 +211,6 @@ func (call ViewCall) decode(raw []byte) ([]interface{}, error) {
 	for index := range retTypes {
 		key := fmt.Sprintf("ret%d", index)
 		item := decoded[key]
-
-		// if bigint, ok := item.(*big.Int); ok {
-		// 	// fmt.Println("Big int-----------", item, bigint, (*BigIntJSONString)(bigint))
-		// 	returns[index] = (*BigIntJSONString)(bigint)
-		// } else {
-		// 	returns[index] = decoded[key]
-		// }
-
 		returns[index] = item
 	}
 	return returns, nil
@@ -232,21 +220,20 @@ func (calls ViewCalls) Decode(raw struct {
 	BlockNumber *big.Int
 	ReturnData  [][]byte
 }) (*Result, error) {
-
 	result := &Result{}
 	result.BlockNumber = raw.BlockNumber.Uint64()
-	result.Calls = make(map[int]CallResult)
+	result.Calls = make([][]interface{}, 0)
 	for index, call := range calls {
-		callResult := CallResult{}
+		callResult := []interface{}{}
 		if raw.ReturnData[index] != nil {
 			returnValues, err := call.decode(raw.ReturnData[index])
 			if err != nil {
 				return nil, err
 			}
-			callResult.Decoded = returnValues
-		}
-		result.Calls[index] = callResult
-	}
+			callResult = returnValues
 
+		}
+		result.Calls = append(result.Calls, callResult)
+	}
 	return result, nil
 }
