@@ -39,6 +39,7 @@ func TestProcessContractCalls(t *testing.T) {
 				},
 			},
 			want: multicall.ViewCalls{multicall.NewViewCall(
+				"decimals:0x00",
 				"0x00",
 				"decimals()",
 				[]interface{}{},
@@ -62,6 +63,7 @@ func TestProcessContractCalls(t *testing.T) {
 				},
 			},
 			want: multicall.ViewCalls{multicall.NewViewCall(
+				"decimals:0x0000000000000000000000000000000000000000",
 				"0x0000000000000000000000000000000000000000",
 				"decimals()",
 				[]interface{}{},
@@ -87,6 +89,7 @@ func TestProcessContractCalls(t *testing.T) {
 				},
 			},
 			want: multicall.ViewCalls{multicall.NewViewCall(
+				"balanceof:0x0000000000000000000000000000000000000000",
 				"0x0000000000000000000000000000000000000000",
 				"balanceOf(address)(uint256)",
 				[]interface{}{"0x71C7656EC7ab88b098defB751B7401B5f6d8976F"},
@@ -118,11 +121,13 @@ func TestProcessContractCalls(t *testing.T) {
 			},
 			want: multicall.ViewCalls{
 				multicall.NewViewCall(
+					"balanceof:0x0000000000000000000000000000000000000000",
 					"0x0000000000000000000000000000000000000000",
 					"balanceOf(address)(uint256)",
 					[]interface{}{"0x71C7656EC7ab88b098defB751B7401B5f6d8976F"},
 				),
 				multicall.NewViewCall(
+					"allowance:0x0000000000000000000000000000000000000000",
 					"0x0000000000000000000000000000000000000000",
 					"allowance(address,address)(uint256)",
 					[]interface{}{
@@ -170,11 +175,13 @@ func TestProcessContractCalls(t *testing.T) {
 			},
 			want: multicall.ViewCalls{
 				multicall.NewViewCall(
+					"balanceof:0x0000000000000000000000000000000000000000",
 					"0x0000000000000000000000000000000000000000",
 					"balanceOf(address)(uint256)",
 					[]interface{}{"0x71C7656EC7ab88b098defB751B7401B5f6d8976F"},
 				),
 				multicall.NewViewCall(
+					"allowance:0x0000000000000000000000000000000000000000",
 					"0x0000000000000000000000000000000000000000",
 					"allowance(address,address)(uint256)",
 					[]interface{}{
@@ -183,6 +190,7 @@ func TestProcessContractCalls(t *testing.T) {
 					},
 				),
 				multicall.NewViewCall(
+					"balanceof:0x0000000000000000000000000000000000000001",
 					"0x0000000000000000000000000000000000000001",
 					"balanceOf(address)(uint256)",
 					[]interface{}{
@@ -221,6 +229,7 @@ func TestGetCallData(t *testing.T) {
 			name: "function with no argument",
 			args: args{
 				vcs: multicall.ViewCalls{multicall.NewViewCall(
+					"decimals:0x0000",
 					"0x0000",
 					"decimals()",
 					[]interface{}{},
@@ -238,6 +247,7 @@ func TestGetCallData(t *testing.T) {
 			name: "function with one argument",
 			args: args{
 				vcs: multicall.ViewCalls{multicall.NewViewCall(
+					"balanceof:0x0000",
 					"0x0000",
 					"balanceOf(address)(uint256)",
 					[]interface{}{
@@ -257,6 +267,7 @@ func TestGetCallData(t *testing.T) {
 			name: "function with multiple arguments",
 			args: args{
 				vcs: multicall.ViewCalls{multicall.NewViewCall(
+					"dosomething:0x0000",
 					"0x0000",
 					"doSomething(address,address,uint256)(uint256)",
 					[]interface{}{
