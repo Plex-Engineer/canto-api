@@ -1,5 +1,11 @@
 package config
 
+import (
+	"encoding/json"
+	"fmt"
+	"os"
+)
+
 type Contract struct {
 	Name    string
 	Address string
@@ -16,34 +22,38 @@ type Contract struct {
 // 	Args    [][]interface{}
 // }
 
-// func getAllContractCalls() []Contract {
-// 	calls := make([]Contract, 0)
-// 	mainnetLmCalls := getMainnetLendingMarketCalls()
-// 	mainnetLPCalls := getMainnetLiquidityPoolCalls()
+func print(calls []Contract) {
 
-// 	calls = append(calls, mainnetLmCalls...)
-// 	calls = append(calls, mainnetLPCalls...)
+	file, err := os.Create("output.json")
+	if err != nil {
+		fmt.Println("Error creating file:", err)
+	}
+	defer file.Close()
 
-// file, err := os.Create("output.json")
-// if err != nil {
-// 	fmt.Println("Error creating file:", err)
-// 	return calls
-// }
-// defer file.Close()
+	encoder := json.NewEncoder(file)
+	encoder.SetIndent("", "  ")
 
-// encoder := json.NewEncoder(file)
-// encoder.SetIndent("", "  ")
+	err = encoder.Encode(calls)
+	if err != nil {
+		fmt.Println("Error encoding JSON:", err)
 
-// err = encoder.Encode(calls)
-// if err != nil {
-// 	fmt.Println("Error encoding JSON:", err)
-// 	return calls
-// }
+	}
 
-// fmt.Println("Data written to output.json")
+	fmt.Println("Data written to output.json")
+}
 
-// 	return calls
-// }
+func getAllContractCalls() []Contract {
+	calls := make([]Contract, 0)
+	// mainnetLmCalls := getMainnetLendingMarketCalls()
+	mainnetLPCalls := getMainnetLiquidityPoolCalls()
+
+	// calls = append(calls, mainnetLmCalls...)
+	calls = append(calls, mainnetLPCalls...)
+
+	// print(calls)
+
+	return calls
+}
 
 var calls []Contract = []Contract{
 	{

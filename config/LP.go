@@ -293,7 +293,7 @@ func getMainnetLiquidityPoolCalls() []Contract {
 				fmt.Sprintf("underlyingprice:%s:%s", strings.ToLower(pair.token1.Name), strings.ToLower(pair.token2.Name)),
 			},
 			Methods: []string{
-				"getReserves(address,address,bool)(uint256)",
+				"getReserves(address,address,bool)(uint256, uint256)",
 				"getUnderlyingPrice(address)(uint256)",
 				"getUnderlyingPrice(address)(uint256)",
 				"getUnderlyingPrice(address)(uint256)",

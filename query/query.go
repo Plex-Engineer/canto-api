@@ -76,7 +76,7 @@ func (qe *QueryEngine) StartQueryEngine(ctx context.Context) {
 			log.Fatal(err)
 		}
 
-		fmt.Println("Response data is------------------------------------------------------------------------------------------------------------------------------------")
+		fmt.Println("Response data is-----------------------------------------------------------------------------------------------------------------------------------------------------------")
 		// fmt.Printf("%+v", ret)
 		i := 0
 		for key, value := range ret.Calls {
@@ -84,7 +84,7 @@ func (qe *QueryEngine) StartQueryEngine(ctx context.Context) {
 			fmt.Printf("%v = %v\n", key, value)
 		}
 
-		fmt.Println("Length of data is-----------------------------------------------------------------------------------------------------------------", i)
+		fmt.Println("Length of data is------------------------------------------------------------------------------------------------------------------------------------------------------------", i)
 		// set results to redis cache
 		// err = qe.SetCacheWithResult(ctx, qe.redisclient, ret)
 		// if err != nil {
