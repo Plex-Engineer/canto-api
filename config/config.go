@@ -15,20 +15,16 @@ var (
 )
 
 func NewConfig() {
-	// RDB = redis.NewClient(&redis.Options{
-	// 	Addr:     "localhost:6379",
-	// 	Password: "",
-	// 	DB:       0,
-	// })
-
-	// EthClient, _ = ethclient.Dial("https://canto-testnet.plexnode.wtf")
-	// MulticallAddress = common.HexToAddress("0x75c8e3eFA6f1B797f75141c0aecfDc83b83e4bF6")
-
+	RDB = redis.NewClient(&redis.Options{
+		Addr:     "localhost:6379",
+		Password: "",
+		DB:       0,
+	})
 	EthClient, _ = ethclient.Dial("https://mainnode.plexnode.org:8545")
+	ContractCalls = calls
 	MulticallAddress = common.HexToAddress("0xcA11bde05977b3631167028862bE2a173976CA11")
 	ContractCalls = calls
 	// ContractCalls = getAllContractCalls()
 	// fmt.Println("Contract calls------------------------", ContractCalls)
-
 	QueryInterval = 5
 }

@@ -2,7 +2,7 @@ package query
 
 import (
 	"context"
-	"fmt"
+	"errors"
 	"log"
 	"time"
 
@@ -43,14 +43,16 @@ func NewQueryEngine() *QueryEngine {
 // SetCacheWithResult sets the result of a multicall query in Redis
 // and returns an error if any occur.
 func (qe *QueryEngine) SetCacheWithResult(ctx context.Context, redisclient *redis.Client, results *multicall.Result) error {
-	// convert result slice to string
-	ret := ResultToString(results)
-	fmt.Println("Reponse Data------------------------------------------------------------------------------------------------------", ret)
-	// set key in redis
-	// err := redisclient.Set(ctx, "key", string(ret), 0).Err()
-	// if err != nil {
-	// 	return errors.New("QueryEngine::SetCacheWithResult - " + err.Error())
-	// }
+
+	for key, value := range results.Calls {
+		// convert result slice to string
+		ret := ResultToString(value)
+		// set key in redis
+		err := redisclient.Set(ctx, key, string(ret), 0).Err()
+		if err != nil {
+			return errors.New("QueryEngine::SetCacheWithResult - " + err.Error())
+		}
+	}
 	return nil
 }
 
@@ -61,7 +63,6 @@ func (qe *QueryEngine) StartQueryEngine(ctx context.Context) {
 	if err != nil {
 		log.Fatal(err)
 	}
-	// fmt.Println("Payload-------------", calldata)
 	ticker := time.NewTicker(qe.interval * time.Second)
 	for range ticker.C {
 		// call functions in multicall contract
@@ -76,20 +77,11 @@ func (qe *QueryEngine) StartQueryEngine(ctx context.Context) {
 			log.Fatal(err)
 		}
 
-		fmt.Println("Response data is-----------------------------------------------------------------------------------------------------------------------------------------------------------")
-		// fmt.Printf("%+v", ret)
-		i := 0
-		for key, value := range ret.Calls {
-			i += 1
-			fmt.Printf("%v = %v\n", key, value)
-		}
-
-		fmt.Println("Length of data is------------------------------------------------------------------------------------------------------------------------------------------------------------", i)
 		// set results to redis cache
-		// err = qe.SetCacheWithResult(ctx, qe.redisclient, ret)
-		// if err != nil {
-		// 	log.Fatal(err)
-		// }
+		err = qe.SetCacheWithResult(ctx, qe.redisclient, ret)
+		if err != nil {
+			log.Fatal(err)
+		}
 	}
 }
 
