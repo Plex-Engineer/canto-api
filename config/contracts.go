@@ -44,13 +44,13 @@ func print(calls []Contract) {
 
 func getAllContractCalls() []Contract {
 	calls := make([]Contract, 0)
-	// mainnetLmCalls := getMainnetLendingMarketCalls()
+	mainnetLmCalls := getMainnetLendingMarketCalls()
 	mainnetLPCalls := getMainnetLiquidityPoolCalls()
 
-	// calls = append(calls, mainnetLmCalls...)
+	calls = append(calls, mainnetLmCalls...)
 	calls = append(calls, mainnetLPCalls...)
 
-	// print(calls)
+	print(calls)
 
 	return calls
 }
@@ -758,10 +758,10 @@ var calls []Contract = []Contract{
 			"reserves:wcanto/note",
 			"underlyingprice:wcanto",
 			"underlyingprice:note",
-			"underlyingprice:wcanto:note",
+			"underlyingprice:wcanto/note",
 		},
 		Methods: []string{
-			"getReserves(address,address,bool)(uint256)",
+			"getReserves(address,address,bool)(uint256, uint256)",
 			"getUnderlyingPrice(address)(uint256)",
 			"getUnderlyingPrice(address)(uint256)",
 			"getUnderlyingPrice(address)(uint256)",
@@ -803,10 +803,10 @@ var calls []Contract = []Contract{
 			"reserves:wcanto/eth",
 			"underlyingprice:wcanto",
 			"underlyingprice:eth",
-			"underlyingprice:wcanto:eth",
+			"underlyingprice:wcanto/eth",
 		},
 		Methods: []string{
-			"getReserves(address,address,bool)(uint256)",
+			"getReserves(address,address,bool)(uint256, uint256)",
 			"getUnderlyingPrice(address)(uint256)",
 			"getUnderlyingPrice(address)(uint256)",
 			"getUnderlyingPrice(address)(uint256)",
@@ -848,10 +848,10 @@ var calls []Contract = []Contract{
 			"reserves:wcanto/atom",
 			"underlyingprice:wcanto",
 			"underlyingprice:atom",
-			"underlyingprice:wcanto:atom",
+			"underlyingprice:wcanto/atom",
 		},
 		Methods: []string{
-			"getReserves(address,address,bool)(uint256)",
+			"getReserves(address,address,bool)(uint256, uint256)",
 			"getUnderlyingPrice(address)(uint256)",
 			"getUnderlyingPrice(address)(uint256)",
 			"getUnderlyingPrice(address)(uint256)",
@@ -893,10 +893,10 @@ var calls []Contract = []Contract{
 			"reserves:note/usdc",
 			"underlyingprice:note",
 			"underlyingprice:usdc",
-			"underlyingprice:note:usdc",
+			"underlyingprice:note/usdc",
 		},
 		Methods: []string{
-			"getReserves(address,address,bool)(uint256)",
+			"getReserves(address,address,bool)(uint256, uint256)",
 			"getUnderlyingPrice(address)(uint256)",
 			"getUnderlyingPrice(address)(uint256)",
 			"getUnderlyingPrice(address)(uint256)",
@@ -938,10 +938,10 @@ var calls []Contract = []Contract{
 			"reserves:note/usdt",
 			"underlyingprice:note",
 			"underlyingprice:usdt",
-			"underlyingprice:note:usdt",
+			"underlyingprice:note/usdt",
 		},
 		Methods: []string{
-			"getReserves(address,address,bool)(uint256)",
+			"getReserves(address,address,bool)(uint256, uint256)",
 			"getUnderlyingPrice(address)(uint256)",
 			"getUnderlyingPrice(address)(uint256)",
 			"getUnderlyingPrice(address)(uint256)",
