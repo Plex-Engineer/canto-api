@@ -18,7 +18,7 @@ func NewConfig() {
 	RDB = redis.NewClient(&redis.Options{
 		Addr:     "localhost:6379",
 		Password: "",
-		DB:       0,
+		DB:       10,
 	})
 	EthClient, _ = ethclient.Dial("https://mainnode.plexnode.org:8545")
 	ContractCalls = calls
