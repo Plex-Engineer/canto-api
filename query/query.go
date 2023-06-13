@@ -82,17 +82,35 @@ func (qe *QueryEngine) StartQueryEngine(ctx context.Context) {
 			log.Fatal(err)
 		}
 
-		process := map[string]map[string]string{}
+		// process := map[string]map[string]string{}
+		// for k, v := range ret.Calls {
+		// 	res := strings.Split(k, ":")
+		// 	if _, ok := process[res[0]]; !ok {
+		// 		process[res[0]] = map[string]string{}
+		// 	}
+
+		// 	process[res[0]][res[1]] = ResultToString(v)
+		// 	bs, _ := json.Marshal(process)
+		// 	fmt.Println(string(bs))
+		// }
+
+		process := map[string]map[string]map[string]string{}
+		var data []byte = nil
 		for k, v := range ret.Calls {
 			res := strings.Split(k, ":")
 			if _, ok := process[res[0]]; !ok {
-				process[res[0]] = map[string]string{}
+				process[res[0]] = map[string]map[string]string{}
+			}
+			if _, ok := process[res[0]][res[1]]; !ok {
+				process[res[0]][res[1]] = map[string]string{}
 			}
 
-			process[res[0]][res[1]] = ResultToString(v)
+			process[res[0]][res[1]][res[2]] = ResultToString(v)
 			bs, _ := json.Marshal(process)
-			fmt.Println(string(bs))
+			data = bs
 		}
+
+		fmt.Println(string(data))
 
 		// set results to redis cache
 		err = qe.SetCacheWithResult(ctx, qe.redisclient, ret)
