@@ -20,6 +20,7 @@ func ProcessContractCalls(contracts []config.Contract) (multicall.ViewCalls, err
 				return nil, err
 			}
 			vc := multicall.NewViewCall(
+				contract.Keys[index],
 				contract.Address,
 				method,
 				contract.Args[index],
@@ -36,7 +37,7 @@ func ProcessContractCalls(contracts []config.Contract) (multicall.ViewCalls, err
 	return vcs, nil
 }
 
-func ResultToString(results *multicall.Result) string {
+func ResultToString(results []interface{}) string {
 	ret, err := json.Marshal(results)
 	if err != nil {
 		return "QueryEngine::ResultToString - " + err.Error()

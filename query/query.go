@@ -2,8 +2,11 @@ package query
 
 import (
 	"context"
+	"encoding/json"
 	"errors"
+	"fmt"
 	"log"
+	"strings"
 	"time"
 
 	"canto-api/config"
@@ -44,13 +47,15 @@ func NewQueryEngine() *QueryEngine {
 // SetCacheWithResult sets the result of a multicall query in Redis
 // and returns an error if any occur.
 func (qe *QueryEngine) SetCacheWithResult(ctx context.Context, redisclient *redis.Client, results *multicall.Result) error {
-	// convert result slice to string
-	ret := ResultToString(results)
 
-	// set key in redis
-	err := redisclient.Set(ctx, "key", string(ret), 0).Err()
-	if err != nil {
-		return errors.New("QueryEngine::SetCacheWithResult - " + err.Error())
+	for key, value := range results.Calls {
+		// convert result slice to string
+		ret := ResultToString(value)
+		// set key in redis
+		err := redisclient.Set(ctx, key, string(ret), 0).Err()
+		if err != nil {
+			return errors.New("QueryEngine::SetCacheWithResult - " + err.Error())
+		}
 	}
 	return nil
 }
@@ -75,6 +80,18 @@ func (qe *QueryEngine) StartQueryEngine(ctx context.Context) {
 		ret, err := qe.viewcalls.Decode(res)
 		if err != nil {
 			log.Fatal(err)
+		}
+
+		process := map[string]map[string]string{}
+		for k, v := range ret.Calls {
+			res := strings.Split(k, ":")
+			if _, ok := process[res[0]]; !ok {
+				process[res[0]] = map[string]string{}
+			}
+
+			process[res[0]][res[1]] = ResultToString(v)
+			bs, _ := json.Marshal(process)
+			fmt.Println(string(bs))
 		}
 
 		// set results to redis cache
