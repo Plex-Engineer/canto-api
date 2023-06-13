@@ -2,8 +2,11 @@ package query
 
 import (
 	"context"
+	"encoding/json"
 	"errors"
+	"fmt"
 	"log"
+	"strings"
 	"time"
 
 	"canto-api/config"
@@ -77,6 +80,18 @@ func (qe *QueryEngine) StartQueryEngine(ctx context.Context) {
 		ret, err := qe.viewcalls.Decode(res)
 		if err != nil {
 			log.Fatal(err)
+		}
+
+		process := map[string]map[string]string{}
+		for k, v := range ret.Calls {
+			res := strings.Split(k, ":")
+			if _, ok := process[res[0]]; !ok {
+				process[res[0]] = map[string]string{}
+			}
+
+			process[res[0]][res[1]] = ResultToString(v)
+			bs, _ := json.Marshal(process)
+			fmt.Println(string(bs))
 		}
 
 		// set results to redis cache
