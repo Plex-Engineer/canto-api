@@ -29,6 +29,9 @@ func TestProcessContractCalls(t *testing.T) {
 					{
 						Name:    "base contract",
 						Address: "0x00",
+						Keys: []string{
+							"decimals:0x00",
+						},
 						Methods: []string{
 							"decimals()",
 						},
@@ -53,6 +56,9 @@ func TestProcessContractCalls(t *testing.T) {
 					{
 						Name:    "base contract",
 						Address: "0x0000000000000000000000000000000000000000",
+						Keys: []string{
+							"decimals:0x0000000000000000000000000000000000000000",
+						},
 						Methods: []string{
 							"decimals()",
 						},
@@ -77,6 +83,9 @@ func TestProcessContractCalls(t *testing.T) {
 					{
 						Name:    "sample erc20",
 						Address: "0x0000000000000000000000000000000000000000",
+						Keys: []string{
+							"balanceof:0x0000000000000000000000000000000000000000",
+						},
 						Methods: []string{
 							"balanceOf(address)(uint256)",
 						},
@@ -103,6 +112,10 @@ func TestProcessContractCalls(t *testing.T) {
 					{
 						Name:    "sample erc20",
 						Address: "0x0000000000000000000000000000000000000000",
+						Keys: []string{
+							"balanceof:0x0000000000000000000000000000000000000000",
+							"allowance:0x0000000000000000000000000000000000000000",
+						},
 						Methods: []string{
 							"balanceOf(address)(uint256)",
 							"allowance(address,address)(uint256)",
@@ -145,6 +158,10 @@ func TestProcessContractCalls(t *testing.T) {
 					{
 						Name:    "sample erc20",
 						Address: "0x0000000000000000000000000000000000000000",
+						Keys: []string{
+							"balanceof:0x0000000000000000000000000000000000000000",
+							"allowance:0x0000000000000000000000000000000000000000",
+						},
 						Methods: []string{
 							"balanceOf(address)(uint256)",
 							"allowance(address,address)(uint256)",
@@ -162,6 +179,9 @@ func TestProcessContractCalls(t *testing.T) {
 					{
 						Name:    "sample pair",
 						Address: "0x0000000000000000000000000000000000000001",
+						Keys: []string{
+							"balanceof:0x0000000000000000000000000000000000000001",
+						},
 						Methods: []string{
 							"balanceOf(address)(uint256)",
 						},
