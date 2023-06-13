@@ -11,6 +11,7 @@ import (
 )
 
 func main() {
+
 	config.NewConfig()
 	ctx := context.Background()
 	go queryengine.Run(ctx) // run query engine in background
@@ -20,6 +21,6 @@ func main() {
 	if server == "fiber" {
 		app := fiber.New()
 		app.Get("/", requestengine.GetSmartContractDataFiber)
-		app.Listen(":3000")
+		app.Listen(":6009")
 	}
 }

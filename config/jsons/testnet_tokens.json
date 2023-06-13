@@ -1,0 +1,207 @@
+{
+  "cTokens": [
+    {
+      "name": "Collateral Note",
+      "address": "0x04E52476d318CdF739C38BD41A922787D441900c",
+      "symbol": "cNOTE",
+      "decimals": 18,
+      "underlying": "0x03F734Bd9847575fDbE9bEaDDf9C166F880B5E5f",
+      "chainId": "7701"
+    },
+    {
+      "name": "Collateral USD Coin",
+      "address": "0x9160c5760a540cAfA24F90102cAA14C50497d5b7",
+      "symbol": "cUSDC",
+      "decimals": 6,
+      "underlying": "0xc51534568489f47949A828C8e3BF68463bdF3566",
+      "chainId": "7701"
+    },
+    {
+      "name": "Collateral USD Tether",
+      "address": "0x3BEe0A8209e6F8c5c743F21e0cA99F2cb780D0D8",
+      "symbol": "cUSDT",
+      "decimals": 6,
+      "underlying": "0x4fC30060226c45D8948718C95a78dFB237e88b40",
+      "chainId": "7701"
+    },
+
+    {
+      "name": "Collateral ATOM",
+      "address": "0x90FCcb79Ad6f013A4bf62Ad43577eed7a8eb961B",
+      "symbol": "cATOM",
+      "decimals": 6,
+      "underlying": "0x40E41DC5845619E7Ba73957449b31DFbfB9678b2",
+      "chainId": "7701"
+    },
+    {
+      "name": "Collateral Ethereum",
+      "address": "0x260fCD909ab9dfF97B03591F83BEd5bBfc89A571",
+      "symbol": "cETH",
+      "decimals": 18,
+      "underlying": "0xCa03230E7FB13456326a234443aAd111AC96410A",
+      "chainId": "7701"
+    },
+    {
+      "name": "Collateral Canto",
+      "address": "0x477eaF5DECf6299EE937954084f0d53EFc57346F",
+      "symbol": "cCANTO",
+      "decimals": 18,
+      "underlying": "0x04a72466De69109889Db059Cb1A4460Ca0648d9D",
+      "chainId": "7701"
+    },
+    {
+      "name": "Collateral Canto Note Liquidity Provider",
+      "address": "0x2fd02CDB9Be9428d4eC2Ae969e52710601E219C6",
+      "symbol": "cCantoNoteLP",
+      "decimals": 18,
+      "underlying": "0x395E6ce7891f32278375Ff551B8ed61dF5579fE3",
+      "chainId": "7701"
+    },
+    {
+      "name": "Collateral Canto Atom Liquidity Provider",
+      "address": "0x4777Dc2b41f1f2Bd878205A61c1eA2609749928C",
+      "symbol": "cCantoAtomLP",
+      "decimals": 18,
+      "underlying": "0x2bDF6c1302efc3c03D9C95f6fb5a4826A6bD964b",
+      "chainId": "7701"
+    },
+
+    {
+      "name": "Collateral Note USD Coin Liquidity Provider",
+      "address": "0x2db30A39Ec88247da8906506DB8E9dd933A5C775",
+      "symbol": "cNoteUSDCLP",
+      "decimals": 18,
+      "underlying": "0xB2C5512a8A70835Cb9aBe830C9e61FBDdcd1dC81",
+      "chainId": "7701"
+    },
+    {
+      "name": "Collateral Note USD Tether Liquidity Provider",
+      "address": "0xBeD263484AEDFD449eE1ed8f0b4799192026E190",
+      "symbol": "cNoteUSDTLP",
+      "decimals": 18,
+      "underlying": "0x252631e22e1ECc2fc0E811562605ed624B7E31d5",
+      "chainId": "7701"
+    },
+    {
+      "name": "Collateral Canto Ethereum Liquidity Provider",
+      "address": "0xf301c9d5804Fab3dd207ef75f78509db6393f37F",
+      "symbol": "cCantoETHLP",
+      "decimals": 18,
+      "underlying": "0x905D3d7F4C892d535160f1E2BA55f23Cd306718b",
+      "chainId": "7701"
+    }
+  ],
+  "tokens": [
+    {
+      "name": "Note",
+      "address": "0x03F734Bd9847575fDbE9bEaDDf9C166F880B5E5f",
+      "symbol": "NOTE",
+      "decimals": 18,
+      "logoURI": "https://canto.io/tokens/Note.svg",
+      "chainId": "7701"
+    },
+    {
+      "name": "USD Coin",
+      "address": "0xc51534568489f47949A828C8e3BF68463bdF3566",
+      "symbol": "USDC",
+      "decimals": 6,
+      "logoURI": "https://canto.io/tokens/USDC.svg",
+      "chainId": "7701"
+    },
+    {
+      "name": "USD Tether",
+      "address": "0x4fC30060226c45D8948718C95a78dFB237e88b40",
+      "symbol": "USDT",
+      "decimals": 6,
+      "logoURI": "https://canto.io/tokens/USDT.svg",
+      "chainId": "7701"
+    },
+    {
+      "name": "ATOM",
+      "address": "0x40E41DC5845619E7Ba73957449b31DFbfB9678b2",
+      "symbol": "ATOM",
+      "decimals": 6,
+      "logoURI": "https://canto.io/tokens/ATOM.svg",
+      "chainId": "7701"
+    },
+    {
+      "name": "Ethereum",
+      "address": "0xCa03230E7FB13456326a234443aAd111AC96410A",
+      "symbol": "ETH",
+      "decimals": 18,
+      "logoURI": "https://canto.io/tokens/ETH.svg",
+      "chainId": "7701"
+    },
+    {
+      "name": "Wrapped Canto",
+      "address": "0x04a72466De69109889Db059Cb1A4460Ca0648d9D",
+      "symbol": "wCANTO",
+      "decimals": 18,
+      "logoURI": "https://canto.io/tokens/Canto.svg",
+      "chainId": "7701"
+    }
+  ],
+  "lpPairs": [
+    {
+      "name": "Canto Note Liquidity Provider",
+      "symbol": "CantoNoteLP",
+      "decimals": 18,
+      "address": "0x395E6ce7891f32278375Ff551B8ed61dF5579fE3",
+      "stable": true,
+      "tokenA": "0x04a72466De69109889Db059Cb1A4460Ca0648d9D",
+      "tokenB": "0x03F734Bd9847575fDbE9bEaDDf9C166F880B5E5f",
+      "chainId": "7701"
+    },
+    {
+      "name": "Canto Atom Liquidity Provider",
+      "symbol": "CantoAtomLP",
+      "decimals": 18,
+      "address": "0x2bDF6c1302efc3c03D9C95f6fb5a4826A6bD964b",
+      "stable": true,
+      "tokenA": "0x04a72466De69109889Db059Cb1A4460Ca0648d9D",
+      "tokenB": "0x40E41DC5845619E7Ba73957449b31DFbfB9678b2",
+      "chainId": "7701"
+    },
+    {
+      "name": "Note USC Coin Liquidity Provider",
+      "symbol": "NoteUSDCLP",
+      "decimals": 18,
+      "address": "0x2db30A39Ec88247da8906506DB8E9dd933A5C775",
+      "stable": true,
+      "tokenA": "0x03F734Bd9847575fDbE9bEaDDf9C166F880B5E5f",
+      "tokenB": "0xc51534568489f47949A828C8e3BF68463bdF3566",
+      "chainId": "7701"
+    },
+    {
+      "name": "Note USD Tether Liquidity Provider",
+      "symbol": "NoteUSDTLP",
+      "decimals": 18,
+      "address": "0x252631e22e1ECc2fc0E811562605ed624B7E31d5",
+      "stable": true,
+      "tokenA": "0x03F734Bd9847575fDbE9bEaDDf9C166F880B5E5f",
+      "tokenB": "0x4fC30060226c45D8948718C95a78dFB237e88b40",
+      "chainId": "7701"
+    },
+    {
+      "name": "Canto Ethereum Liquidity Provider",
+      "symbol": "CantoETHLP",
+      "decimals": 18,
+      "address": "0x905D3d7F4C892d535160f1E2BA55f23Cd306718b",
+      "stable": true,
+      "tokenA": "0x04a72466De69109889Db059Cb1A4460Ca0648d9D",
+      "tokenB": "0x03F734Bd9847575fDbE9bEaDDf9C166F880B5E5f",
+      "chainId": "7701"
+    }
+  ],
+  "extra": {
+    "Comptroller": {
+      "address": "0x9514c07bC6e80B652e4264E64f589C59065C231f"
+    },
+    "Router": {
+      "address": "0x463e7d4DF8fE5fb42D024cb57c77b76e6e74417a"
+    },
+    "Reservoir": {
+      "address": "0x07C50Bf0804A06860AeACAcFaf029F9a1c014F91"
+    }
+  }
+}
