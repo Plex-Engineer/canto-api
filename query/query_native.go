@@ -8,28 +8,78 @@ import (
 	"canto-api/config"
 
 	"github.com/redis/go-redis/v9"
-
-	"github.com/Canto-Network/Canto/v6/x/csr/types"
-
 	"google.golang.org/grpc"
 
-	"io/ioutil"
-	"net/http"
+	csr "github.com/Canto-Network/Canto/v6/x/csr/types"
+	inflation "github.com/Canto-Network/Canto/v6/x/inflation/types"
+	"github.com/cosmos/cosmos-sdk/types"
+	staking "github.com/cosmos/cosmos-sdk/x/staking/types"
+	// "google.golang.org/grpc"
 )
+
+func checkError(err error) {
+	if err != nil {
+		panic(err)
+	}
+}
+
+/**
+*OTHER WAY OF QUERYING GRPC
+ */
+// out := new(inflation.QueryEpochMintProvisionResponse)
+// err11 := config.GrpcClient.Invoke(ctx, "/canto.inflation.v1.Query/EpochMintProvision", &inflation.QueryEpochMintProvisionRequest{}, out)
+// checkError(err11)
+// fmt.Println(out)
+// fmt.Println(out.GetEpochMintProvision().Amount)
 
 type NativeQueryEngine struct {
 	redisclient *redis.Client
-	GrpcClient  *grpc.ClientConn
 	interval    time.Duration
+	//query handlers
+	CSRQueryHandler       csr.QueryClient
+	StakingQueryHandler   staking.QueryClient
+	InflationQueryHandler inflation.QueryClient
 }
 
 // Returns a NativeQueryEngine instance
 func NewNativeQueryEngine() *NativeQueryEngine {
 	return &NativeQueryEngine{
-		redisclient: config.RDB,
-		GrpcClient:  config.GrpcClient,
-		interval:    time.Duration(config.QueryInterval),
+		redisclient:           config.RDB,
+		interval:              time.Duration(config.QueryInterval),
+		CSRQueryHandler:       csr.NewQueryClient(config.GrpcClient),
+		StakingQueryHandler:   staking.NewQueryClient(config.GrpcClient),
+		InflationQueryHandler: inflation.NewQueryClient(config.GrpcClient),
 	}
+}
+
+// get all CSRS
+func getCSRS(ctx context.Context, queryClient csr.QueryClient) {
+	resp, err := queryClient.CSRs(ctx, &csr.QueryCSRsRequest{})
+	if err != nil {
+		fmt.Println("Error: ", resp)
+	}
+	fmt.Println(resp)
+}
+
+// get staking apr
+func (nqe *NativeQueryEngine) getStakingAPR(ctx context.Context) {
+	//get bonded tokens
+	pool, err := nqe.StakingQueryHandler.Pool(ctx, &staking.QueryPoolRequest{})
+	checkError(err)
+	bondedTokens := pool.GetPool().BondedTokens
+
+	//get mint provision from epoch
+	epoch, err := nqe.InflationQueryHandler.EpochMintProvision(ctx, &inflation.QueryEpochMintProvisionRequest{}, &grpc.EmptyCallOption{})
+	checkError(err)
+	
+	//get amount (will be in acanto)
+	mintProvision := epoch.GetEpochMintProvision().Amount
+
+	//calculate apr (mint provision / bonded tokens) * 365 (days) * 100%
+	apr := mintProvision.Mul(types.NewDec(36500)).QuoInt(bondedTokens)
+
+	//print apr
+	fmt.Println(apr)
 }
 
 // StartNativeQueryEngine starts the query engine and runs the ticker
@@ -37,26 +87,14 @@ func NewNativeQueryEngine() *NativeQueryEngine {
 func (nqe *NativeQueryEngine) StartQueryEngine(ctx context.Context) {
 	ticker := time.NewTicker(nqe.interval * time.Second)
 	for range ticker.C {
-		// test calls
-		csrQueryHandler := types.NewQueryClient(nqe.GrpcClient)
-		
-		startGRPC := time.Now();
-		resp, err := csrQueryHandler.CSRs(ctx, &types.QueryCSRsRequest{})
-		fmt.Println("GRPC call took: ", time.Since(startGRPC))
+		// getCSRS(ctx, nqe.CSRQueryHandler)
+		nqe.getStakingAPR(ctx)
 
-		//REST
-		startRest := time.Now();
-		resp1, err := http.Get("https://mainnode.plexnode.org:1317/canto/v1/csr/csrs")
-		fmt.Println("REST call took: ", time.Since(startRest))
-
-		if err != nil {
-			fmt.Println(err)
+		resp1, err1 := nqe.StakingQueryHandler.Validators(ctx, &staking.QueryValidatorsRequest{})
+		if err1 != nil {
+			fmt.Println("Error: ", err1)
 		}
-		_, err = ioutil.ReadAll(resp1.Body)
-		if err != nil {
-			fmt.Println(resp)
-		}
-		// fmt.Println(string(body))
+		fmt.Println("Error: ", resp1)
 	}
 }
 
