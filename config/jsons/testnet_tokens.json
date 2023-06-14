@@ -147,7 +147,7 @@
       "symbol": "CantoNoteLP",
       "decimals": 18,
       "address": "0x395E6ce7891f32278375Ff551B8ed61dF5579fE3",
-      "stable": true,
+      "stable": false,
       "tokenA": "0x04a72466De69109889Db059Cb1A4460Ca0648d9D",
       "tokenB": "0x03F734Bd9847575fDbE9bEaDDf9C166F880B5E5f",
       "chainId": "7701"
@@ -157,7 +157,7 @@
       "symbol": "CantoAtomLP",
       "decimals": 18,
       "address": "0x2bDF6c1302efc3c03D9C95f6fb5a4826A6bD964b",
-      "stable": true,
+      "stable": false,
       "tokenA": "0x04a72466De69109889Db059Cb1A4460Ca0648d9D",
       "tokenB": "0x40E41DC5845619E7Ba73957449b31DFbfB9678b2",
       "chainId": "7701"
@@ -187,7 +187,7 @@
       "symbol": "CantoETHLP",
       "decimals": 18,
       "address": "0x905D3d7F4C892d535160f1E2BA55f23Cd306718b",
-      "stable": true,
+      "stable": false,
       "tokenA": "0x04a72466De69109889Db059Cb1A4460Ca0648d9D",
       "tokenB": "0x03F734Bd9847575fDbE9bEaDDf9C166F880B5E5f",
       "chainId": "7701"
