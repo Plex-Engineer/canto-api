@@ -1,6 +1,7 @@
 package config
 
 import (
+	"errors"
 	"fmt"
 	"io"
 	"os"
@@ -14,28 +15,45 @@ type Contract struct {
 	Args    [][]interface{}
 }
 
-func getContractsFromJsonFile() []Contract {
+// filter(data.CTokens, func(token Token) (Token, error) {
+// 	if token.Underlying == &pair.TokenA {
+// 		return token, nil
+// 	}
 
-	jsonFile, err := os.Open("./config/jsons/mainnet_tokens.json")
+// 	notFound := Token{}
+// 	return notFound, errors.New("token not found")
+// })
 
-	if err != nil {
-		fmt.Println(err)
+func getCTokenFromTokenAddress(cTokens []Token, keyName string, underlying string) (Token, error) {
+	for _, token := range cTokens {
+		// fmt.Println("token underlying: ", *token.Underlying, "pair underlying: ", underlying, "keyName: ", keyName)
+
+		if *token.Underlying == underlying {
+			return token, nil
+		}
 	}
 
-	defer jsonFile.Close()
-	byteValue, _ := io.ReadAll(jsonFile)
-	// var result map[string]map[string]string interface{}
-	// json.Unmarshal([]byte(byteValue), &result)
-	res, err := UnmarshalTokens(byteValue)
+	notFound := Token{}
+	return notFound, errors.New(underlying + " token :  not found : " + keyName)
+}
 
-	if err != nil {
-		fmt.Println(err)
-	}
+// func getCTokenFromPairAddress(lpPairs []LpPair, underlyingPair string) (Token, error) {
+// 	for _, token := range lpPairs {
+// 		if token == &underlyingPair {
+// 			return token, nil
+// 		}
+// 	}
+
+// 	notFound := Token{}
+// 	return notFound, errors.New(underlying + " token :  not found")
+// }
+
+func getCTokensFromJson(tokens []Token) []Contract {
 
 	calls := []Contract{}
 
 	//get cTokens
-	for _, token := range res.CTokens {
+	for _, token := range tokens {
 		tokenKey := token.Symbol
 		calls = append(calls, Contract{
 			Name:    token.Name,
@@ -95,27 +113,81 @@ func getContractsFromJsonFile() []Contract {
 		})
 	}
 
-	// //get tokens
-	// for _, token := range res.Tokens {
-	// 	tokenKey := token.Symbol
-	// 	calls = append(calls, Contract{
-	// 		Name:    token.Name,
-	// 		Address: token.Address,
-	// 		Keys: []string{
-	// 			"tokens:" + tokenKey + ":balanceOf",
-	// 			"tokens:" + tokenKey + ":totalSupply",
-	// 		},
-	// 		Methods: []string{
-	// 			"balanceOf(address)(uint256)",
-	// 			"totalSupply()(uint256)",
-	// 		},
-	// 		Args: [][]interface{}{
-	// 			{},
-	// 			{},
-	// 		},
-	// 	})
-	// }
-
 	return calls
 
+}
+
+func getLPPairsFromJson(data Tokens) []Contract {
+	calls := []Contract{}
+
+	for _, pair := range data.LpPairs {
+		pairKey := pair.Symbol
+
+		cTokenA, err := getCTokenFromTokenAddress(data.CTokens, "tokenA", pair.TokenA)
+
+		if err != nil {
+			fmt.Println(err)
+		}
+
+		cTokenB, err := getCTokenFromTokenAddress(data.CTokens, "tokenB", pair.TokenB)
+		if err != nil {
+			fmt.Println(err)
+		}
+
+		cPair, err := getCTokenFromTokenAddress(data.CTokens, "cPair", pair.Address)
+
+		if err != nil {
+			fmt.Println(err)
+		}
+
+		calls = append(calls, Contract{
+			Name:    pair.Name,
+			Address: pair.Address,
+			Keys: []string{
+				"lpPairs:" + pairKey + ":reserves",
+				"lpPairs:" + pairKey + ":tokenA",
+				"lpPairs:" + pairKey + ":tokenB",
+				"lpPairs:" + pairKey + ":pair",
+			},
+			Methods: []string{
+				"getReserves(address,address,bool)(uint256, uint256)",
+				"getUnderlyingPrice(address)(uint256)",
+				"getUnderlyingPrice(address)(uint256)",
+				"getUnderlyingPrice(address)(uint256)",
+			},
+			Args: [][]interface{}{
+				{pair.TokenA, pair.TokenB, pair.Stable},
+				{cTokenA.Address},
+				{cTokenB.Address},
+				{cPair.Address},
+			},
+		})
+	}
+	fmt.Println("calls: ", calls)
+	return calls
+
+}
+
+func getAllContractsFromJson() []Contract {
+	jsonFile, err := os.Open("./config/jsons/mainnet_tokens.json")
+
+	calls := []Contract{}
+
+	if err != nil {
+		fmt.Println(err)
+	}
+
+	defer jsonFile.Close()
+	byteValue, _ := io.ReadAll(jsonFile)
+	// var result map[string]map[string]string interface{}
+	// json.Unmarshal([]byte(byteValue), &result)
+	res, err := UnmarshalTokens(byteValue)
+
+	if err != nil {
+		fmt.Println(err)
+	}
+	calls = append(calls, getCTokensFromJson(res.CTokens)...)
+	calls = append(calls, getLPPairsFromJson(res)...)
+
+	return calls
 }
