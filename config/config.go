@@ -22,7 +22,7 @@ func NewConfig() {
 		DB:       0,
 	})
 	EthClient, _ = ethclient.Dial("https://mainnode.plexnode.org:8545")
-	ContractCalls = getContractsFromJsonFile()
+	ContractCalls = getAllContractsFromJson()
 	MulticallAddress = common.HexToAddress("0xcA11bde05977b3631167028862bE2a173976CA11")
 	QueryInterval = 5
 }
