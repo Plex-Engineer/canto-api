@@ -19,7 +19,7 @@
     {
       "name": "Collateral USD Tether",
       "address": "0x6b46ba92d7e94FfA658698764f5b8dfD537315A9",
-      "symbol": "CUSDT",
+      "symbol": "cUSDT",
       "decimals": 6,
       "underlying": "0xd567B3d7B8FE3C79a1AD8dA978812cfC4Fa05e75",
       "chainId": "7700"
