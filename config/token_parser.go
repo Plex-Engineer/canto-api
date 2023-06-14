@@ -19,9 +19,13 @@ func (r *Tokens) Marshal() ([]byte, error) {
 }
 
 type Tokens struct {
-	CTokens []Token  `json:"cTokens"`
-	Tokens  []Token  `json:"tokens"`
-	LpPairs []LpPair `json:"lpPairs"`
+	Name     string   `json:"name"`
+	Version  float64  `json:"version"`
+	Keywords []string `json:"keywords"`
+	ChainID  string   `json:"chainId"`
+	CTokens  []Token  `json:"cTokens"`
+	Tokens   []Token  `json:"tokens"`
+	Pairs    []Pair   `json:"pairs"`
 }
 
 type Token struct {
@@ -34,7 +38,7 @@ type Token struct {
 	LogoURI    *string `json:"logoURI,omitempty"`
 }
 
-type LpPair struct {
+type Pair struct {
 	Name     string `json:"name"`
 	Symbol   string `json:"symbol"`
 	Decimals int64  `json:"decimals"`
