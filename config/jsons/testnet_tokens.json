@@ -1,4 +1,8 @@
 {
+  "name": "Canto Testnet Token List",
+  "version": 0.1,
+  "keywords": ["canto", "testnet"],
+  "chainId": "7701",
   "cTokens": [
     {
       "name": "Collateral Note",
@@ -68,10 +72,10 @@
 
     {
       "name": "Collateral Note USD Coin Liquidity Provider",
-      "address": "0x2db30A39Ec88247da8906506DB8E9dd933A5C775",
+      "address": "0xB2C5512a8A70835Cb9aBe830C9e61FBDdcd1dC81",
       "symbol": "cNoteUSDCLP",
       "decimals": 18,
-      "underlying": "0xB2C5512a8A70835Cb9aBe830C9e61FBDdcd1dC81",
+      "underlying": "0x2db30A39Ec88247da8906506DB8E9dd933A5C775",
       "chainId": "7701"
     },
     {
@@ -141,7 +145,7 @@
       "chainId": "7701"
     }
   ],
-  "lpPairs": [
+  "pairs": [
     {
       "name": "Canto Note Liquidity Provider",
       "symbol": "CantoNoteLP",
