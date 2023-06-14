@@ -103,16 +103,16 @@ func getLPPairsFromJson(data Tokens) []Contract {
 	for _, pair := range data.LpPairs {
 		pairKey := pair.Symbol
 
-		cTokenA, err := getCTokenFromTokenAddress(data.CTokens, "tokenA", pair.TokenA)
+		// cTokenA, err := getCTokenFromTokenAddress(data.CTokens, "tokenA", pair.TokenA)
 
-		if err != nil {
-			fmt.Println(err)
-		}
+		// if err != nil {
+		// 	fmt.Println(err)
+		// }
 
-		cTokenB, err := getCTokenFromTokenAddress(data.CTokens, "tokenB", pair.TokenB)
-		if err != nil {
-			fmt.Println(err)
-		}
+		// cTokenB, err := getCTokenFromTokenAddress(data.CTokens, "tokenB", pair.TokenB)
+		// if err != nil {
+		// 	fmt.Println(err)
+		// }
 
 		cPair, err := getCTokenFromTokenAddress(data.CTokens, "cPair", pair.Address)
 
@@ -125,20 +125,14 @@ func getLPPairsFromJson(data Tokens) []Contract {
 			Address: "0xa252eEE9BDe830Ca4793F054B506587027825a8e",
 			Keys: []string{
 				"lpPairs:" + pairKey + ":reserves",
-				"lpPairs:" + pairKey + ":tokenA",
-				"lpPairs:" + pairKey + ":tokenB",
-				"lpPairs:" + pairKey + ":pair",
+				"lpPairs:" + pairKey + ":price",
 			},
 			Methods: []string{
 				"getReserves(address,address,bool)(uint256, uint256)",
 				"getUnderlyingPrice(address)(uint256)",
-				"getUnderlyingPrice(address)(uint256)",
-				"getUnderlyingPrice(address)(uint256)",
 			},
 			Args: [][]interface{}{
 				{pair.TokenA, pair.TokenB, pair.Stable},
-				{cTokenA.Address},
-				{cTokenB.Address},
 				{cPair.Address},
 			},
 		})
