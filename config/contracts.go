@@ -15,15 +15,6 @@ type Contract struct {
 	Args    [][]interface{}
 }
 
-// filter(data.CTokens, func(token Token) (Token, error) {
-// 	if token.Underlying == &pair.TokenA {
-// 		return token, nil
-// 	}
-
-// 	notFound := Token{}
-// 	return notFound, errors.New("token not found")
-// })
-
 func getCTokenFromTokenAddress(cTokens []Token, keyName string, underlying string) (Token, error) {
 	for _, token := range cTokens {
 		// fmt.Println("token underlying: ", *token.Underlying, "pair underlying: ", underlying, "keyName: ", keyName)
@@ -36,17 +27,6 @@ func getCTokenFromTokenAddress(cTokens []Token, keyName string, underlying strin
 	notFound := Token{}
 	return notFound, errors.New(underlying + " token :  not found : " + keyName)
 }
-
-// func getCTokenFromPairAddress(lpPairs []LpPair, underlyingPair string) (Token, error) {
-// 	for _, token := range lpPairs {
-// 		if token == &underlyingPair {
-// 			return token, nil
-// 		}
-// 	}
-
-// 	notFound := Token{}
-// 	return notFound, errors.New(underlying + " token :  not found")
-// }
 
 func getCTokensFromJson(tokens []Token) []Contract {
 
@@ -142,7 +122,7 @@ func getLPPairsFromJson(data Tokens) []Contract {
 
 		calls = append(calls, Contract{
 			Name:    pair.Name,
-			Address: pair.Address,
+			Address: "0xa252eEE9BDe830Ca4793F054B506587027825a8e",
 			Keys: []string{
 				"lpPairs:" + pairKey + ":reserves",
 				"lpPairs:" + pairKey + ":tokenA",
