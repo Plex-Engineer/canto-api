@@ -14,6 +14,7 @@ func main() {
 	config.NewConfig()
 	ctx := context.Background()
 	go queryengine.Run(ctx) // run query engine in background
+	go queryengine.RunNative(ctx)
 
 	server := "fiber"
 
