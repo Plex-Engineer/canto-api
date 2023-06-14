@@ -21,6 +21,6 @@ func main() {
 	if server == "fiber" {
 		app := fiber.New()
 		app.Get("/", requestengine.GetSmartContractDataFiber)
-		app.Listen(":6009")
+		app.Listen(":6010")
 	}
 }

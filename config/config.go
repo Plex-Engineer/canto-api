@@ -7,11 +7,13 @@ import (
 )
 
 var (
-	RDB              *redis.Client
-	EthClient        *ethclient.Client
-	ContractCalls    []Contract // list of calls to make
-	MulticallAddress common.Address
-	QueryInterval    uint
+	RDB                   *redis.Client
+	EthClient             *ethclient.Client
+	ContractCalls         []Contract // list of calls to make
+	MulticallAddress      common.Address
+	QueryInterval         uint
+	ParsedTokens          Tokens
+	ParsedContractsConfig ContractsConfig
 )
 
 func NewConfig() {
@@ -22,7 +24,9 @@ func NewConfig() {
 		DB:       0,
 	})
 	EthClient, _ = ethclient.Dial("https://mainnode.plexnode.org:8545")
-	ContractCalls = getAllContractsFromJson(true)
+	ParsedTokens = getAllTokensFromJson(false)
+	ParsedContractsConfig = getAllContractsConfigFromJson()
+	ContractCalls = getAllContractsFromJson()
 	MulticallAddress = common.HexToAddress("0xcA11bde05977b3631167028862bE2a173976CA11")
 	QueryInterval = 5
 }

@@ -28,12 +28,12 @@ func getCTokenFromTokenAddress(cTokens []Token, keyName string, underlying strin
 	return notFound, errors.New(underlying + " token :  not found : " + keyName)
 }
 
-func getCTokensFromJson(tokens []Token, raw RawContracts) []Contract {
+func getCTokensFromJson() []Contract {
 
 	calls := []Contract{}
 
 	//get cTokens
-	for _, token := range tokens {
+	for _, token := range ParsedTokens.CTokens {
 		tokenKey := token.Symbol
 		calls = append(calls, Contract{
 			Name:    token.Name,
@@ -60,7 +60,7 @@ func getCTokensFromJson(tokens []Token, raw RawContracts) []Contract {
 
 		calls = append(calls, Contract{
 			Name:    "Router",
-			Address: raw["7700"].Router.Address,
+			Address: ParsedContractsConfig[ParsedTokens.ChainID].Router.Address,
 			Keys: []string{
 				"cTokens:" + tokenKey + ":price",
 			},
@@ -74,7 +74,7 @@ func getCTokensFromJson(tokens []Token, raw RawContracts) []Contract {
 
 		calls = append(calls, Contract{
 			Name:    "Comptroller",
-			Address: raw["7700"].Comptroller.Address,
+			Address: ParsedContractsConfig[ParsedTokens.ChainID].Comptroller.Address,
 			Keys: []string{
 				"cTokens:" + tokenKey + ":markets",
 				"cTokens:" + tokenKey + ":supplySpeeds",
@@ -97,10 +97,10 @@ func getCTokensFromJson(tokens []Token, raw RawContracts) []Contract {
 
 }
 
-func getLPPairsFromJson(tokenData Tokens, contractData RawContracts) []Contract {
+func getLPPairsFromJson() []Contract {
 	calls := []Contract{}
 
-	for _, pair := range tokenData.Pairs {
+	for _, pair := range ParsedTokens.Pairs {
 		pairKey := pair.Symbol
 
 		// cTokenA, err := getCTokenFromTokenAddress(tokenData.CTokens, "tokenA", pair.TokenA)
@@ -114,7 +114,7 @@ func getLPPairsFromJson(tokenData Tokens, contractData RawContracts) []Contract 
 		// 	fmt.Println(err)
 		// }
 
-		cPair, err := getCTokenFromTokenAddress(tokenData.CTokens, "cPair", pair.Address)
+		cPair, err := getCTokenFromTokenAddress(ParsedTokens.CTokens, "cPair", pair.Address)
 
 		if err != nil {
 			fmt.Println(err)
@@ -122,7 +122,7 @@ func getLPPairsFromJson(tokenData Tokens, contractData RawContracts) []Contract 
 
 		calls = append(calls, Contract{
 			Name:    "Router",
-			Address: contractData[tokenData.ChainID].Router.Address,
+			Address: ParsedContractsConfig[ParsedTokens.ChainID].Router.Address,
 			Keys: []string{
 				"lpPairs:" + pairKey + ":reserves",
 				"lpPairs:" + pairKey + ":price",
@@ -141,15 +141,12 @@ func getLPPairsFromJson(tokenData Tokens, contractData RawContracts) []Contract 
 
 }
 
-func getAllContractsFromJson(isTestnet bool) []Contract {
-
+func getAllTokensFromJson(isTestnet bool) Tokens {
 	fileName := "tokens.json"
 
 	if isTestnet {
 		fileName = "testnet_tokens.json"
 	}
-
-	calls := []Contract{}
 
 	tokensFile, err := os.Open("./config/jsons/" + fileName)
 
@@ -157,13 +154,7 @@ func getAllContractsFromJson(isTestnet bool) []Contract {
 		fmt.Println(err)
 	}
 
-	contractsFile, err := os.Open("./config/jsons/contracts.json")
-
-	if err != nil {
-		fmt.Println(err)
-	}
 	defer tokensFile.Close()
-	defer contractsFile.Close()
 
 	tokensByteValue, _ := io.ReadAll(tokensFile)
 	tokens, err := UnmarshalTokens(tokensByteValue)
@@ -172,15 +163,33 @@ func getAllContractsFromJson(isTestnet bool) []Contract {
 		fmt.Println(err)
 	}
 
-	contractsByteValue, _ := io.ReadAll(contractsFile)
-	contracts, err := UnmarshalRawContracts(contractsByteValue)
+	return tokens
+}
+
+func getAllContractsConfigFromJson() ContractsConfig {
+
+	contractsFile, err := os.Open("./config/jsons/contracts.json")
 
 	if err != nil {
 		fmt.Println(err)
 	}
 
-	calls = append(calls, getCTokensFromJson(tokens.CTokens, contracts)...)
-	calls = append(calls, getLPPairsFromJson(tokens, contracts)...)
+	defer contractsFile.Close()
+
+	contractsByteValue, _ := io.ReadAll(contractsFile)
+	contracts, err := UnmarshalContractsConfig(contractsByteValue)
+
+	if err != nil {
+		fmt.Println(err)
+	}
+	return contracts
+}
+
+func getAllContractsFromJson() []Contract {
+	calls := []Contract{}
+
+	calls = append(calls, getCTokensFromJson()...)
+	calls = append(calls, getLPPairsFromJson()...)
 
 	return calls
 }
