@@ -7,7 +7,6 @@ import (
 )
 
 // gets viewcalls from the contracts
-
 func ProcessContractCalls(contracts []config.Contract) (multicall.ViewCalls, error) {
 
 	vcs := multicall.ViewCalls{}
