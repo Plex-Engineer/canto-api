@@ -34,3 +34,6 @@ func QueryStakingAPR(ctx *fiber.Ctx) error {
 func QueryValidators(ctx *fiber.Ctx) error {
 	return ctx.SendString(getStoreValueFromKey("validators"))
 }
+func QueryCSRs(ctx *fiber.Ctx) error {
+	return ctx.SendString(getStoreValueFromKey("csrs"))
+}

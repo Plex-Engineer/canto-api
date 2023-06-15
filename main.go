@@ -23,6 +23,7 @@ func main() {
 		app.Get("/", requestengine.GetSmartContractDataFiber)
 		app.Get("/apr", requestengine.QueryStakingAPR)
 		app.Get("/validators", requestengine.QueryValidators)
+		app.Get("/csrs", requestengine.QueryCSRs)
 		app.Listen(":3000")
 	}
 }

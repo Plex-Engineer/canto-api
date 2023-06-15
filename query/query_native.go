@@ -3,7 +3,6 @@ package query
 import (
 	"context"
 	"errors"
-	"fmt"
 	"time"
 
 	"canto-api/config"
@@ -56,10 +55,10 @@ func (nqe *NativeQueryEngine) SetCacheWithResult(ctx context.Context, key string
 
 // get all CSRS
 // TODO: finish this when csr storage is ready
-func getCSRS(ctx context.Context, queryClient csr.QueryClient) {
+func getCSRS(ctx context.Context, queryClient csr.QueryClient) ([]csr.CSR) {
 	resp, err := queryClient.CSRs(ctx, &csr.QueryCSRsRequest{})
 	checkError(err)
-	fmt.Println(resp)
+	return resp.GetCsrs()
 }
 
 // make type for what will be returned from getValidatrs
@@ -105,6 +104,9 @@ func getValidators(ctx context.Context, queryClient staking.QueryClient) []GetVa
 func (nqe *NativeQueryEngine) StartQueryEngine(ctx context.Context) {
 	ticker := time.NewTicker(nqe.interval * time.Second)
 	for range ticker.C {
+		//
+		// STAKING
+		//
 		//get pool
 		pool, err := nqe.StakingQueryHandler.Pool(ctx, &staking.QueryPoolRequest{})
 		checkError(err)
@@ -121,6 +123,13 @@ func (nqe *NativeQueryEngine) StartQueryEngine(ctx context.Context) {
 		//VALIDATORS
 		validators := getValidators(ctx, nqe.StakingQueryHandler)
 		err = nqe.SetCacheWithResult(ctx, "validators", validators)
+		checkError(err)
+
+		//
+		// CSR
+		//
+		csrs := getCSRS(ctx, nqe.CSRQueryHandler)
+		err = nqe.SetCacheWithResult(ctx, "csrs", csrs)
 		checkError(err)
 	}
 }
