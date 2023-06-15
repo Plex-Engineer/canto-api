@@ -2,6 +2,7 @@ package query
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"time"
 
@@ -12,9 +13,9 @@ import (
 
 	csr "github.com/Canto-Network/Canto/v6/x/csr/types"
 	inflation "github.com/Canto-Network/Canto/v6/x/inflation/types"
-	"github.com/cosmos/cosmos-sdk/types"
 	staking "github.com/cosmos/cosmos-sdk/x/staking/types"
-	// "google.golang.org/grpc"
+
+	query "github.com/cosmos/cosmos-sdk/types/query"
 )
 
 func checkError(err error) {
@@ -22,15 +23,6 @@ func checkError(err error) {
 		panic(err)
 	}
 }
-
-/**
-*OTHER WAY OF QUERYING GRPC
- */
-// out := new(inflation.QueryEpochMintProvisionResponse)
-// err11 := config.GrpcClient.Invoke(ctx, "/canto.inflation.v1.Query/EpochMintProvision", &inflation.QueryEpochMintProvisionRequest{}, out)
-// checkError(err11)
-// fmt.Println(out)
-// fmt.Println(out.GetEpochMintProvision().Amount)
 
 type NativeQueryEngine struct {
 	redisclient *redis.Client
@@ -52,34 +44,60 @@ func NewNativeQueryEngine() *NativeQueryEngine {
 	}
 }
 
+func (nqe *NativeQueryEngine) SetCacheWithResult(ctx context.Context, key string, result interface{}) error {
+	// set key in redis
+	ret := GeneralResultToString(&result)
+	err := nqe.redisclient.Set(ctx, key, ret, 0).Err()
+	if err != nil {
+		return errors.New("NativeQueryEngine::SetCacheWithResult - " + err.Error())
+	}
+	return nil
+}
+
 // get all CSRS
+// TODO: finish this when csr storage is ready
 func getCSRS(ctx context.Context, queryClient csr.QueryClient) {
 	resp, err := queryClient.CSRs(ctx, &csr.QueryCSRsRequest{})
-	if err != nil {
-		fmt.Println("Error: ", resp)
-	}
+	checkError(err)
 	fmt.Println(resp)
 }
 
-// get staking apr
-func (nqe *NativeQueryEngine) getStakingAPR(ctx context.Context) {
-	//get bonded tokens
-	pool, err := nqe.StakingQueryHandler.Pool(ctx, &staking.QueryPoolRequest{})
+// make type for what will be returned from getValidatrs
+type GetValidatorsResponse struct {
+	// operator_address defines the address of the validator's operator; bech encoded in JSON.
+	OperatorAddress string
+	// jailed defined whether the validator has been jailed from bonded status or not.
+	Jailed bool
+	// status defines the validator's status (bonded(3)/unbonding(2)/unbonded(1)).
+	Status string
+	// tokens defines the amount of staking tokens delegated to the validator.
+	Tokens string
+	// description of validator includes moniker, identity, website, security contact, and details.
+	Description staking.Description
+	// commission defines the commission rate.
+	Commission string
+}
+
+// get all Validators for staking
+func getValidators(ctx context.Context, queryClient staking.QueryClient) []GetValidatorsResponse {
+	validators, err := queryClient.Validators(ctx, &staking.QueryValidatorsRequest{
+		Pagination: &query.PageRequest{
+			Limit: 500,
+		},
+	})
 	checkError(err)
-	bondedTokens := pool.GetPool().BondedTokens
-
-	//get mint provision from epoch
-	epoch, err := nqe.InflationQueryHandler.EpochMintProvision(ctx, &inflation.QueryEpochMintProvisionRequest{}, &grpc.EmptyCallOption{})
-	checkError(err)
-	
-	//get amount (will be in acanto)
-	mintProvision := epoch.GetEpochMintProvision().Amount
-
-	//calculate apr (mint provision / bonded tokens) * 365 (days) * 100%
-	apr := mintProvision.Mul(types.NewDec(36500)).QuoInt(bondedTokens)
-
-	//print apr
-	fmt.Println(apr)
+	modifiedValidators := new([]GetValidatorsResponse)
+	for _, validator := range validators.Validators {
+		*modifiedValidators = append(*modifiedValidators, GetValidatorsResponse{
+			OperatorAddress: validator.OperatorAddress,
+			Jailed:          validator.Jailed,
+			Status:          validator.Status.String(),
+			Tokens:          validator.Tokens.String(),
+			Description:     validator.Description,
+			Commission:      validator.Commission.CommissionRates.Rate.String(),
+		})
+	}
+	return *modifiedValidators
 }
 
 // StartNativeQueryEngine starts the query engine and runs the ticker
@@ -87,14 +105,23 @@ func (nqe *NativeQueryEngine) getStakingAPR(ctx context.Context) {
 func (nqe *NativeQueryEngine) StartQueryEngine(ctx context.Context) {
 	ticker := time.NewTicker(nqe.interval * time.Second)
 	for range ticker.C {
-		// getCSRS(ctx, nqe.CSRQueryHandler)
-		nqe.getStakingAPR(ctx)
+		//get pool
+		pool, err := nqe.StakingQueryHandler.Pool(ctx, &staking.QueryPoolRequest{})
+		checkError(err)
 
-		resp1, err1 := nqe.StakingQueryHandler.Validators(ctx, &staking.QueryValidatorsRequest{})
-		if err1 != nil {
-			fmt.Println("Error: ", err1)
-		}
-		fmt.Println("Error: ", resp1)
+		//get mint provision
+		mintProvision, err := nqe.InflationQueryHandler.EpochMintProvision(ctx, &inflation.QueryEpochMintProvisionRequest{}, &grpc.EmptyCallOption{})
+		checkError(err)
+
+		stakingApr := GetStakingAPR(*pool, *mintProvision)
+
+		err = nqe.SetCacheWithResult(ctx, "stakingApr", stakingApr)
+		checkError(err)
+
+		//VALIDATORS
+		validators := getValidators(ctx, nqe.StakingQueryHandler)
+		err = nqe.SetCacheWithResult(ctx, "validators", validators)
+		checkError(err)
 	}
 }
 

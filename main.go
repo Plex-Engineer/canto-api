@@ -21,6 +21,8 @@ func main() {
 	if server == "fiber" {
 		app := fiber.New()
 		app.Get("/", requestengine.GetSmartContractDataFiber)
+		app.Get("/apr", requestengine.QueryStakingAPR)
+		app.Get("/validators", requestengine.QueryValidators)
 		app.Listen(":3000")
 	}
 }
