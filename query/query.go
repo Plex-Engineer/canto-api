@@ -44,13 +44,15 @@ func NewQueryEngine() *QueryEngine {
 // SetCacheWithResult sets the result of a multicall query in Redis
 // and returns an error if any occur.
 func (qe *QueryEngine) SetCacheWithResult(ctx context.Context, redisclient *redis.Client, results *multicall.Result) error {
-	// convert result slice to string
-	ret := ResultToString(results)
 
-	// set key in redis
-	err := redisclient.Set(ctx, "key", string(ret), 0).Err()
-	if err != nil {
-		return errors.New("QueryEngine::SetCacheWithResult - " + err.Error())
+	for key, value := range results.Calls {
+		// convert result slice to string
+		ret := ResultToString(value)
+		// set key in redis
+		err := redisclient.Set(ctx, key, string(ret), 0).Err()
+		if err != nil {
+			return errors.New("QueryEngine::SetCacheWithResult - " + err.Error())
+		}
 	}
 	return nil
 }
