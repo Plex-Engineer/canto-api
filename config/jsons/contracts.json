@@ -1,0 +1,42 @@
+[
+    {
+      "Name": "ccanto pricefeed",
+      "Address": "0xa252eEE9BDe830Ca4793F054B506587027825a8e",
+      "Keys": [
+        "pricefeed:ccanto"
+      ],
+      "Methods": [
+        "getUnderlyingPrice(address)(uint256)"
+      ],
+      "Args": [
+        [
+          "0xB65Ec550ff356EcA6150F733bA9B954b2e0Ca488"
+        ]
+      ]
+    },
+    {
+      "Name":    "ccanto comptroller",
+      "Address": "0x5E23dC409Fc2F832f83CEc191E245A191a4bCc5C",
+      "Keys": [
+        "markets:ccanto",
+        "supplysppeds:ccanto",
+        "borrowcaps"
+      ],
+      "Methods": [
+        "markets(address)(bool, uint256, bool)",
+        "compSupplySpeeds(address)(uint256)",
+        "borrowCaps(address)(uint256)"
+      ],
+      "Args": [
+        [
+          "0xB65Ec550ff356EcA6150F733bA9B954b2e0Ca488"
+        ],
+        [
+          "0xB65Ec550ff356EcA6150F733bA9B954b2e0Ca488"
+        ],
+        [
+          "0xB65Ec550ff356EcA6150F733bA9B954b2e0Ca488"
+        ]
+      ]
+    }
+  ]

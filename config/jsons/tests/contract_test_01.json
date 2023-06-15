@@ -1,0 +1,16 @@
+
+[
+    {
+      "Name": "ccanto token",
+      "Address": "0xB65Ec550ff356EcA6150F733bA9B954b2e0Ca488",
+      "Keys": [
+        "cash"
+      ],
+      "Methods": [
+        "getCash()(uint256)"
+      ],
+      "Args": [
+        []
+      ]
+    }
+  ]
