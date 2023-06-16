@@ -32,7 +32,7 @@ func validateAddress(address string) error {
 	return nil
 }
 
-func GeneralResultToString(results *interface{}) string {
+func GeneralResultToString(results interface{}) string {
 	ret, err := json.Marshal(results)
 	if err != nil {
 		return "QueryEngine::GeneralResultToString - " + err.Error()
