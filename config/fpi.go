@@ -33,7 +33,7 @@ func getCTokenContractCalls() []Contract {
 	calls := []Contract{}
 
 	//get cTokens
-	for _, token := range ParsedTokens.CTokens {
+	for _, token := range TokensConfig.CTokens {
 		tokenKey := token.Symbol
 		calls = append(calls, Contract{
 			Name:    token.Name,
@@ -60,7 +60,7 @@ func getCTokenContractCalls() []Contract {
 
 		calls = append(calls, Contract{
 			Name:    "Router",
-			Address: ParsedContractsConfig[ParsedTokens.ChainID].Router.Address,
+			Address: ContractsConfig[TokensConfig.ChainID].Router.Address,
 			Keys: []string{
 				"cTokens:" + tokenKey + ":price",
 			},
@@ -74,7 +74,7 @@ func getCTokenContractCalls() []Contract {
 
 		calls = append(calls, Contract{
 			Name:    "Comptroller",
-			Address: ParsedContractsConfig[ParsedTokens.ChainID].Comptroller.Address,
+			Address: ContractsConfig[TokensConfig.ChainID].Comptroller.Address,
 			Keys: []string{
 				"cTokens:" + tokenKey + ":markets",
 				"cTokens:" + tokenKey + ":supplySpeeds",
@@ -100,7 +100,7 @@ func getCTokenContractCalls() []Contract {
 func getPairsContractsCalls() []Contract {
 	calls := []Contract{}
 
-	for _, pair := range ParsedTokens.Pairs {
+	for _, pair := range TokensConfig.Pairs {
 		pairKey := pair.Symbol
 
 		// cTokenA, err := getCTokenFromTokenAddress(tokenData.CTokens, "tokenA", pair.TokenA)
@@ -114,7 +114,7 @@ func getPairsContractsCalls() []Contract {
 		// 	fmt.Println(err)
 		// }
 
-		cPair, err := getCTokenFromTokenAddress(ParsedTokens.CTokens, "cPair", pair.Address)
+		cPair, err := getCTokenFromTokenAddress(TokensConfig.CTokens, "cPair", pair.Address)
 
 		if err != nil {
 			fmt.Println(err)
@@ -122,7 +122,7 @@ func getPairsContractsCalls() []Contract {
 
 		calls = append(calls, Contract{
 			Name:    "Router",
-			Address: ParsedContractsConfig[ParsedTokens.ChainID].Router.Address,
+			Address: ContractsConfig[TokensConfig.ChainID].Router.Address,
 			Keys: []string{
 				"lpPairs:" + pairKey + ":reserves",
 				"lpPairs:" + pairKey + ":price",
@@ -141,7 +141,7 @@ func getPairsContractsCalls() []Contract {
 
 }
 
-func getAllTokensFromJson(isTestnet bool) Tokens {
+func getAllTokensFromJson(isTestnet bool) TokensInfo {
 	fileName := "tokens.json"
 
 	if isTestnet {
@@ -166,7 +166,7 @@ func getAllTokensFromJson(isTestnet bool) Tokens {
 	return tokens
 }
 
-func getAllContractsConfigFromJson() ContractsConfig {
+func getContractsDataFromJson() ContractsInfo {
 
 	contractsFile, err := os.Open("./config/jsons/contracts.json")
 
@@ -185,7 +185,7 @@ func getAllContractsConfigFromJson() ContractsConfig {
 	return contracts
 }
 
-func getAllContractsFromJson() []Contract {
+func getAllContracts() []Contract {
 	calls := []Contract{}
 
 	calls = append(calls, getCTokenContractCalls()...)

@@ -8,17 +8,17 @@ package config
 
 import "encoding/json"
 
-func UnmarshalTokens(data []byte) (Tokens, error) {
-	var r Tokens
+func UnmarshalTokens(data []byte) (TokensInfo, error) {
+	var r TokensInfo
 	err := json.Unmarshal(data, &r)
 	return r, err
 }
 
-func (r *Tokens) Marshal() ([]byte, error) {
+func (r *TokensInfo) Marshal() ([]byte, error) {
 	return json.Marshal(r)
 }
 
-type Tokens struct {
+type TokensInfo struct {
 	Name     string   `json:"name"`
 	Version  float64  `json:"version"`
 	Keywords []string `json:"keywords"`

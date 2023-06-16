@@ -8,15 +8,15 @@ package config
 
 import "encoding/json"
 
-type ContractsConfig map[string]ContractsConfigValue
+type ContractsInfo map[string]ContractsConfigValue
 
-func UnmarshalContractsConfig(data []byte) (ContractsConfig, error) {
-	var r ContractsConfig
+func UnmarshalContractsConfig(data []byte) (ContractsInfo, error) {
+	var r ContractsInfo
 	err := json.Unmarshal(data, &r)
 	return r, err
 }
 
-func (r *ContractsConfig) Marshal() ([]byte, error) {
+func (r *ContractsInfo) Marshal() ([]byte, error) {
 	return json.Marshal(r)
 }
 
