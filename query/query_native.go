@@ -95,7 +95,6 @@ func getValidators(ctx context.Context, queryClient staking.QueryClient) []GetVa
 	checkError(err)
 	modifiedValidators := new([]GetValidatorsResponse)
 	for _, validator := range validators.Validators {
-		validator.String()
 		*modifiedValidators = append(*modifiedValidators, GetValidatorsResponse{
 			OperatorAddress: validator.OperatorAddress,
 			Jailed:          validator.Jailed,
