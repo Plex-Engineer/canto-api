@@ -28,7 +28,7 @@ func getCTokenFromTokenAddress(cTokens []Token, keyName string, underlying strin
 	return notFound, errors.New(underlying + " token :  not found : " + keyName)
 }
 
-func getCTokensFromJson() []Contract {
+func getCTokenContractCalls() []Contract {
 
 	calls := []Contract{}
 
@@ -97,7 +97,7 @@ func getCTokensFromJson() []Contract {
 
 }
 
-func getLPPairsFromJson() []Contract {
+func getPairsContractsCalls() []Contract {
 	calls := []Contract{}
 
 	for _, pair := range ParsedTokens.Pairs {
@@ -188,8 +188,8 @@ func getAllContractsConfigFromJson() ContractsConfig {
 func getAllContractsFromJson() []Contract {
 	calls := []Contract{}
 
-	calls = append(calls, getCTokensFromJson()...)
-	calls = append(calls, getLPPairsFromJson()...)
+	calls = append(calls, getCTokenContractCalls()...)
+	calls = append(calls, getPairsContractsCalls()...)
 
 	return calls
 }
