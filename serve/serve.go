@@ -8,7 +8,8 @@ import (
 	"github.com/gofiber/fiber/v2"
 
 	"canto-api/config"
-	"canto-api/query"
+	contracts "canto-api/query/contracts"
+	native "canto-api/query/native"
 
 	csr "github.com/Canto-Network/Canto/v6/x/csr/types"
 )
@@ -40,12 +41,12 @@ func QueryValidators(ctx *fiber.Ctx) error {
 	return ctx.SendString(getStoreValueFromKey("validators"))
 }
 func QueryValidatorByAddress(ctx *fiber.Ctx) error {
-	allValidators := new([]query.GetValidatorsResponse)
+	allValidators := new([]native.GetValidatorsResponse)
 	validatorJson := getStoreValueFromKey("validators")
 	json.Unmarshal([]byte(validatorJson), &allValidators)
 	for _, validator := range *allValidators {
 		if validator.OperatorAddress == ctx.Params("address") {
-			resp := query.GeneralResultToString(validator)
+			resp := contracts.GeneralResultToString(validator)
 			return ctx.SendString(resp)
 		}
 	}
@@ -81,13 +82,13 @@ func QueryProposalByID(ctx *fiber.Ctx) error {
 		return ctx.SendString("id not found")
 	}
 
-	allProposals := new([]query.GetProposalsResponse)
+	allProposals := new([]native.GetProposalsResponse)
 	proposalJson := getStoreValueFromKey("proposals")
 	json.Unmarshal([]byte(proposalJson), &allProposals)
 
 	for _, proposal := range *allProposals {
 		if int(proposal.ProposalId) == numIdQuery {
-			resp := query.GeneralResultToString(proposal)
+			resp := contracts.GeneralResultToString(proposal)
 			return ctx.SendString(resp)
 		}
 	}

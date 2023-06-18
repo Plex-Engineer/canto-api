@@ -194,7 +194,7 @@ func (nqe *NativeQueryEngine) StartQueryEngine(ctx context.Context) {
 }
 
 // RunNative initializes a NativeQueryEngine and starts it
-func RunNative(ctx context.Context) {
+func Run(ctx context.Context) {
 	nqe := NewNativeQueryEngine()
 	nqe.StartQueryEngine(ctx)
 }

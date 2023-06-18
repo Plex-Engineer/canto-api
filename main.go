@@ -4,7 +4,8 @@ import (
 	"context"
 
 	"canto-api/config"
-	queryengine "canto-api/query"
+	cqe "canto-api/query/contracts"
+	nqe "canto-api/query/native"
 	requestengine "canto-api/serve"
 
 	"github.com/gofiber/fiber/v2"
@@ -13,8 +14,8 @@ import (
 func main() {
 	config.NewConfig()
 	ctx := context.Background()
-	go queryengine.Run(ctx) // run query engine in background
-	go queryengine.RunNative(ctx)
+	go cqe.Run(ctx) // run contract query engine
+	go nqe.Run(ctx) // run native query engine
 
 	server := "fiber"
 

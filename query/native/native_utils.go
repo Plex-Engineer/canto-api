@@ -1,6 +1,8 @@
 package query
 
 import (
+	"encoding/json"
+
 	inflation "github.com/Canto-Network/Canto/v6/x/inflation/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	staking "github.com/cosmos/cosmos-sdk/x/staking/types"
@@ -20,4 +22,12 @@ func GetStakingAPR(pool staking.QueryPoolResponse, mintProvision inflation.Query
 
 	//calculate apr (mint provision / bonded tokens) * 365 (days) * 100%
 	return mintProvisionAmount.Mul(sdk.NewDec(36500)).QuoInt(bondedTokens)
+}
+
+func GeneralResultToString(results interface{}) string {
+	ret, err := json.Marshal(results)
+	if err != nil {
+		return "QueryEngine::GeneralResultToString - " + err.Error()
+	}
+	return string(ret)
 }
