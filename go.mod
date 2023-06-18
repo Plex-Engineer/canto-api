@@ -4,6 +4,7 @@ go 1.20
 
 require (
 	github.com/Canto-Network/Canto/v6 v6.0.0
+	github.com/cosmos/cosmos-sdk v0.45.9
 	github.com/ethereum/go-ethereum v1.10.19
 	github.com/gofiber/fiber/v2 v2.46.0
 	github.com/redis/go-redis/v9 v9.0.5
@@ -27,7 +28,6 @@ require (
 	github.com/cespare/xxhash/v2 v2.2.0 // indirect
 	github.com/confio/ics23/go v0.7.0 // indirect
 	github.com/cosmos/btcutil v1.0.4 // indirect
-	github.com/cosmos/cosmos-sdk v0.45.9 // indirect
 	github.com/cosmos/go-bip39 v1.0.0 // indirect
 	github.com/cosmos/gorocksdb v1.2.0 // indirect
 	github.com/cosmos/iavl v0.19.3 // indirect
