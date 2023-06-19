@@ -1,4 +1,4 @@
-package redisKeys
+package rediskeys
 
 const (
 	StakingAPR = "STAKING_APR"

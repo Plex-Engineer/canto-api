@@ -30,14 +30,14 @@ func getStoreValueFromKey(key string) string {
 
 // STAKING
 func QueryStakingAPR(ctx *fiber.Ctx) error {
-	return ctx.SendString(getStoreValueFromKey(redisKeys.StakingAPR))
+	return ctx.SendString(getStoreValueFromKey(rediskeys.StakingAPR))
 }
 
 func QueryValidators(ctx *fiber.Ctx) error {
-	return ctx.SendString(getStoreValueFromKey(redisKeys.AllValidators))
+	return ctx.SendString(getStoreValueFromKey(rediskeys.AllValidators))
 }
 func QueryValidatorByAddress(ctx *fiber.Ctx) error {
-	val, err := config.RDB.HGet(context.Background(), redisKeys.ValidatorMap, ctx.Params("address")).Result()
+	val, err := config.RDB.HGet(context.Background(), rediskeys.ValidatorMap, ctx.Params("address")).Result()
 	if err != nil {
 		val = "Validator not found"
 	}
@@ -46,10 +46,10 @@ func QueryValidatorByAddress(ctx *fiber.Ctx) error {
 
 // CSR
 func QueryCSRs(ctx *fiber.Ctx) error {
-	return ctx.SendString(getStoreValueFromKey(redisKeys.AllCSRs))
+	return ctx.SendString(getStoreValueFromKey(rediskeys.AllCSRs))
 }
 func QueryCSRByID(ctx *fiber.Ctx) error {
-	val, err := config.RDB.HGet(context.Background(), redisKeys.CSRMap, ctx.Params("id")).Result()
+	val, err := config.RDB.HGet(context.Background(), rediskeys.CSRMap, ctx.Params("id")).Result()
 	if err != nil {
 		val = "CSR not found"
 	}
@@ -58,10 +58,10 @@ func QueryCSRByID(ctx *fiber.Ctx) error {
 
 // GOVSHUTTLE
 func QueryProposals(ctx *fiber.Ctx) error {
-	return ctx.SendString(getStoreValueFromKey(redisKeys.AllProposals))
+	return ctx.SendString(getStoreValueFromKey(rediskeys.AllProposals))
 }
 func QueryProposalByID(ctx *fiber.Ctx) error {
-	val, err := config.RDB.HGet(context.Background(), redisKeys.ProposalMap, ctx.Params("id")).Result()
+	val, err := config.RDB.HGet(context.Background(), rediskeys.ProposalMap, ctx.Params("id")).Result()
 	if err != nil {
 		return ctx.SendString("id not found")
 	}
