@@ -2,22 +2,17 @@ package requests
 
 import (
 	"context"
-	"encoding/json"
-	"strconv"
 
 	"github.com/gofiber/fiber/v2"
 
 	"canto-api/config"
-	contracts "canto-api/query/contracts"
-	native "canto-api/query/native"
-
-	csr "github.com/Canto-Network/Canto/v6/x/csr/types"
+	"canto-api/rediskeys"
 )
 
 func GetSmartContractDataFiber(ctx *fiber.Ctx) error {
 	rdb := config.RDB
 
-	val, err := rdb.Get(context.Background(), "cTokens:cUSDC:getCash").Result()
+	val, err := rdb.Get(context.Background(), "ctokens").Result()
 	if err != nil {
 		panic(err)
 	}
@@ -33,64 +28,42 @@ func getStoreValueFromKey(key string) string {
 	return val
 }
 
+// STAKING
 func QueryStakingAPR(ctx *fiber.Ctx) error {
-	return ctx.SendString(getStoreValueFromKey("stakingApr"))
+	return ctx.SendString(getStoreValueFromKey(rediskeys.StakingAPR))
 }
 
 func QueryValidators(ctx *fiber.Ctx) error {
-	return ctx.SendString(getStoreValueFromKey("validators"))
+	return ctx.SendString(getStoreValueFromKey(rediskeys.AllValidators))
 }
 func QueryValidatorByAddress(ctx *fiber.Ctx) error {
-	allValidators := new([]native.GetValidatorsResponse)
-	validatorJson := getStoreValueFromKey("validators")
-	json.Unmarshal([]byte(validatorJson), &allValidators)
-	for _, validator := range *allValidators {
-		if validator.OperatorAddress == ctx.Params("address") {
-			resp := contracts.GeneralResultToString(validator)
-			return ctx.SendString(resp)
-		}
+	val, err := config.RDB.HGet(context.Background(), rediskeys.ValidatorMap, ctx.Params("address")).Result()
+	if err != nil {
+		val = "Validator not found"
 	}
-	return ctx.SendString("address not found")
+	return ctx.SendString(val)
 }
 
+// CSR
 func QueryCSRs(ctx *fiber.Ctx) error {
-	return ctx.SendString(getStoreValueFromKey("csrs"))
+	return ctx.SendString(getStoreValueFromKey(rediskeys.AllCSRs))
 }
 func QueryCSRByID(ctx *fiber.Ctx) error {
-	numIdQuery, err := strconv.Atoi(ctx.Params("id"))
+	val, err := config.RDB.HGet(context.Background(), rediskeys.CSRMap, ctx.Params("id")).Result()
 	if err != nil {
-		return ctx.SendString("id not found")
+		val = "CSR not found"
 	}
-
-	allCSRS := new([]csr.CSR)
-	csrJson := getStoreValueFromKey("csrs")
-	json.Unmarshal([]byte(csrJson), &allCSRS)
-	for _, csr := range *allCSRS {
-		if int(csr.Id) == numIdQuery {
-			return ctx.SendString(csr.String())
-		}
-	}
-	return ctx.SendString("id not found")
+	return ctx.SendString(val)
 }
 
+// GOVSHUTTLE
 func QueryProposals(ctx *fiber.Ctx) error {
-	return ctx.SendString(getStoreValueFromKey("proposals"))
+	return ctx.SendString(getStoreValueFromKey(rediskeys.AllProposals))
 }
 func QueryProposalByID(ctx *fiber.Ctx) error {
-	numIdQuery, err := strconv.Atoi(ctx.Params("id"))
+	val, err := config.RDB.HGet(context.Background(), rediskeys.ProposalMap, ctx.Params("id")).Result()
 	if err != nil {
 		return ctx.SendString("id not found")
 	}
-
-	allProposals := new([]native.GetProposalsResponse)
-	proposalJson := getStoreValueFromKey("proposals")
-	json.Unmarshal([]byte(proposalJson), &allProposals)
-
-	for _, proposal := range *allProposals {
-		if int(proposal.ProposalId) == numIdQuery {
-			resp := contracts.GeneralResultToString(proposal)
-			return ctx.SendString(resp)
-		}
-	}
-	return ctx.SendString("id not found")
+	return ctx.SendString(val)
 }
