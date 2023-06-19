@@ -1,24 +1,10 @@
 package config
 
 import (
-	"errors"
 	"fmt"
 	"io"
 	"os"
 )
-
-func getCTokenFromTokenAddress(cTokens []Token, keyName string, underlying string) (Token, error) {
-	for _, token := range cTokens {
-		// fmt.Println("token underlying: ", *token.Underlying, "pair underlying: ", underlying, "keyName: ", keyName)
-
-		if *token.Underlying == underlying {
-			return token, nil
-		}
-	}
-
-	notFound := Token{}
-	return notFound, errors.New(underlying + " token :  not found : " + keyName)
-}
 
 func getCTokenContractCalls() []Contract {
 
@@ -82,8 +68,8 @@ func getPairsContractsCalls() []Contract {
 
 }
 
+// read jsoon to get all tokens and set them to TokensConfig
 func getAllTokensFromJson(path string) TokensInfo {
-
 	var TokensInfo TokensInfo
 
 	tokensFile, err := os.Open(path)
@@ -108,7 +94,6 @@ func getAllTokensFromJson(path string) TokensInfo {
 
 func getAllFPI(path string) []Contract {
 	calls := []Contract{}
-
 	TokensConfig = getAllTokensFromJson(path)
 
 	calls = append(calls, getCTokenContractCalls()...)
