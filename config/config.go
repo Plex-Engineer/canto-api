@@ -66,4 +66,5 @@ func NewConfig() {
 	// append calls to get all contract calls
 	calls := append(fpiCalls, generalCalls...)
 	ContractCalls = calls
+
 }
