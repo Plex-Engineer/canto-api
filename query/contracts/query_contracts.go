@@ -16,34 +16,6 @@ import (
 type TokensMap map[string]map[string]interface{}
 type PairsMap map[string]map[string]interface{}
 
-// gets viewcalls from the contracts
-func ProcessContractCalls(contracts []config.Contract) (multicall.ViewCalls, error) {
-	vcs := multicall.ViewCalls{}
-
-	for _, contract := range contracts {
-		for index, method := range contract.Methods {
-			// validate address
-			if err := validateAddress(contract.Address); err != nil {
-				return nil, err
-			}
-			vc := multicall.NewViewCall(
-				contract.Keys[index],
-				contract.Address,
-				method,
-				contract.Args[index],
-			)
-
-			if err := vc.Validate(); err != nil {
-				return nil, errors.New("QueryEngine::ProcessContractCalls - " + err.Error())
-			}
-
-			vcs = append(vcs, vc)
-		}
-	}
-
-	return vcs, nil
-}
-
 // QueryEngine queries smart contracts directly from a node
 // and stores the data in a Redis database on a regular interval.
 type QueryEngine struct {
@@ -71,6 +43,34 @@ func NewQueryEngine() *QueryEngine {
 		mcinstance:  mc,
 		viewcalls:   vcs,
 	}
+}
+
+// gets viewcalls from the contracts
+func ProcessContractCalls(contracts []config.Contract) (multicall.ViewCalls, error) {
+	vcs := multicall.ViewCalls{}
+
+	for _, contract := range contracts {
+		for index, method := range contract.Methods {
+			// validate address
+			if err := validateAddress(contract.Address); err != nil {
+				return nil, err
+			}
+			vc := multicall.NewViewCall(
+				contract.Keys[index],
+				contract.Address,
+				method,
+				contract.Args[index],
+			)
+
+			if err := vc.Validate(); err != nil {
+				return nil, errors.New("QueryEngine::ProcessContractCalls - " + err.Error())
+			}
+
+			vcs = append(vcs, vc)
+		}
+	}
+
+	return vcs, nil
 }
 
 func (qe *QueryEngine) ProcessMulticallResults(ctx context.Context, results *multicall.Result) (TokensMap, PairsMap, map[string]interface{}) {
