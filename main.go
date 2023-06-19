@@ -24,17 +24,17 @@ func main() {
 	})
 	app.Get("/", re.GetSmartContractDataFiber)
 
-	err := app.Listen(":3000")
-	if err != nil {
-		return
-	}
-
 	routerValidator(app)
 	routerCSR(app)
 	routerGovernance(app)
 	routerStaking(app)
 	routerLending(app)
 	routerLiquidityPool(app)
+
+	err := app.Listen(":3000")
+	if err != nil {
+		return
+	}
 }
 func routerLiquidityPool(app *fiber.App) {
 	liquidity := app.Group("/lp")
