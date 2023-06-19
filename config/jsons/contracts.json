@@ -19,7 +19,7 @@
       "Address": "0x5E23dC409Fc2F832f83CEc191E245A191a4bCc5C",
       "Keys": [
         "markets:ccanto",
-        "supplysppeds:ccanto",
+        "supplyspeeds:ccanto",
         "borrowcaps"
       ],
       "Methods": [

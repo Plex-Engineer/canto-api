@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"os"
 )
 
@@ -28,7 +28,7 @@ func getContractsFromJson(pathToContractsJsonFile string) ([]Contract, error) {
 	defer file.Close()
 
 	// Read the file content
-	fileContent, err := ioutil.ReadAll(file)
+	fileContent, err := io.ReadAll(file)
 	if err != nil {
 		return nil, errors.New("Config::getContractsFromJson - " + err.Error())
 	}

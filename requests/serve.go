@@ -1,4 +1,4 @@
-package serve
+package requests
 
 import (
 	"context"
@@ -17,7 +17,7 @@ import (
 func GetSmartContractDataFiber(ctx *fiber.Ctx) error {
 	rdb := config.RDB
 
-	val, err := rdb.Get(context.Background(), "key").Result()
+	val, err := rdb.Get(context.Background(), "cTokens:cUSDC:getCash").Result()
 	if err != nil {
 		panic(err)
 	}

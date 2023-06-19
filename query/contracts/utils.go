@@ -27,7 +27,7 @@ func GetCallData(vcs multicall.ViewCalls) ([]multicall.Multicall3Call, error) {
 func validateAddress(address string) error {
 	re := regexp.MustCompile("^0x[0-9a-fA-F]{40}$")
 	if !re.MatchString(address) {
-		return errors.New("QueryEngine::ValidateAddress - invalid address")
+		return errors.New("QueryEngine::ValidateAddress - invalid address" + address)
 	}
 	return nil
 }

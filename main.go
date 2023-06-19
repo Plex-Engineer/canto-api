@@ -6,12 +6,13 @@ import (
 	"canto-api/config"
 	cqe "canto-api/query/contracts"
 	nqe "canto-api/query/native"
-	requestengine "canto-api/serve"
+	re "canto-api/requests"
 
 	"github.com/gofiber/fiber/v2"
 )
 
 func main() {
+
 	config.NewConfig()
 	ctx := context.Background()
 	go cqe.Run(ctx) // run contract query engine
@@ -21,14 +22,14 @@ func main() {
 
 	if server == "fiber" {
 		app := fiber.New()
-		app.Get("/", requestengine.GetSmartContractDataFiber)
-		app.Get("/apr", requestengine.QueryStakingAPR)
-		app.Get("/validators", requestengine.QueryValidators)
-		app.Get("/validators/:address", requestengine.QueryValidatorByAddress)
-		app.Get("/csrs", requestengine.QueryCSRs)
-		app.Get("/csrs/:id", requestengine.QueryCSRByID)
-		app.Get("/gov/proposals", requestengine.QueryProposals)
-		app.Get("/gov/proposals/:id", requestengine.QueryProposalByID)
+		app.Get("/", re.GetSmartContractDataFiber)
+		app.Get("/apr", re.QueryStakingAPR)
+		app.Get("/validators", re.QueryValidators)
+		app.Get("/validators/:address", re.QueryValidatorByAddress)
+		app.Get("/csrs", re.QueryCSRs)
+		app.Get("/csrs/:id", re.QueryCSRByID)
+		app.Get("/gov/proposals", re.QueryProposals)
+		app.Get("/gov/proposals/:id", re.QueryProposalByID)
 		app.Listen(":3000")
 	}
 }
