@@ -33,6 +33,46 @@ func getStoreValueFromKey(key string) string {
 	return val
 }
 
+func QueryLP(ctx *fiber.Ctx) error {
+	return ctx.SendString(getStoreValueFromKey("pairs"))
+}
+
+func QueryLpByAddress(ctx *fiber.Ctx) error {
+	allPairs := new([]config.Pair)
+	pairsJson := getStoreValueFromKey("pairs")
+	err := json.Unmarshal([]byte(pairsJson), &allPairs)
+	if err != nil {
+		return err
+	}
+	for _, pair := range *allPairs {
+		if pair.Address == ctx.Params("address") {
+			resp := contracts.GeneralResultToString(pair)
+			return ctx.SendString(resp)
+		}
+	}
+	return ctx.SendString("address not found")
+}
+
+func QueryLending(ctx *fiber.Ctx) error {
+	return ctx.SendString(getStoreValueFromKey("lending"))
+}
+
+func QueryLendingByAddress(ctx *fiber.Ctx) error {
+	allCTokens := new([]config.Token)
+	cTokensJson := getStoreValueFromKey("lending")
+	err := json.Unmarshal([]byte(cTokensJson), &allCTokens)
+	if err != nil {
+		return err
+	}
+	for _, cToken := range *allCTokens {
+		if cToken.Address == ctx.Params("address") {
+			resp := contracts.GeneralResultToString(cToken)
+			return ctx.SendString(resp)
+		}
+	}
+	return ctx.SendString("address not found")
+}
+
 func QueryStakingAPR(ctx *fiber.Ctx) error {
 	return ctx.SendString(getStoreValueFromKey("stakingApr"))
 }
@@ -43,7 +83,10 @@ func QueryValidators(ctx *fiber.Ctx) error {
 func QueryValidatorByAddress(ctx *fiber.Ctx) error {
 	allValidators := new([]native.GetValidatorsResponse)
 	validatorJson := getStoreValueFromKey("validators")
-	json.Unmarshal([]byte(validatorJson), &allValidators)
+	err := json.Unmarshal([]byte(validatorJson), &allValidators)
+	if err != nil {
+		return err
+	}
 	for _, validator := range *allValidators {
 		if validator.OperatorAddress == ctx.Params("address") {
 			resp := contracts.GeneralResultToString(validator)
@@ -64,10 +107,14 @@ func QueryCSRByID(ctx *fiber.Ctx) error {
 
 	allCSRS := new([]csr.CSR)
 	csrJson := getStoreValueFromKey("csrs")
-	json.Unmarshal([]byte(csrJson), &allCSRS)
-	for _, csr := range *allCSRS {
-		if int(csr.Id) == numIdQuery {
-			return ctx.SendString(csr.String())
+
+	cErr := json.Unmarshal([]byte(csrJson), &allCSRS)
+	if cErr != nil {
+		return err
+	}
+	for _, csrItem := range *allCSRS {
+		if int(csrItem.Id) == numIdQuery {
+			return ctx.SendString(csrItem.String())
 		}
 	}
 	return ctx.SendString("id not found")
@@ -84,7 +131,10 @@ func QueryProposalByID(ctx *fiber.Ctx) error {
 
 	allProposals := new([]native.GetProposalsResponse)
 	proposalJson := getStoreValueFromKey("proposals")
-	json.Unmarshal([]byte(proposalJson), &allProposals)
+	pErr := json.Unmarshal([]byte(proposalJson), &allProposals)
+	if pErr != nil {
+		return pErr
+	}
 
 	for _, proposal := range *allProposals {
 		if int(proposal.ProposalId) == numIdQuery {
