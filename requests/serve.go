@@ -6,6 +6,7 @@ import (
 	"github.com/gofiber/fiber/v2"
 
 	"canto-api/config"
+	"canto-api/rediskeys"
 )
 
 func GetSmartContractDataFiber(ctx *fiber.Ctx) error {
@@ -29,14 +30,14 @@ func getStoreValueFromKey(key string) string {
 
 // STAKING
 func QueryStakingAPR(ctx *fiber.Ctx) error {
-	return ctx.SendString(getStoreValueFromKey("stakingApr"))
+	return ctx.SendString(getStoreValueFromKey(redisKeys.StakingAPR))
 }
 
 func QueryValidators(ctx *fiber.Ctx) error {
-	return ctx.SendString(getStoreValueFromKey("validators"))
+	return ctx.SendString(getStoreValueFromKey(redisKeys.AllValidators))
 }
 func QueryValidatorByAddress(ctx *fiber.Ctx) error {
-	val, err := config.RDB.HGet(context.Background(), "validatorMap", ctx.Params("address")).Result()
+	val, err := config.RDB.HGet(context.Background(), redisKeys.ValidatorMap, ctx.Params("address")).Result()
 	if err != nil {
 		val = "Validator not found"
 	}
@@ -45,10 +46,10 @@ func QueryValidatorByAddress(ctx *fiber.Ctx) error {
 
 // CSR
 func QueryCSRs(ctx *fiber.Ctx) error {
-	return ctx.SendString(getStoreValueFromKey("csrs"))
+	return ctx.SendString(getStoreValueFromKey(redisKeys.AllCSRs))
 }
 func QueryCSRByID(ctx *fiber.Ctx) error {
-	val, err := config.RDB.HGet(context.Background(), "csrMap", ctx.Params("id")).Result()
+	val, err := config.RDB.HGet(context.Background(), redisKeys.CSRMap, ctx.Params("id")).Result()
 	if err != nil {
 		val = "CSR not found"
 	}
@@ -57,10 +58,10 @@ func QueryCSRByID(ctx *fiber.Ctx) error {
 
 // GOVSHUTTLE
 func QueryProposals(ctx *fiber.Ctx) error {
-	return ctx.SendString(getStoreValueFromKey("proposals"))
+	return ctx.SendString(getStoreValueFromKey(redisKeys.AllProposals))
 }
 func QueryProposalByID(ctx *fiber.Ctx) error {
-	val, err := config.RDB.HGet(context.Background(), "proposalMap", ctx.Params("id")).Result()
+	val, err := config.RDB.HGet(context.Background(), redisKeys.ProposalMap, ctx.Params("id")).Result()
 	if err != nil {
 		return ctx.SendString("id not found")
 	}

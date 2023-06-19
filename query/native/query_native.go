@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"canto-api/config"
+	"canto-api/rediskeys"
 
 	"github.com/redis/go-redis/v9"
 
@@ -214,32 +215,32 @@ func (nqe *NativeQueryEngine) StartQueryEngine(ctx context.Context) {
 		stakingApr := GetStakingAPR(*pool, *mintProvision)
 
 		// save to cache
-		err = nqe.SetJsonToCache(ctx, "stakingApr", stakingApr)
+		err = nqe.SetJsonToCache(ctx, redisKeys.StakingAPR, stakingApr)
 		checkError(err)
 
 		// get and save all validators to cache
 		validators, validatorMap := getValidators(ctx, nqe.StakingQueryHandler)
-		err = nqe.SetJsonToCache(ctx, "validators", validators)
+		err = nqe.SetJsonToCache(ctx, redisKeys.AllValidators, validators)
 		checkError(err)
-		err = nqe.SetMappingToCache(ctx, "validatorMap", validatorMap)
+		err = nqe.SetMappingToCache(ctx, redisKeys.ValidatorMap, validatorMap)
 		checkError(err)
 
 		//
 		// CSR
 		//
 		csrs, csrMap := getCSRS(ctx, nqe.CSRQueryHandler)
-		err = nqe.SetJsonToCache(ctx, "csrs", csrs)
+		err = nqe.SetJsonToCache(ctx, redisKeys.AllCSRs, csrs)
 		checkError(err)
-		err = nqe.SetMappingToCache(ctx, "csrMap", csrMap)
+		err = nqe.SetMappingToCache(ctx, redisKeys.CSRMap, csrMap)
 		checkError(err)
 
 		//
 		// GOVSHUTTLE
 		//
 		proposals, proposalMap := getAllProposals(ctx, nqe.GovQueryHandler)
-		err = nqe.SetJsonToCache(ctx, "proposals", proposals)
+		err = nqe.SetJsonToCache(ctx, redisKeys.AllProposals, proposals)
 		checkError(err)
-		err = nqe.SetMappingToCache(ctx, "proposalMap", proposalMap)
+		err = nqe.SetMappingToCache(ctx, redisKeys.ProposalMap, proposalMap)
 		checkError(err)
 	}
 }
