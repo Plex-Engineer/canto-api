@@ -8,7 +8,7 @@ import (
 	"regexp"
 )
 
-func ResultToString(results []interface{}) string {
+func ResultToString(results interface{}) string {
 	ret, err := json.Marshal(results)
 	if err != nil {
 		return "QueryEngine::ResultToString - " + err.Error()
