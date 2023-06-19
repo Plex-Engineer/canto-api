@@ -12,7 +12,7 @@ import (
 func GetSmartContractDataFiber(ctx *fiber.Ctx) error {
 	rdb := config.RDB
 
-	val, err := rdb.Get(context.Background(), "cTokens:cUSDC:getCash").Result()
+	val, err := rdb.Get(context.Background(), "ctokens").Result()
 	if err != nil {
 		panic(err)
 	}
