@@ -7,14 +7,6 @@ import (
 	"os"
 )
 
-type Contract struct {
-	Name    string
-	Address string
-	Keys    []string
-	Methods []string
-	Args    [][]interface{}
-}
-
 func getCTokenFromTokenAddress(cTokens []Token, keyName string, underlying string) (Token, error) {
 	for _, token := range cTokens {
 		// fmt.Println("token underlying: ", *token.Underlying, "pair underlying: ", underlying, "keyName: ", keyName)
@@ -57,44 +49,8 @@ func getCTokenContractCalls() []Contract {
 				{},
 			},
 		})
-
-		calls = append(calls, Contract{
-			Name:    "Router",
-			Address: ContractsConfig[TokensConfig.ChainID].Router.Address,
-			Keys: []string{
-				"cTokens:" + tokenKey + ":price",
-			},
-			Methods: []string{
-				"getUnderlyingPrice(address)(uint256)",
-			},
-			Args: [][]interface{}{
-				{token.Address},
-			},
-		})
-
-		calls = append(calls, Contract{
-			Name:    "Comptroller",
-			Address: ContractsConfig[TokensConfig.ChainID].Comptroller.Address,
-			Keys: []string{
-				"cTokens:" + tokenKey + ":markets",
-				"cTokens:" + tokenKey + ":supplySpeeds",
-				"cTokens:" + tokenKey + ":borrowCaps",
-			},
-			Methods: []string{
-				"markets(address)(bool, uint256, bool)",
-				"compSupplySpeeds(address)(uint256)",
-				"borrowCaps(address)(uint256)",
-			},
-			Args: [][]interface{}{
-				{token.Address},
-				{token.Address},
-				{token.Address},
-			},
-		})
 	}
-
 	return calls
-
 }
 
 func getPairsContractsCalls() []Contract {
@@ -102,38 +58,23 @@ func getPairsContractsCalls() []Contract {
 
 	for _, pair := range TokensConfig.Pairs {
 		pairKey := pair.Symbol
-
-		// cTokenA, err := getCTokenFromTokenAddress(tokenData.CTokens, "tokenA", pair.TokenA)
-
-		// if err != nil {
-		// 	fmt.Println(err)
-		// }
-
-		// cTokenB, err := getCTokenFromTokenAddress(tokenData.CTokens, "tokenB", pair.TokenB)
-		// if err != nil {
-		// 	fmt.Println(err)
-		// }
-
-		cPair, err := getCTokenFromTokenAddress(TokensConfig.CTokens, "cPair", pair.Address)
-
-		if err != nil {
-			fmt.Println(err)
-		}
-
 		calls = append(calls, Contract{
-			Name:    "Router",
-			Address: ContractsConfig[TokensConfig.ChainID].Router.Address,
+			Name:    pair.Name,
+			Address: pair.Address,
 			Keys: []string{
 				"lpPairs:" + pairKey + ":reserves",
-				"lpPairs:" + pairKey + ":price",
+				"lpPairs:" + pairKey + ":tokens",
+				"lpPairs:" + pairKey + ":stable",
 			},
 			Methods: []string{
-				"getReserves(address,address,bool)(uint256, uint256)",
-				"getUnderlyingPrice(address)(uint256)",
+				"getReserves()(uint256,uint256,uint256)",
+				"tokens()(address,address)",
+				"stable()(bool)",
 			},
 			Args: [][]interface{}{
-				{pair.TokenA, pair.TokenB, pair.Stable},
-				{cPair.Address},
+				{},
+				{},
+				{},
 			},
 		})
 	}
@@ -141,14 +82,11 @@ func getPairsContractsCalls() []Contract {
 
 }
 
-func getAllTokensFromJson(isTestnet bool) TokensInfo {
-	fileName := "tokens.json"
+func getAllTokensFromJson(path string) TokensInfo {
 
-	if isTestnet {
-		fileName = "testnet_tokens.json"
-	}
+	var TokensInfo TokensInfo
 
-	tokensFile, err := os.Open("./config/jsons/" + fileName)
+	tokensFile, err := os.Open(path)
 
 	if err != nil {
 		fmt.Println(err)
@@ -163,30 +101,15 @@ func getAllTokensFromJson(isTestnet bool) TokensInfo {
 		fmt.Println(err)
 	}
 
-	return tokens
+	TokensInfo.CTokens = tokens.CTokens
+	TokensInfo.Pairs = tokens.Pairs
+	return TokensInfo
 }
 
-func getContractsDataFromJson() ContractsInfo {
-
-	contractsFile, err := os.Open("./config/jsons/contracts.json")
-
-	if err != nil {
-		fmt.Println(err)
-	}
-
-	defer contractsFile.Close()
-
-	contractsByteValue, _ := io.ReadAll(contractsFile)
-	contracts, err := UnmarshalContractsConfig(contractsByteValue)
-
-	if err != nil {
-		fmt.Println(err)
-	}
-	return contracts
-}
-
-func getAllContracts() []Contract {
+func getAllFPI(path string) []Contract {
 	calls := []Contract{}
+
+	TokensConfig = getAllTokensFromJson(path)
 
 	calls = append(calls, getCTokenContractCalls()...)
 	calls = append(calls, getPairsContractsCalls()...)

@@ -2,11 +2,8 @@ package query
 
 import (
 	"context"
-	"encoding/json"
 	"errors"
-	"fmt"
 	"log"
-	"strings"
 	"time"
 
 	"canto-api/config"
@@ -14,6 +11,34 @@ import (
 
 	"github.com/redis/go-redis/v9"
 )
+
+// gets viewcalls from the contracts
+func ProcessContractCalls(contracts []config.Contract) (multicall.ViewCalls, error) {
+	vcs := multicall.ViewCalls{}
+
+	for _, contract := range contracts {
+		for index, method := range contract.Methods {
+			// validate address
+			if err := validateAddress(contract.Address); err != nil {
+				return nil, err
+			}
+			vc := multicall.NewViewCall(
+				contract.Keys[index],
+				contract.Address,
+				method,
+				contract.Args[index],
+			)
+
+			if err := vc.Validate(); err != nil {
+				return nil, errors.New("QueryEngine::ProcessContractCalls - " + err.Error())
+			}
+
+			vcs = append(vcs, vc)
+		}
+	}
+
+	return vcs, nil
+}
 
 // QueryEngine queries smart contracts directly from a node
 // and stores the data in a Redis database on a regular interval.
@@ -81,36 +106,6 @@ func (qe *QueryEngine) StartQueryEngine(ctx context.Context) {
 		if err != nil {
 			log.Fatal(err)
 		}
-
-		// process := map[string]map[string]string{}
-		// for k, v := range ret.Calls {
-		// 	res := strings.Split(k, ":")
-		// 	if _, ok := process[res[0]]; !ok {
-		// 		process[res[0]] = map[string]string{}
-		// 	}
-
-		// 	process[res[0]][res[1]] = ResultToString(v)
-		// 	bs, _ := json.Marshal(process)
-		// 	fmt.Println(string(bs))
-		// }
-
-		process := map[string]map[string]map[string]string{}
-		var data []byte = nil
-		for k, v := range ret.Calls {
-			res := strings.Split(k, ":")
-			if _, ok := process[res[0]]; !ok {
-				process[res[0]] = map[string]map[string]string{}
-			}
-			if _, ok := process[res[0]][res[1]]; !ok {
-				process[res[0]][res[1]] = map[string]string{}
-			}
-
-			process[res[0]][res[1]][res[2]] = ResultToString(v)
-			bs, _ := json.Marshal(process)
-			data = bs
-		}
-
-		fmt.Println(string(data))
 
 		// set results to redis cache
 		err = qe.SetCacheWithResult(ctx, qe.redisclient, ret)
