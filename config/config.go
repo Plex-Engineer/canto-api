@@ -60,5 +60,4 @@ func NewConfig() {
 	calls := append(fpiCalls, generalCalls...)
 	ContractCalls = calls
 
-	fmt.Println("contract calls: ", ContractCalls)
 }
