@@ -10,13 +10,14 @@ import (
 )
 
 var (
-	RDB              *redis.Client
-	EthClient        *ethclient.Client
-	GrpcClient       *grpc.ClientConn
-	ContractCalls    []Contract // list of calls to make
-	MulticallAddress common.Address
-	QueryInterval    uint
-	TokensConfig     TokensInfo
+	RDB                     *redis.Client
+	EthClient               *ethclient.Client
+	GrpcClient              *grpc.ClientConn
+	ContractCalls           []Contract // list of calls to make
+	MulticallAddress        common.Address
+	QueryInterval           uint
+	TokensConfig            TokensInfo
+	ContractAddressesConfig ContractAddresses
 )
 
 /*
@@ -47,6 +48,12 @@ func NewConfig() {
 	// set query interval per block (5 seconds)
 	QueryInterval = 5
 
+	// get tokens data from tokens.json
+	TokensConfig = getAllTokensFromJson("./config/jsons/tokens.json")
+
+	// get contract addresses data from contract_addresses.json
+	ContractAddressesConfig = getContractAddressesFromJson("./config/jsons/contract_addresses.json")
+
 	// get general contracts from contracts.json
 	generalCalls, err := getContractsFromJson("./config/jsons/contracts.json")
 	if err != nil {
@@ -59,6 +66,4 @@ func NewConfig() {
 	// append calls to get all contract calls
 	calls := append(fpiCalls, generalCalls...)
 	ContractCalls = calls
-
-	fmt.Println("contract calls: ", ContractCalls)
 }
