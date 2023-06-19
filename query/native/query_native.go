@@ -3,6 +3,7 @@ package query
 import (
 	"context"
 	"errors"
+	"strconv"
 	"time"
 
 	"canto-api/config"
@@ -48,93 +49,135 @@ func NewNativeQueryEngine() *NativeQueryEngine {
 	}
 }
 
-func (nqe *NativeQueryEngine) SetCacheWithResult(ctx context.Context, key string, result interface{}) error {
+// set json to to cache (will be list of structs, or single strings)
+func (nqe *NativeQueryEngine) SetJsonToCache(ctx context.Context, key string, result interface{}) error {
 	// set key in redis
 	ret := GeneralResultToString(result)
 	err := nqe.redisclient.Set(ctx, key, ret, 0).Err()
 	if err != nil {
-		return errors.New("NativeQueryEngine::SetCacheWithResult - " + err.Error())
+		return errors.New("NativeQueryEngine::SetJsonToCache - " + err.Error())
+	}
+	return nil
+}
+
+// set mapping to cache (to easy lookup by id in queries)
+func (nqe *NativeQueryEngine) SetMappingToCache(ctx context.Context, key string, result map[string]string) error {
+	//set key in redis
+	err := nqe.redisclient.HSet(ctx, key, result).Err()
+	if err != nil {
+		return errors.New("NativeQueryEngine::SetMappingToCache - " + err.Error())
 	}
 	return nil
 }
 
 // CSR
+type CSR struct {
+	// ID of the CSR
+	Id uint64 `json:"id"`
+	// all contracts under this csr id
+	Contracts []string `json:"contracts"`
+	// total number of transactions under this csr id
+	Txs uint64 `json:"txs"`
+	// The cumulative revenue for this CSR NFT -> represented as a big.Int
+	Revenue string `json:"revenue"`
+}
 
 // get all CSRS
-func getCSRS(ctx context.Context, queryClient csr.QueryClient) []csr.CSR {
-	resp, err := queryClient.CSRs(ctx, &csr.QueryCSRsRequest{})
+// will return full response string and mapping of nft id to response string
+func getCSRS(ctx context.Context, queryClient csr.QueryClient) ([]CSR, map[string]string) {
+	resp, err := queryClient.CSRs(ctx, &csr.QueryCSRsRequest{Pagination: &query.PageRequest{
+		Limit: 500,
+	}})
 	checkError(err)
-	return resp.GetCsrs()
+	allCsrs := new([]CSR)
+	csrMap := make(map[string]string)
+	for _, csr := range resp.GetCsrs() {
+		csrResponse := CSR{
+			Id:        csr.GetId(),
+			Contracts: csr.GetContracts(),
+			Txs:       csr.GetTxs(),
+			Revenue:   csr.Revenue.String(),
+		}
+		*allCsrs = append(*allCsrs, csrResponse)
+		csrMap[strconv.Itoa(int(csr.GetId()))] = GeneralResultToString(csrResponse)
+	}
+	return *allCsrs, csrMap
 }
 
 // STAKING
 
-// make type for what will be returned from getValidatrs
-type GetValidatorsResponse struct {
+type Validator struct {
 	// operator_address defines the address of the validator's operator; bech encoded in JSON.
-	OperatorAddress string
+	OperatorAddress string `json:"operator_address"`
 	// jailed defined whether the validator has been jailed from bonded status or not.
-	Jailed bool
+	Jailed bool `json:"jailed"`
 	// status defines the validator's status (bonded(3)/unbonding(2)/unbonded(1)).
-	Status string
+	Status string `json:"status"`
 	// tokens defines the amount of staking tokens delegated to the validator.
-	Tokens string
+	Tokens string `json:"tokens"`
 	// description of validator includes moniker, identity, website, security contact, and details.
-	Description staking.Description
+	Description staking.Description `json:"description"`
 	// commission defines the commission rate.
-	Commission string
+	Commission string `json:"commission"`
 }
 
 // get all Validators for staking
-func getValidators(ctx context.Context, queryClient staking.QueryClient) []GetValidatorsResponse {
-	validators, err := queryClient.Validators(ctx, &staking.QueryValidatorsRequest{
+// will return full response string and mapping of operator address to response string
+func getValidators(ctx context.Context, queryClient staking.QueryClient) ([]Validator, map[string]string) {
+	respValidators, err := queryClient.Validators(ctx, &staking.QueryValidatorsRequest{
 		Pagination: &query.PageRequest{
 			Limit: 500,
 		},
 	})
 	checkError(err)
-	modifiedValidators := new([]GetValidatorsResponse)
-	for _, validator := range validators.Validators {
-		*modifiedValidators = append(*modifiedValidators, GetValidatorsResponse{
+	allValidators := new([]Validator)
+	validatorMap := make(map[string]string)
+	for _, validator := range respValidators.Validators {
+		valResponse := Validator{
 			OperatorAddress: validator.OperatorAddress,
 			Jailed:          validator.Jailed,
 			Status:          validator.Status.String(),
 			Tokens:          validator.Tokens.String(),
 			Description:     validator.Description,
 			Commission:      validator.Commission.CommissionRates.Rate.String(),
-		})
+		}
+		*allValidators = append(*allValidators, valResponse)
+		validatorMap[validator.OperatorAddress] = GeneralResultToString(valResponse)
 	}
-	return *modifiedValidators
+	return *allValidators, validatorMap
 }
 
 // GOVSHUTTLE
-type GetProposalsResponse struct {
+type Proposal struct {
 	// proposalId defines the unique id of the proposal.
-	ProposalId uint64
+	ProposalId uint64 `json:"proposal_id"`
 	// typeUrl indentifies the type of the proposal by a serialized protocol buffer message
-	TypeUrl string
+	TypeUrl string `json:"type_url"`
 	// status defines the current status of the proposal.
-	Status string
+	Status string `json:"status"`
 	// finalVote defined the result of the proposal
-	FinalVote gov.TallyResult
+	FinalVote gov.TallyResult `json:"final_vote"`
 	// submitTime defines the block time the proposal was submitted.
-	SubmitTime time.Time
+	SubmitTime time.Time `json:"submit_time"`
 	// depositEndTime defines the time when the proposal deposit period will end.
-	DepositEndTime time.Time
+	DepositEndTime time.Time `json:"deposit_end_time"`
 	// totalDeposit defines the total amount of coins deposited on this proposal
-	TotalDeposit sdk.Coins
+	TotalDeposit sdk.Coins `json:"total_deposit"`
 	// votingStartTime defines the time when the proposal voting period will start
-	VotingStartTime time.Time
+	VotingStartTime time.Time `json:"voting_start_time"`
 	// votingEndTime defines the time when the proposal voting period will end
-	VotingEndTime time.Time
+	VotingEndTime time.Time `json:"voting_end_time"`
 }
 
-func getAllProposals(ctx context.Context, queryClient gov.QueryClient) []GetProposalsResponse {
+// get all proposals from gov shuttle
+// will return full response string and mapping of proposal id to response string
+func getAllProposals(ctx context.Context, queryClient gov.QueryClient) ([]Proposal, map[string]string) {
 	resp, err := queryClient.Proposals(ctx, &gov.QueryProposalsRequest{})
 	checkError(err)
-	allProposals := new([]GetProposalsResponse)
+	allProposals := new([]Proposal)
+	proposalMap := make(map[string]string)
 	for _, proposal := range resp.GetProposals() {
-		*allProposals = append(*allProposals, GetProposalsResponse{
+		proposalResponse := Proposal{
 			ProposalId:      proposal.ProposalId,
 			TypeUrl:         proposal.Content.TypeUrl,
 			Status:          proposal.Status.String(),
@@ -144,9 +187,11 @@ func getAllProposals(ctx context.Context, queryClient gov.QueryClient) []GetProp
 			TotalDeposit:    proposal.TotalDeposit,
 			VotingStartTime: proposal.VotingStartTime,
 			VotingEndTime:   proposal.VotingEndTime,
-		})
+		}
+		*allProposals = append(*allProposals, proposalResponse)
+		proposalMap[strconv.Itoa(int(proposal.ProposalId))] = GeneralResultToString(proposalResponse)
 	}
-	return *allProposals
+	return *allProposals, proposalMap
 }
 
 // StartNativeQueryEngine starts the query engine and runs the ticker
@@ -169,26 +214,32 @@ func (nqe *NativeQueryEngine) StartQueryEngine(ctx context.Context) {
 		stakingApr := GetStakingAPR(*pool, *mintProvision)
 
 		// save to cache
-		err = nqe.SetCacheWithResult(ctx, "stakingApr", stakingApr)
+		err = nqe.SetJsonToCache(ctx, "stakingApr", stakingApr)
 		checkError(err)
 
 		// get and save all validators to cache
-		validators := getValidators(ctx, nqe.StakingQueryHandler)
-		err = nqe.SetCacheWithResult(ctx, "validators", validators)
+		validators, validatorMap := getValidators(ctx, nqe.StakingQueryHandler)
+		err = nqe.SetJsonToCache(ctx, "validators", validators)
+		checkError(err)
+		err = nqe.SetMappingToCache(ctx, "validatorMap", validatorMap)
 		checkError(err)
 
 		//
 		// CSR
 		//
-		csrs := getCSRS(ctx, nqe.CSRQueryHandler)
-		err = nqe.SetCacheWithResult(ctx, "csrs", csrs)
+		csrs, csrMap := getCSRS(ctx, nqe.CSRQueryHandler)
+		err = nqe.SetJsonToCache(ctx, "csrs", csrs)
+		checkError(err)
+		err = nqe.SetMappingToCache(ctx, "csrMap", csrMap)
 		checkError(err)
 
 		//
 		// GOVSHUTTLE
 		//
-		proposals := getAllProposals(ctx, nqe.GovQueryHandler)
-		err = nqe.SetCacheWithResult(ctx, "proposals", proposals)
+		proposals, proposalMap := getAllProposals(ctx, nqe.GovQueryHandler)
+		err = nqe.SetJsonToCache(ctx, "proposals", proposals)
+		checkError(err)
+		err = nqe.SetMappingToCache(ctx, "proposalMap", proposalMap)
 		checkError(err)
 	}
 }
