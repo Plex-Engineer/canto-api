@@ -19,7 +19,7 @@ func getCTokenContractCalls() []Contract {
 			Name:    token.Symbol,
 			Address: token.Address,
 			Keys: []string{
-				"cTokens:" + token.Symbol + ":getCash",
+				"cTokens:" + token.Symbol + ":cash",
 				"cTokens:" + token.Symbol + ":exchangeRateStored",
 				"cTokens:" + token.Symbol + ":supplyRatePerBlock",
 				"cTokens:" + token.Symbol + ":borrowRatePerBlock",
@@ -43,7 +43,7 @@ func getCTokenContractCalls() []Contract {
 			Name:    token.Symbol + "pricefeed",
 			Address: ContractAddressesConfig.Mainnet.Router,
 			Keys: []string{
-				"cTokens:" + token.Symbol + ":getUnderlyingPrice",
+				"cTokens:" + token.Symbol + ":underlyingPrice",
 			},
 			Methods: []string{
 				"getUnderlyingPrice(address)(uint256)",
@@ -127,10 +127,10 @@ func getPairsContractsCalls() []Contract {
 			Name:    pair.Symbol + "pricefeed",
 			Address: ContractAddressesConfig.Mainnet.Router,
 			Keys: []string{
-				"lpPairs:" + pair.Symbol + ":getReserves",
-				"lpPairs:" + pair.Symbol + ":getUnderlyingPriceTokenA",
-				"lpPairs:" + pair.Symbol + ":getUnderlyingPriceTokenB",
-				"lpPairs:" + pair.Symbol + ":getUnderlyingPriceLp",
+				"lpPairs:" + pair.Symbol + ":reserves",
+				"lpPairs:" + pair.Symbol + ":underlyingPriceTokenA",
+				"lpPairs:" + pair.Symbol + ":underlyingPriceTokenB",
+				"lpPairs:" + pair.Symbol + ":underlyingPriceLp",
 			},
 			Methods: []string{
 				"getReserves(address,address,bool)(uint256, uint256)",
