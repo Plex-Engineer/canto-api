@@ -3,6 +3,7 @@ package query
 import (
 	"context"
 	"errors"
+	"fmt"
 	"strconv"
 	"time"
 
@@ -18,11 +19,10 @@ import (
 	gov "github.com/cosmos/cosmos-sdk/x/gov/types"
 	staking "github.com/cosmos/cosmos-sdk/x/staking/types"
 
-	sdk "github.com/cosmos/cosmos-sdk/types"
 	query "github.com/cosmos/cosmos-sdk/types/query"
 )
 
-func checkError(err error) {
+func CheckError(err error) {
 	if err != nil {
 		panic(err)
 	}
@@ -89,7 +89,7 @@ func getCSRS(ctx context.Context, queryClient csr.QueryClient) ([]CSR, map[strin
 	resp, err := queryClient.CSRs(ctx, &csr.QueryCSRsRequest{Pagination: &query.PageRequest{
 		Limit: 500,
 	}})
-	checkError(err)
+	CheckError(err)
 	allCsrs := new([]CSR)
 	csrMap := make(map[string]string)
 	for _, csr := range resp.GetCsrs() {
@@ -130,7 +130,7 @@ func getValidators(ctx context.Context, queryClient staking.QueryClient) ([]Vali
 			Limit: 500,
 		},
 	})
-	checkError(err)
+	CheckError(err)
 	allValidators := new([]Validator)
 	validatorMap := make(map[string]string)
 	for _, validator := range respValidators.Validators {
@@ -148,53 +148,6 @@ func getValidators(ctx context.Context, queryClient staking.QueryClient) ([]Vali
 	return *allValidators, validatorMap
 }
 
-// GOVSHUTTLE
-type Proposal struct {
-	// proposalId defines the unique id of the proposal.
-	ProposalId uint64 `json:"proposal_id"`
-	// typeUrl indentifies the type of the proposal by a serialized protocol buffer message
-	TypeUrl string `json:"type_url"`
-	// status defines the current status of the proposal.
-	Status string `json:"status"`
-	// finalVote defined the result of the proposal
-	FinalVote gov.TallyResult `json:"final_vote"`
-	// submitTime defines the block time the proposal was submitted.
-	SubmitTime time.Time `json:"submit_time"`
-	// depositEndTime defines the time when the proposal deposit period will end.
-	DepositEndTime time.Time `json:"deposit_end_time"`
-	// totalDeposit defines the total amount of coins deposited on this proposal
-	TotalDeposit sdk.Coins `json:"total_deposit"`
-	// votingStartTime defines the time when the proposal voting period will start
-	VotingStartTime time.Time `json:"voting_start_time"`
-	// votingEndTime defines the time when the proposal voting period will end
-	VotingEndTime time.Time `json:"voting_end_time"`
-}
-
-// get all proposals from gov shuttle
-// will return full response string and mapping of proposal id to response string
-func getAllProposals(ctx context.Context, queryClient gov.QueryClient) ([]Proposal, map[string]string) {
-	resp, err := queryClient.Proposals(ctx, &gov.QueryProposalsRequest{})
-	checkError(err)
-	allProposals := new([]Proposal)
-	proposalMap := make(map[string]string)
-	for _, proposal := range resp.GetProposals() {
-		proposalResponse := Proposal{
-			ProposalId:      proposal.ProposalId,
-			TypeUrl:         proposal.Content.TypeUrl,
-			Status:          proposal.Status.String(),
-			FinalVote:       proposal.FinalTallyResult,
-			SubmitTime:      proposal.SubmitTime,
-			DepositEndTime:  proposal.DepositEndTime,
-			TotalDeposit:    proposal.TotalDeposit,
-			VotingStartTime: proposal.VotingStartTime,
-			VotingEndTime:   proposal.VotingEndTime,
-		}
-		*allProposals = append(*allProposals, proposalResponse)
-		proposalMap[strconv.Itoa(int(proposal.ProposalId))] = GeneralResultToString(proposalResponse)
-	}
-	return *allProposals, proposalMap
-}
-
 // StartNativeQueryEngine starts the query engine and runs the ticker
 // on the interval specified in config
 func (nqe *NativeQueryEngine) StartQueryEngine(ctx context.Context) {
@@ -205,43 +158,47 @@ func (nqe *NativeQueryEngine) StartQueryEngine(ctx context.Context) {
 		//
 		// get pool
 		pool, err := nqe.StakingQueryHandler.Pool(ctx, &staking.QueryPoolRequest{})
-		checkError(err)
+		CheckError(err)
 
 		// get mint provision
 		mintProvision, err := nqe.InflationQueryHandler.EpochMintProvision(ctx, &inflation.QueryEpochMintProvisionRequest{}, &grpc.EmptyCallOption{})
-		checkError(err)
+		CheckError(err)
 
 		// get global staking apr
 		stakingApr := GetStakingAPR(*pool, *mintProvision)
 
 		// save to cache
 		err = nqe.SetJsonToCache(ctx, rediskeys.StakingAPR, stakingApr)
-		checkError(err)
+		CheckError(err)
 
 		// get and save all validators to cache
 		validators, validatorMap := getValidators(ctx, nqe.StakingQueryHandler)
 		err = nqe.SetJsonToCache(ctx, rediskeys.AllValidators, validators)
-		checkError(err)
+		CheckError(err)
 		err = nqe.SetMappingToCache(ctx, rediskeys.ValidatorMap, validatorMap)
-		checkError(err)
+		CheckError(err)
 
 		//
 		// CSR
 		//
 		csrs, csrMap := getCSRS(ctx, nqe.CSRQueryHandler)
 		err = nqe.SetJsonToCache(ctx, rediskeys.AllCSRs, csrs)
-		checkError(err)
+		CheckError(err)
 		err = nqe.SetMappingToCache(ctx, rediskeys.CSRMap, csrMap)
-		checkError(err)
+		CheckError(err)
 
 		//
 		// GOVSHUTTLE
 		//
-		proposals, proposalMap := getAllProposals(ctx, nqe.GovQueryHandler)
+		proposals, proposalMap := GetAllProposals(ctx, nqe.GovQueryHandler)
 		err = nqe.SetJsonToCache(ctx, rediskeys.AllProposals, proposals)
-		checkError(err)
+		CheckError(err)
 		err = nqe.SetMappingToCache(ctx, rediskeys.ProposalMap, proposalMap)
-		checkError(err)
+		CheckError(err)
+
+		userVote, err := GetUserVote(ctx, nqe.GovQueryHandler, 89, "0x4BBd79Bb8293c85b216F2ef337aaCf1D0F401FC7")
+		fmt.Println(userVote)
+		fmt.Println(err)
 	}
 }
 
