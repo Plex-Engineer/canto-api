@@ -14,6 +14,7 @@ import (
 )
 
 type ViewCall struct {
+	contract  string
 	key       string
 	target    string
 	method    string
@@ -30,8 +31,9 @@ type Result struct {
 var insideParens = regexp.MustCompile("\\(.*?\\)")
 var numericArg = regexp.MustCompile("u?int(256)|(8)")
 
-func NewViewCall(key string, target string, method string, arguments []interface{}) ViewCall {
+func NewViewCall(contract string, key string, target string, method string, arguments []interface{}) ViewCall {
 	return ViewCall{
+		contract:  contract,
 		key:       key,
 		target:    target,
 		method:    method,
@@ -236,10 +238,13 @@ func (calls ViewCalls) Decode(raw struct {
 
 		}
 		if len(call.arguments) == 0 {
-			result.Calls[call.key] = callResult
+			result.Calls[call.contract+":"+strings.Split(call.method, "(")[0]] = callResult
 		} else {
+			// create key string
 			argumentString := call.arguments[0].(string)
-			result.Calls[call.key+":"+argumentString] = callResult
+			contractString := call.contract
+			methodString := strings.Split(call.method, "(")[0]
+			result.Calls[contractString+":"+methodString+":"+argumentString] = callResult
 		}
 	}
 	return result, nil

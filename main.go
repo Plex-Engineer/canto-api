@@ -25,10 +25,10 @@ func main() {
 	app.Get("/", re.GetGeneralContractDataFiber)
 
 	routes := []string{
-		"/pricefeed/ccanto/0xB65Ec550ff356EcA6150F733bA9B954b2e0Ca488",
-		"/borrowcaps/ccanto/0xB65Ec550ff356EcA6150F733bA9B954b2e0Ca488",
-		"/supplyspeeds/ccanto/0xB65Ec550ff356EcA6150F733bA9B954b2e0Ca488",
-		"/admin/factory",
+		"/pricefeed/getUnderlyingPrice/0xB65Ec550ff356EcA6150F733bA9B954b2e0Ca488",
+		"/comptroller/borrowCaps/0xB65Ec550ff356EcA6150F733bA9B954b2e0Ca488",
+		"/comptroller/compSupplySpeeds/0xB65Ec550ff356EcA6150F733bA9B954b2e0Ca488",
+		"/factory/admin",
 	}
 
 	for _, route := range routes {

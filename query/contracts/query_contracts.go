@@ -3,7 +3,6 @@ package query
 import (
 	"context"
 	"errors"
-	"fmt"
 	"log"
 	"strings"
 	"time"
@@ -57,6 +56,7 @@ func ProcessContractCalls(contracts []config.Contract) (multicall.ViewCalls, err
 				return nil, err
 			}
 			vc := multicall.NewViewCall(
+				contract.Name,
 				contract.Keys[index],
 				contract.Address,
 				method,
@@ -84,7 +84,6 @@ func (qe *QueryEngine) ProcessMulticallResults(ctx context.Context, results *mul
 	for key, value := range results.Calls {
 		// split the keys at ':'
 		keys := strings.Split(key, ":")
-
 		if keys[0] == "cTokens" {
 			// Check if the keys[1] map(ex: cCanto) is already initialized
 			if ctokens[keys[1]] == nil {
@@ -106,7 +105,6 @@ func (qe *QueryEngine) ProcessMulticallResults(ctx context.Context, results *mul
 			pairs[keys[1]][keys[2]] = value
 
 		} else {
-			fmt.Println(key)
 			others[key] = value
 		}
 
@@ -189,8 +187,6 @@ func (qe *QueryEngine) StartQueryEngine(ctx context.Context) {
 		// if err != nil {
 		// 	log.Fatal(err)
 		// }
-
-		// fmt.Println(others)
 
 		// set results to redis cache
 		err = qe.SetCacheWithResult(ctx, qe.redisclient, others)
