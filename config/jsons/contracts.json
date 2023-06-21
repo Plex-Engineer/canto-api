@@ -20,7 +20,7 @@
       "Keys": [
         "markets:ccanto",
         "supplyspeeds:ccanto",
-        "borrowcaps"
+        "borrowcaps:ccanto"
       ],
       "Methods": [
         "markets(address)(bool, uint256, bool)",
@@ -37,6 +37,19 @@
         [
           "0xB65Ec550ff356EcA6150F733bA9B954b2e0Ca488"
         ]
+      ]
+    },
+    {
+      "Name": "factory",
+      "Address": "0xE387067f12561e579C5f7d4294f51867E0c1cFba",
+      "Keys": [
+        "admin:factory"
+      ],
+      "Methods": [
+        "admin()(address)"
+      ],
+      "Args": [
+        []
       ]
     }
   ]

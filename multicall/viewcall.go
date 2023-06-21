@@ -235,7 +235,12 @@ func (calls ViewCalls) Decode(raw struct {
 			callResult = returnValues
 
 		}
-		result.Calls[call.key] = callResult
+		if len(call.arguments) == 0 {
+			result.Calls[call.key] = callResult
+		} else {
+			argumentString := call.arguments[0].(string)
+			result.Calls[call.key+":"+argumentString] = callResult
+		}
 	}
 	return result, nil
 }

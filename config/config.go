@@ -53,11 +53,11 @@ func NewConfig() {
 		fmt.Println("Error getting contracts from json:", err)
 	}
 
-	// get FPI contracts from tokens.json
-	fpiCalls := getAllFPI("./config/jsons/tokens.json")
+	// // get FPI contracts from tokens.json
+	// fpiCalls := getAllFPI("./config/jsons/tokens.json")
 
-	// append calls to get all contract calls
-	calls := append(fpiCalls, generalCalls...)
-	ContractCalls = calls
+	// // append calls to get all contract calls
+	// calls := append(fpiCalls, generalCalls...)
+	ContractCalls = generalCalls
 
 }

@@ -3,6 +3,7 @@ package query
 import (
 	"context"
 	"errors"
+	"fmt"
 	"log"
 	"strings"
 	"time"
@@ -79,7 +80,7 @@ func (qe *QueryEngine) ProcessMulticallResults(ctx context.Context, results *mul
 	pairs := make(PairsMap)
 	others := make(map[string]interface{})
 
-	// Iterate the results to segregate them into ctokens, pairs and other according to their keys
+	// Iterate the results to separate them into ctokens, pairs and other according to their keys
 	for key, value := range results.Calls {
 		// split the keys at ':'
 		keys := strings.Split(key, ":")
@@ -105,6 +106,7 @@ func (qe *QueryEngine) ProcessMulticallResults(ctx context.Context, results *mul
 			pairs[keys[1]][keys[2]] = value
 
 		} else {
+			fmt.Println(key)
 			others[key] = value
 		}
 
@@ -180,13 +182,15 @@ func (qe *QueryEngine) StartQueryEngine(ctx context.Context) {
 		}
 
 		// get ctokens, pairs and others from multicall results
-		ctokens, pairs, others := qe.ProcessMulticallResults(ctx, ret)
+		_, _, others := qe.ProcessMulticallResults(ctx, ret)
 
 		// set ctokens, pairs to redis cache with fpi
-		err = qe.SetCacheWithFpi(ctx, qe.redisclient, ctokens, pairs)
-		if err != nil {
-			log.Fatal(err)
-		}
+		// err = qe.SetCacheWithFpi(ctx, qe.redisclient, ctokens, pairs)
+		// if err != nil {
+		// 	log.Fatal(err)
+		// }
+
+		// fmt.Println(others)
 
 		// set results to redis cache
 		err = qe.SetCacheWithResult(ctx, qe.redisclient, others)
