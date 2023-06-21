@@ -29,13 +29,13 @@ type TokensInfo struct {
 }
 
 type Token struct {
-	Name       string  `json:"name"`
-	Address    string  `json:"address"`
-	Symbol     string  `json:"symbol"`
-	Decimals   int64   `json:"decimals"`
-	Underlying *string `json:"underlying,omitempty"`
-	ChainID    string  `json:"chainId"`
-	LogoURI    *string `json:"logoURI,omitempty"`
+	Name       string `json:"name"`
+	Address    string `json:"address"`
+	Symbol     string `json:"symbol"`
+	Decimals   int64  `json:"decimals"`
+	Underlying string `json:"underlying,omitempty"`
+	ChainID    string `json:"chainId"`
+	LogoURI    string `json:"logoURI,omitempty"`
 }
 
 type Pair struct {
@@ -47,4 +47,17 @@ type Pair struct {
 	TokenA   string `json:"tokenA"`
 	TokenB   string `json:"tokenB"`
 	ChainID  string `json:"chainId"`
+}
+
+type ContractAddresses struct {
+	Mainnet ContractList `json:"mainnet"`
+	Testnet ContractList `json:"testnet"`
+}
+type ContractList struct {
+	Comptroller string `json:"comptroller"`
+	Router      string `json:"router"`
+	Reservoir   string `json:"reservoir"`
+	MulticallV1 string `json:"multicallV1"`
+	MulticallV2 string `json:"multicallV2"`
+	MulticallV3 string `json:"multicallV3"`
 }
