@@ -80,24 +80,20 @@ func getCTokenContractCalls() []Contract {
 
 // this function returns the ctoken address of the token having address equal to underlyingAddress
 func getCTokenAddress(underlyingAddress string) string {
-	// Declare cNoteAddress which wll be returned when ctoken is not found for underlyingAddress
-	var cNoteAddress string
+	// Declare cTokenAddress
+	var cTokenAddress string
 
 	// iterate through ctokens config to get the ctoken address of the token with underlyingAddress
 	for _, token := range TokensConfig.CTokens {
-		//check if the current ctoken is cnote and store its address
-		if token.Symbol == "cNOTE" {
-			cNoteAddress = token.Address
-		}
-
 		// check if the current ctoken has given underlying address and return ctoken address if true
 		if token.Underlying == underlyingAddress {
-			return token.Address
+			cTokenAddress = token.Address
+			break
 		}
 	}
 
-	// return cnote address when token with underlyingAddress is not found in ctokens list
-	return cNoteAddress
+	// return cTokenAddress
+	return cTokenAddress
 }
 
 // this function generates and returns required contract calls for all pairs in TokensConfig
