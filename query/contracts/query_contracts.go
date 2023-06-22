@@ -37,6 +37,7 @@ func NewQueryEngine() *QueryEngine {
 	if err != nil {
 		log.Fatal(err)
 	}
+
 	return &QueryEngine{
 		redisclient: config.RDB,
 		interval:    time.Duration(config.QueryInterval),
@@ -180,13 +181,13 @@ func (qe *QueryEngine) StartQueryEngine(ctx context.Context) {
 		}
 
 		// get ctokens, pairs and others from multicall results
-		_, _, others := qe.ProcessMulticallResults(ctx, ret)
+		ctokens, pairs, others := qe.ProcessMulticallResults(ctx, ret)
 
 		// set ctokens, pairs to redis cache with fpi
-		// err = qe.SetCacheWithFpi(ctx, qe.redisclient, ctokens, pairs)
-		// if err != nil {
-		// 	log.Fatal(err)
-		// }
+		err = qe.SetCacheWithFpi(ctx, qe.redisclient, ctokens, pairs)
+		if err != nil {
+			log.Fatal(err)
+		}
 
 		// set results to redis cache
 		err = qe.SetCacheWithResult(ctx, qe.redisclient, others)

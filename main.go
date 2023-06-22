@@ -54,7 +54,7 @@ func routerLiquidityPool(app *fiber.App) {
 }
 
 func routerLending(app *fiber.App) {
-	lending := app.Group("/lending")
+	lending := app.Group("/ctokens")
 	lending.Get("/", re.QueryLending)
 	lending.Get("/:address", re.QueryLendingByAddress)
 }

@@ -237,6 +237,14 @@ func (calls ViewCalls) Decode(raw struct {
 			callResult = returnValues
 
 		}
+
+		// store ctokens and lppairs in separate maps
+		if strings.Split(call.key, ":")[0] == "cTokens" {
+			result.Calls[call.key] = callResult
+		} else if strings.Split(call.key, ":")[0] == "lpPairs" {
+			result.Calls[call.key] = callResult
+		}
+
 		if len(call.arguments) == 0 {
 			result.Calls[call.contract+":"+strings.Split(call.method, "(")[0]] = callResult
 		} else {

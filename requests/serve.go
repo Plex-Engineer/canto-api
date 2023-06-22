@@ -76,12 +76,12 @@ func QueryLpByAddress(ctx *fiber.Ctx) error {
 }
 
 func QueryLending(ctx *fiber.Ctx) error {
-	return ctx.SendString(getStoreValueFromKey("lending"))
+	return ctx.SendString(getStoreValueFromKey("ctokens"))
 }
 
 func QueryLendingByAddress(ctx *fiber.Ctx) error {
 	allCTokens := new([]config.Token)
-	cTokensJson := getStoreValueFromKey("lending")
+	cTokensJson := getStoreValueFromKey("ctokens")
 	err := json.Unmarshal([]byte(cTokensJson), &allCTokens)
 	if err != nil {
 		return err
