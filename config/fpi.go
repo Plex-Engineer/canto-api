@@ -83,12 +83,21 @@ func getPairsContractsCalls() []Contract {
 			Name:    pair.Symbol,
 			Address: pair.Address,
 			Keys: []string{
+				"lpPairs:" + pair.Address + ":reserves",
+				"lpPairs:" + pair.Address + ":tokens",
+				"lpPairs:" + pair.Address + ":stable",
 				"lpPairs:" + pair.Address + ":totalSupply",
 			},
 			Methods: []string{
+				"getReserves()(uint256,uint256,uint256)",
+				"tokens()(address,address)",
+				"stable()(bool)",
 				"totalSupply()(uint256)",
 			},
 			Args: [][]interface{}{
+				{},
+				{},
+				{},
 				{},
 			},
 		})

@@ -2,8 +2,11 @@ package requests
 
 import (
 	"context"
+	"encoding/json"
 
 	"github.com/gofiber/fiber/v2"
+
+	contracts "canto-api/query/contracts"
 
 	"canto-api/config"
 	"canto-api/rediskeys"
@@ -12,7 +15,7 @@ import (
 func GetSmartContractDataFiber(ctx *fiber.Ctx) error {
 	rdb := config.RDB
 
-	val, err := rdb.Get(context.Background(), "ctokens").Result()
+	val, err := rdb.Get(context.Background(), rediskeys.Pairs).Result()
 	if err != nil {
 		panic(err)
 	}
@@ -28,7 +31,46 @@ func getStoreValueFromKey(key string) string {
 	return val
 }
 
-// STAKING
+func QueryLP(ctx *fiber.Ctx) error {
+	return ctx.SendString(getStoreValueFromKey("pairs"))
+}
+
+func QueryLpByAddress(ctx *fiber.Ctx) error {
+	allPairs := new([]config.Pair)
+	pairsJson := getStoreValueFromKey("pairs")
+	err := json.Unmarshal([]byte(pairsJson), &allPairs)
+	if err != nil {
+		return err
+	}
+	for _, pair := range *allPairs {
+		if pair.Address == ctx.Params("address") {
+			resp := contracts.GeneralResultToString(pair)
+			return ctx.SendString(resp)
+		}
+	}
+	return ctx.SendString("address not found")
+}
+
+func QueryLending(ctx *fiber.Ctx) error {
+	return ctx.SendString(getStoreValueFromKey("lending"))
+}
+
+func QueryLendingByAddress(ctx *fiber.Ctx) error {
+	allCTokens := new([]config.Token)
+	cTokensJson := getStoreValueFromKey("lending")
+	err := json.Unmarshal([]byte(cTokensJson), &allCTokens)
+	if err != nil {
+		return err
+	}
+	for _, cToken := range *allCTokens {
+		if cToken.Address == ctx.Params("address") {
+			resp := contracts.GeneralResultToString(cToken)
+			return ctx.SendString(resp)
+		}
+	}
+	return ctx.SendString("address not found")
+}
+
 func QueryStakingAPR(ctx *fiber.Ctx) error {
 	return ctx.SendString(getStoreValueFromKey(rediskeys.StakingAPR))
 }

@@ -9,11 +9,11 @@ import (
 )
 
 // Processed Pairs
-func GetPairs(ctx *fiber.Ctx) error {
+func QueryPairs(ctx *fiber.Ctx) error {
 	return ctx.SendString(getStoreValueFromKey(rediskeys.ProcessedPairs))
 }
 
-func GetPairsByAddress(ctx *fiber.Ctx) error {
+func QueryPairsByAddress(ctx *fiber.Ctx) error {
 	val, err := config.RDB.HGet(context.Background(), rediskeys.ProcessedPairsMap, ctx.Params("address")).Result()
 	if err != nil {
 		val = "CSR not found"
