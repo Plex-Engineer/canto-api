@@ -16,7 +16,7 @@ func QueryPairs(ctx *fiber.Ctx) error {
 func QueryPairsByAddress(ctx *fiber.Ctx) error {
 	val, err := config.RDB.HGet(context.Background(), rediskeys.ProcessedPairsMap, ctx.Params("address")).Result()
 	if err != nil {
-		val = "CSR not found"
+		val = "Pair not found"
 	}
 	return ctx.SendString(val)
 }
