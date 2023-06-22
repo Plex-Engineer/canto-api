@@ -23,6 +23,8 @@ func main() {
 	if server == "fiber" {
 		app := fiber.New()
 		app.Get("/", re.GetSmartContractDataFiber)
+		app.Get("/pairs", re.GetPairs)
+		app.Get("/pairs/:address", re.GetPairsByAddress)
 		app.Get("/apr", re.QueryStakingAPR)
 		app.Get("/validators", re.QueryValidators)
 		app.Get("/validators/:address", re.QueryValidatorByAddress)
