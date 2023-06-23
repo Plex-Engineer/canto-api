@@ -3,8 +3,6 @@ package query
 import (
 	"context"
 	"errors"
-	"fmt"
-	"strconv"
 	"time"
 
 	"canto-api/config"
@@ -19,7 +17,6 @@ import (
 	gov "github.com/cosmos/cosmos-sdk/x/gov/types"
 	staking "github.com/cosmos/cosmos-sdk/x/staking/types"
 
-	query "github.com/cosmos/cosmos-sdk/types/query"
 )
 
 func CheckError(err error) {
@@ -71,82 +68,6 @@ func (nqe *NativeQueryEngine) SetMappingToCache(ctx context.Context, key string,
 	return nil
 }
 
-// CSR
-type CSR struct {
-	// ID of the CSR
-	Id uint64 `json:"id"`
-	// all contracts under this csr id
-	Contracts []string `json:"contracts"`
-	// total number of transactions under this csr id
-	Txs uint64 `json:"txs"`
-	// The cumulative revenue for this CSR NFT -> represented as a big.Int
-	Revenue string `json:"revenue"`
-}
-
-// get all CSRS
-// will return full response string and mapping of nft id to response string
-func getCSRS(ctx context.Context, queryClient csr.QueryClient) ([]CSR, map[string]string) {
-	resp, err := queryClient.CSRs(ctx, &csr.QueryCSRsRequest{Pagination: &query.PageRequest{
-		Limit: 500,
-	}})
-	CheckError(err)
-	allCsrs := new([]CSR)
-	csrMap := make(map[string]string)
-	for _, csr := range resp.GetCsrs() {
-		csrResponse := CSR{
-			Id:        csr.GetId(),
-			Contracts: csr.GetContracts(),
-			Txs:       csr.GetTxs(),
-			Revenue:   csr.Revenue.String(),
-		}
-		*allCsrs = append(*allCsrs, csrResponse)
-		csrMap[strconv.Itoa(int(csr.GetId()))] = GeneralResultToString(csrResponse)
-	}
-	return *allCsrs, csrMap
-}
-
-// STAKING
-
-type Validator struct {
-	// operator_address defines the address of the validator's operator; bech encoded in JSON.
-	OperatorAddress string `json:"operator_address"`
-	// jailed defined whether the validator has been jailed from bonded status or not.
-	Jailed bool `json:"jailed"`
-	// status defines the validator's status (bonded(3)/unbonding(2)/unbonded(1)).
-	Status string `json:"status"`
-	// tokens defines the amount of staking tokens delegated to the validator.
-	Tokens string `json:"tokens"`
-	// description of validator includes moniker, identity, website, security contact, and details.
-	Description staking.Description `json:"description"`
-	// commission defines the commission rate.
-	Commission string `json:"commission"`
-}
-
-// get all Validators for staking
-// will return full response string and mapping of operator address to response string
-func getValidators(ctx context.Context, queryClient staking.QueryClient) ([]Validator, map[string]string) {
-	respValidators, err := queryClient.Validators(ctx, &staking.QueryValidatorsRequest{
-		Pagination: &query.PageRequest{
-			Limit: 500,
-		},
-	})
-	CheckError(err)
-	allValidators := new([]Validator)
-	validatorMap := make(map[string]string)
-	for _, validator := range respValidators.Validators {
-		valResponse := Validator{
-			OperatorAddress: validator.OperatorAddress,
-			Jailed:          validator.Jailed,
-			Status:          validator.Status.String(),
-			Tokens:          validator.Tokens.String(),
-			Description:     validator.Description,
-			Commission:      validator.Commission.CommissionRates.Rate.String(),
-		}
-		*allValidators = append(*allValidators, valResponse)
-		validatorMap[validator.OperatorAddress] = GeneralResultToString(valResponse)
-	}
-	return *allValidators, validatorMap
-}
 
 // StartNativeQueryEngine starts the query engine and runs the ticker
 // on the interval specified in config
@@ -172,7 +93,7 @@ func (nqe *NativeQueryEngine) StartQueryEngine(ctx context.Context) {
 		CheckError(err)
 
 		// get and save all validators to cache
-		validators, validatorMap := getValidators(ctx, nqe.StakingQueryHandler)
+		validators, validatorMap := GetValidators(ctx, nqe.StakingQueryHandler)
 		err = nqe.SetJsonToCache(ctx, rediskeys.AllValidators, validators)
 		CheckError(err)
 		err = nqe.SetMappingToCache(ctx, rediskeys.ValidatorMap, validatorMap)
@@ -181,7 +102,7 @@ func (nqe *NativeQueryEngine) StartQueryEngine(ctx context.Context) {
 		//
 		// CSR
 		//
-		csrs, csrMap := getCSRS(ctx, nqe.CSRQueryHandler)
+		csrs, csrMap := GetCSRS(ctx, nqe.CSRQueryHandler)
 		err = nqe.SetJsonToCache(ctx, rediskeys.AllCSRs, csrs)
 		CheckError(err)
 		err = nqe.SetMappingToCache(ctx, rediskeys.CSRMap, csrMap)
@@ -196,9 +117,6 @@ func (nqe *NativeQueryEngine) StartQueryEngine(ctx context.Context) {
 		err = nqe.SetMappingToCache(ctx, rediskeys.ProposalMap, proposalMap)
 		CheckError(err)
 
-		userVote, err := GetUserVote(ctx, nqe.GovQueryHandler, 89, "0x4BBd79Bb8293c85b216F2ef337aaCf1D0F401FC7")
-		fmt.Println(userVote)
-		fmt.Println(err)
 	}
 }
 
