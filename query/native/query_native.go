@@ -16,7 +16,6 @@ import (
 	inflation "github.com/Canto-Network/Canto/v6/x/inflation/types"
 	gov "github.com/cosmos/cosmos-sdk/x/gov/types"
 	staking "github.com/cosmos/cosmos-sdk/x/staking/types"
-
 )
 
 func CheckError(err error) {
@@ -68,7 +67,6 @@ func (nqe *NativeQueryEngine) SetMappingToCache(ctx context.Context, key string,
 	return nil
 }
 
-
 // StartNativeQueryEngine starts the query engine and runs the ticker
 // on the interval specified in config
 func (nqe *NativeQueryEngine) StartQueryEngine(ctx context.Context) {
@@ -117,6 +115,7 @@ func (nqe *NativeQueryEngine) StartQueryEngine(ctx context.Context) {
 		err = nqe.SetMappingToCache(ctx, rediskeys.ProposalMap, proposalMap)
 		CheckError(err)
 
+		GetUserDelegations(ctx, nqe.StakingQueryHandler, "0x8915da99B69e84DE6C97928d378D9887482C671c")
 	}
 }
 

@@ -2,7 +2,6 @@ package query
 
 import (
 	"context"
-	"fmt"
 	"strconv"
 	"time"
 
@@ -59,7 +58,6 @@ func GetAllProposals(ctx context.Context, queryClient gov.QueryClient) ([]Propos
 // will not work if proposal is not active
 func GetUserVote(ctx context.Context, queryClient gov.QueryClient, proposalId uint64, ethAddress string) (gov.WeightedVoteOptions, error) {
 	cantoAddress, err := EthToCantoAddress(ethAddress)
-	fmt.Println(cantoAddress)
 	if err != nil {
 		return gov.WeightedVoteOptions{}, err
 	}

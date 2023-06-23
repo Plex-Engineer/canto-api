@@ -5,6 +5,8 @@ import (
 
 	query "github.com/cosmos/cosmos-sdk/types/query"
 	staking "github.com/cosmos/cosmos-sdk/x/staking/types"
+
+	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
 type Validator struct {
@@ -46,4 +48,38 @@ func GetValidators(ctx context.Context, queryClient staking.QueryClient) ([]Vali
 		validatorMap[validator.OperatorAddress] = GeneralResultToString(valResponse)
 	}
 	return *allValidators, validatorMap
+}
+
+type Delegation struct {
+	// delegator address is bech32 encoded address of delegator
+	DelegatorAddress string `json:"delegator_address"`
+	// validator address is bech32 encoded address of validator
+	ValidatorAddress string `json:"validator_address"`
+	// shares define the amount of the validator's shares held in this delegation in (acanto)
+	Shares string `json:"shares"`
+	// balance defined the user's total stake (acanto)
+	Balance sdk.Coin `json:"balance"`
+}
+
+func GetUserDelegations(ctx context.Context, queryClient staking.QueryClient, ethAddress string) []Delegation {
+	cantoAddress, err := EthToCantoAddress(ethAddress)
+	if err != nil {
+		return []Delegation{}
+	}
+	resp, err := queryClient.DelegatorDelegations(ctx, &staking.QueryDelegatorDelegationsRequest{
+		DelegatorAddr: cantoAddress,
+	})
+	if err != nil {
+		return []Delegation{}
+	}
+	userDelegations := new([]Delegation)
+	for _, delegation := range resp.DelegationResponses {
+		*userDelegations = append(*userDelegations, Delegation{
+			DelegatorAddress: delegation.Delegation.DelegatorAddress,
+			ValidatorAddress: delegation.Delegation.ValidatorAddress,
+			Shares:           delegation.Delegation.Shares.String(),
+			Balance:          delegation.Balance,
+		})
+	}
+	return *userDelegations
 }
