@@ -6,21 +6,36 @@ import (
 	"fmt"
 	"strings"
 
-
 	"github.com/gofiber/fiber/v2"
 
 	contracts "canto-api/query/contracts"
+
+	cantoConfig "github.com/Canto-Network/Canto/v6/cmd/config"
 
 	"canto-api/config"
 	"canto-api/rediskeys"
 )
 
-
 var (
-	StatusBadRequest          = fiber.ErrBadRequest
-	StatusInternalServerError = fiber.ErrInternalServerError
-	StatusOkay                = fiber.StatusOK
+	StatusBadRequest          = fiber.ErrBadRequest          // 400 (required fields are invalid)
+	StatusNotFound            = fiber.ErrNotFound            // 404 (resource do not exist)
+	StatusInternalServerError = fiber.ErrInternalServerError // 500 (unexpected error)
+	StatusOkay                = fiber.StatusOK               // 200 (success)
 )
+
+// functions to return status errors
+func redisKeyNotFound(ctx *fiber.Ctx, key string) error {
+	//key there are looking for is not in redis
+	return ctx.Status(StatusNotFound.Code).SendString(fmt.Sprintf("%s not found", key))
+}
+
+// check parameter functions
+func checkValidatorAddress(address string) error {
+	if !(strings.HasPrefix(address, cantoConfig.Bech32PrefixValAddr)) {
+		return fmt.Errorf("invalid bech32 validator address: %s", address)
+	}
+	return nil
+}
 
 func GetGeneralContractDataFiber(ctx *fiber.Ctx) error {
 
@@ -44,7 +59,6 @@ func GetGeneralContractDataFiber(ctx *fiber.Ctx) error {
 	return ctx.SendString(val)
 }
 
-
 func GetSmartContractDataFiber(ctx *fiber.Ctx) error {
 
 	rdb := config.RDB
@@ -63,13 +77,6 @@ func getStoreValueFromKey(key string) (string, error) {
 		return "", err
 	}
 	return val, nil
-}
-
-func redisKeyNotFound(ctx *fiber.Ctx, key string) error {
-	return ctx.Status(StatusInternalServerError.Code).SendString(fmt.Sprintf("%s not found", key))
-}
-func idNotFound(ctx *fiber.Ctx, key string, id string) error {
-	return ctx.Status(StatusBadRequest.Code).SendString(fmt.Sprintf("%s: %s not found", key, id))
 }
 
 func QueryLP(ctx *fiber.Ctx) error {
@@ -149,9 +156,13 @@ func QueryValidators(ctx *fiber.Ctx) error {
 	return ctx.Status(StatusOkay).SendString(val)
 }
 func QueryValidatorByAddress(ctx *fiber.Ctx) error {
+	err := checkValidatorAddress(ctx.Params("address"))
+	if err != nil {
+		return ctx.Status(StatusBadRequest.Code).SendString(err.Error())
+	}
 	val, err := config.RDB.HGet(context.Background(), rediskeys.ValidatorMap, ctx.Params("address")).Result()
 	if err != nil {
-		return idNotFound(ctx, rediskeys.ValidatorMap, ctx.Params("address"))
+		return redisKeyNotFound(ctx, fmt.Sprintf("validator address: %s ", ctx.Params("address")))
 	}
 	return ctx.Status(StatusOkay).SendString(val)
 }
@@ -167,7 +178,7 @@ func QueryCSRs(ctx *fiber.Ctx) error {
 func QueryCSRByID(ctx *fiber.Ctx) error {
 	val, err := config.RDB.HGet(context.Background(), rediskeys.CSRMap, ctx.Params("id")).Result()
 	if err != nil {
-		return idNotFound(ctx, rediskeys.CSRMap, ctx.Params("id"))
+		return redisKeyNotFound(ctx, fmt.Sprintf("csr nft id: %s ", ctx.Params("id")))
 	}
 	return ctx.Status(StatusOkay).SendString(val)
 }
@@ -183,7 +194,7 @@ func QueryProposals(ctx *fiber.Ctx) error {
 func QueryProposalByID(ctx *fiber.Ctx) error {
 	val, err := config.RDB.HGet(context.Background(), rediskeys.ProposalMap, ctx.Params("id")).Result()
 	if err != nil {
-		return idNotFound(ctx, rediskeys.ProposalMap, ctx.Params("id"))
+		return redisKeyNotFound(ctx, fmt.Sprintf("proposal id: %s ", ctx.Params("id")))
 	}
 	return ctx.Status(StatusOkay).SendString(val)
 }
