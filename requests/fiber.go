@@ -12,6 +12,8 @@ func Run(ctx context.Context) {
 			ServerHeader: "Fiber",
 		})
 	app.Get("/", GetSmartContractDataFiber)
+
+
 	routerCSR(app)
 	routerGovernance(app)
 	routerStaking(app)

@@ -3,6 +3,7 @@ package requests
 import (
 	"context"
 	"encoding/json"
+	"fmt"
 
 	"github.com/gofiber/fiber/v2"
 
@@ -10,6 +11,12 @@ import (
 
 	"canto-api/config"
 	"canto-api/rediskeys"
+)
+
+var (
+	StatusBadRequest          = fiber.ErrBadRequest
+	StatusInternalServerError = fiber.ErrInternalServerError
+	StatusOkay                = fiber.StatusOK
 )
 
 func GetSmartContractDataFiber(ctx *fiber.Ctx) error {
@@ -22,23 +29,37 @@ func GetSmartContractDataFiber(ctx *fiber.Ctx) error {
 	return ctx.SendString(val)
 }
 
-func getStoreValueFromKey(key string) string {
+func getStoreValueFromKey(key string) (string, error) {
 	rdb := config.RDB
 	val, err := rdb.Get(context.Background(), key).Result()
 	if err != nil {
-		panic(err)
+		return "", err
 	}
-	return val
+	return val, nil
+}
+
+func redisKeyNotFound(ctx *fiber.Ctx, key string) error {
+	return ctx.Status(StatusInternalServerError.Code).SendString(fmt.Sprintf("%s not found", key))
+}
+func idNotFound(ctx *fiber.Ctx, key string, id string) error {
+	return ctx.Status(StatusBadRequest.Code).SendString(fmt.Sprintf("%s: %s not found", key, id))
 }
 
 func QueryLP(ctx *fiber.Ctx) error {
-	return ctx.SendString(getStoreValueFromKey("pairs"))
+	val, err := getStoreValueFromKey("pairs")
+	if err != nil {
+		return redisKeyNotFound(ctx, "pairs")
+	}
+	return ctx.Status(StatusOkay).SendString(val)
 }
 
 func QueryLpByAddress(ctx *fiber.Ctx) error {
 	allPairs := new([]config.Pair)
-	pairsJson := getStoreValueFromKey("pairs")
-	err := json.Unmarshal([]byte(pairsJson), &allPairs)
+	pairsJson, err := getStoreValueFromKey("pairs")
+	if err != nil {
+		return redisKeyNotFound(ctx, "pairs")
+	}
+	err = json.Unmarshal([]byte(pairsJson), &allPairs)
 	if err != nil {
 		return err
 	}
@@ -52,15 +73,22 @@ func QueryLpByAddress(ctx *fiber.Ctx) error {
 }
 
 func QueryLending(ctx *fiber.Ctx) error {
-	return ctx.SendString(getStoreValueFromKey("lending"))
+	val, err := getStoreValueFromKey("lending")
+	if err != nil {
+		return redisKeyNotFound(ctx, "lending")
+	}
+	return ctx.Status(StatusOkay).SendString(val)
 }
 
 func QueryLendingByAddress(ctx *fiber.Ctx) error {
 	allCTokens := new([]config.Token)
-	cTokensJson := getStoreValueFromKey("lending")
-	err := json.Unmarshal([]byte(cTokensJson), &allCTokens)
+	cTokensJson, err := getStoreValueFromKey("lending")
 	if err != nil {
-		return err
+		return redisKeyNotFound(ctx, "lending")
+	}
+	err = json.Unmarshal([]byte(cTokensJson), &allCTokens)
+	if err != nil {
+		return ctx.Status(StatusInternalServerError.Code).SendString(err.Error())
 	}
 	for _, cToken := range *allCTokens {
 		if cToken.Address == ctx.Params("address") {
@@ -73,40 +101,56 @@ func QueryLendingByAddress(ctx *fiber.Ctx) error {
 
 // STAKING
 func QueryStakingAPR(ctx *fiber.Ctx) error {
-	return ctx.SendString(getStoreValueFromKey(rediskeys.StakingAPR))
+	val, err := getStoreValueFromKey(rediskeys.StakingAPR)
+	if err != nil {
+		return redisKeyNotFound(ctx, rediskeys.StakingAPR)
+	}
+	return ctx.Status(StatusOkay).SendString(val)
 }
-
 func QueryValidators(ctx *fiber.Ctx) error {
-	return ctx.SendString(getStoreValueFromKey(rediskeys.AllValidators))
+	val, err := getStoreValueFromKey(rediskeys.AllValidators)
+	if err != nil {
+		return redisKeyNotFound(ctx, rediskeys.AllValidators)
+
+	}
+	return ctx.Status(StatusOkay).SendString(val)
 }
 func QueryValidatorByAddress(ctx *fiber.Ctx) error {
 	val, err := config.RDB.HGet(context.Background(), rediskeys.ValidatorMap, ctx.Params("address")).Result()
 	if err != nil {
-		val = "Validator not found"
+		return idNotFound(ctx, rediskeys.ValidatorMap, ctx.Params("address"))
 	}
-	return ctx.SendString(val)
+	return ctx.Status(StatusOkay).SendString(val)
 }
 
 // CSR
 func QueryCSRs(ctx *fiber.Ctx) error {
-	return ctx.SendString(getStoreValueFromKey(rediskeys.AllCSRs))
+	val, err := getStoreValueFromKey(rediskeys.AllCSRs)
+	if err != nil {
+		return redisKeyNotFound(ctx, rediskeys.AllCSRs)
+	}
+	return ctx.Status(StatusOkay).SendString(val)
 }
 func QueryCSRByID(ctx *fiber.Ctx) error {
 	val, err := config.RDB.HGet(context.Background(), rediskeys.CSRMap, ctx.Params("id")).Result()
 	if err != nil {
-		val = "CSR not found"
+		return idNotFound(ctx, rediskeys.CSRMap, ctx.Params("id"))
 	}
-	return ctx.SendString(val)
+	return ctx.Status(StatusOkay).SendString(val)
 }
 
 // GOVSHUTTLE
 func QueryProposals(ctx *fiber.Ctx) error {
-	return ctx.SendString(getStoreValueFromKey(rediskeys.AllProposals))
+	val, err := getStoreValueFromKey(rediskeys.AllProposals)
+	if err != nil {
+		return redisKeyNotFound(ctx, rediskeys.AllProposals)
+	}
+	return ctx.Status(StatusOkay).SendString(val)
 }
 func QueryProposalByID(ctx *fiber.Ctx) error {
 	val, err := config.RDB.HGet(context.Background(), rediskeys.ProposalMap, ctx.Params("id")).Result()
 	if err != nil {
-		return ctx.SendString("id not found")
+		return idNotFound(ctx, rediskeys.ProposalMap, ctx.Params("id"))
 	}
-	return ctx.SendString(val)
+	return ctx.Status(StatusOkay).SendString(val)
 }
