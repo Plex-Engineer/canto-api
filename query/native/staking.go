@@ -29,7 +29,7 @@ type Validator struct {
 func GetValidators(ctx context.Context, queryClient staking.QueryClient) ([]Validator, map[string]string) {
 	respValidators, err := queryClient.Validators(ctx, &staking.QueryValidatorsRequest{
 		Pagination: &query.PageRequest{
-			Limit: 500,
+			Limit: 1000,
 		},
 	})
 	CheckError(err)

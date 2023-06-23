@@ -71,6 +71,7 @@ func QueryLendingByAddress(ctx *fiber.Ctx) error {
 	return ctx.SendString("address not found")
 }
 
+// STAKING
 func QueryStakingAPR(ctx *fiber.Ctx) error {
 	return ctx.SendString(getStoreValueFromKey(rediskeys.StakingAPR))
 }

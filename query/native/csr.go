@@ -24,7 +24,7 @@ type CSR struct {
 // will return full response string and mapping of nft id to response string
 func GetCSRS(ctx context.Context, queryClient csr.QueryClient) ([]CSR, map[string]string) {
 	resp, err := queryClient.CSRs(ctx, &csr.QueryCSRsRequest{Pagination: &query.PageRequest{
-		Limit: 500,
+		Limit: 1000,
 	}})
 	CheckError(err)
 	allCsrs := new([]CSR)
