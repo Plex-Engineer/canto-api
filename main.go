@@ -49,8 +49,8 @@ func main() {
 }
 func routerLiquidityPool(app *fiber.App) {
 	liquidity := app.Group("/lp")
-	liquidity.Get("/", re.QueryLP)
-	liquidity.Get("/:address", re.QueryLpByAddress)
+	liquidity.Get("/", re.QueryPairs)
+	liquidity.Get("/:address", re.QueryPairsByAddress)
 }
 
 func routerLending(app *fiber.App) {
