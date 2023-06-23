@@ -55,7 +55,8 @@ func GetAllProposals(ctx context.Context, queryClient gov.QueryClient) ([]Propos
 	}
 	return *allProposals, proposalMap
 }
-
+// get user vote on active proposal
+// will not work if proposal is not active
 func GetUserVote(ctx context.Context, queryClient gov.QueryClient, proposalId uint64, ethAddress string) (gov.WeightedVoteOptions, error) {
 	cantoAddress, err := EthToCantoAddress(ethAddress)
 	fmt.Println(cantoAddress)
