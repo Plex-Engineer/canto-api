@@ -8,7 +8,6 @@ require (
 	github.com/ethereum/go-ethereum v1.10.19
 	github.com/gofiber/fiber/v2 v2.46.0
 	github.com/redis/go-redis/v9 v9.0.5
-	github.com/tharsis/evmos/v5 v5.0.1
 	google.golang.org/grpc v1.50.1
 )
 
@@ -118,7 +117,6 @@ require (
 	github.com/tendermint/go-amino v0.16.0 // indirect
 	github.com/tendermint/tendermint v0.34.25 // indirect
 	github.com/tendermint/tm-db v0.6.7 // indirect
-	github.com/tharsis/ethermint v0.16.2 // indirect
 	github.com/tinylib/msgp v1.1.8 // indirect
 	github.com/tklauser/go-sysconf v0.3.7 // indirect
 	github.com/tklauser/numcpus v0.2.3 // indirect
