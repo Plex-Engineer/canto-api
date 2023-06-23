@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
+	"fmt"
 	"log"
 	"math/big"
 	"strings"
@@ -59,9 +60,19 @@ func ProcessContractCalls(contracts []config.Contract) (multicall.ViewCalls, err
 			if err := validateAddress(contract.Address); err != nil {
 				return nil, err
 			}
+			var key string
+			// check if the contract has keys
+			if len(contract.Keys) == 0 {
+				// generate key from name, method and argument of contracts
+				key = contract.Name + ":" + strings.Split(method, "(")[0]
+				if len(contract.Args[index]) != 0 {
+					key += ":" + fmt.Sprintf("%v", contract.Args[index][0])
+				}
+			} else {
+				key = contract.Keys[index]
+			}
 			vc := multicall.NewViewCall(
-				contract.Name,
-				contract.Keys[index],
+				key,
 				contract.Address,
 				method,
 				contract.Args[index],

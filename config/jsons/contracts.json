@@ -1,10 +1,7 @@
 [
     {
-      "Name": "factory contract",
+      "Name": "factory",
       "Address": "0xE387067f12561e579C5f7d4294f51867E0c1cFba",
-      "Keys": [
-        "factory:allPairsLength"
-      ],
       "Methods": [
         "allPairsLength()(uint256)"
       ],
@@ -13,11 +10,8 @@
       ]
     },
     {
-      "Name": "ccanto pricefeed",
+      "Name": "pricefeed",
       "Address": "0xa252eEE9BDe830Ca4793F054B506587027825a8e",
-      "Keys": [
-        "pricefeed:ccanto"
-      ],
       "Methods": [
         "getUnderlyingPrice(address)(uint256)"
       ],
@@ -30,11 +24,6 @@
     {
       "Name":    "comptroller",
       "Address": "0x5E23dC409Fc2F832f83CEc191E245A191a4bCc5C",
-      "Keys": [
-        "markets:ccanto",
-        "supplyspeeds:ccanto",
-        "borrowcaps:ccanto"
-      ],
       "Methods": [
         "markets(address)(bool, uint256, bool)",
         "compSupplySpeeds(address)(uint256)",
@@ -53,11 +42,8 @@
       ]
     },
     {
-      "Name": "factory again",
+      "Name": "factoryagain",
       "Address": "0xE387067f12561e579C5f7d4294f51867E0c1cFba",
-      "Keys": [
-        "key"
-      ],
       "Methods": [
         "admin()(address)"
       ],
