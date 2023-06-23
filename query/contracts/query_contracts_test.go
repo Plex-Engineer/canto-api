@@ -38,7 +38,6 @@ func TestProcessContractCalls(t *testing.T) {
 				},
 			},
 			want: multicall.ViewCalls{multicall.NewViewCall(
-				"base contract",
 				"decimals:0x00",
 				"0x00",
 				"decimals()",
@@ -66,7 +65,6 @@ func TestProcessContractCalls(t *testing.T) {
 				},
 			},
 			want: multicall.ViewCalls{multicall.NewViewCall(
-				"base contract",
 				"decimals:0x0000000000000000000000000000000000000000",
 				"0x0000000000000000000000000000000000000000",
 				"decimals()",
@@ -96,7 +94,6 @@ func TestProcessContractCalls(t *testing.T) {
 				},
 			},
 			want: multicall.ViewCalls{multicall.NewViewCall(
-				"sample erc20",
 				"balanceof:0x0000000000000000000000000000000000000000",
 				"0x0000000000000000000000000000000000000000",
 				"balanceOf(address)(uint256)",
@@ -133,14 +130,12 @@ func TestProcessContractCalls(t *testing.T) {
 			},
 			want: multicall.ViewCalls{
 				multicall.NewViewCall(
-					"sample erc20",
 					"balanceof:0x0000000000000000000000000000000000000000",
 					"0x0000000000000000000000000000000000000000",
 					"balanceOf(address)(uint256)",
 					[]interface{}{"0x71C7656EC7ab88b098defB751B7401B5f6d8976F"},
 				),
 				multicall.NewViewCall(
-					"sample erc20",
 					"allowance:0x0000000000000000000000000000000000000000",
 					"0x0000000000000000000000000000000000000000",
 					"allowance(address,address)(uint256)",
@@ -196,14 +191,12 @@ func TestProcessContractCalls(t *testing.T) {
 			},
 			want: multicall.ViewCalls{
 				multicall.NewViewCall(
-					"sample erc20",
 					"balanceof:0x0000000000000000000000000000000000000000",
 					"0x0000000000000000000000000000000000000000",
 					"balanceOf(address)(uint256)",
 					[]interface{}{"0x71C7656EC7ab88b098defB751B7401B5f6d8976F"},
 				),
 				multicall.NewViewCall(
-					"sample erc20",
 					"allowance:0x0000000000000000000000000000000000000000",
 					"0x0000000000000000000000000000000000000000",
 					"allowance(address,address)(uint256)",
@@ -213,7 +206,6 @@ func TestProcessContractCalls(t *testing.T) {
 					},
 				),
 				multicall.NewViewCall(
-					"sample pair",
 					"balanceof:0x0000000000000000000000000000000000000001",
 					"0x0000000000000000000000000000000000000001",
 					"balanceOf(address)(uint256)",
