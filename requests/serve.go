@@ -100,13 +100,21 @@ func QueryLpByAddress(ctx *fiber.Ctx) error {
 }
 
 func QueryLending(ctx *fiber.Ctx) error {
-	return ctx.SendString(getStoreValueFromKey("ctokens"))
+	val, err := getStoreValueFromKey("ctokens")
+	if err != nil {
+		return redisKeyNotFound(ctx, "ctokens")
+	}
+	return ctx.Status(StatusOkay).SendString(val)
 }
 
 func QueryLendingByAddress(ctx *fiber.Ctx) error {
 	allCTokens := new([]config.Token)
-	cTokensJson := getStoreValueFromKey("ctokens")
-	err := json.Unmarshal([]byte(cTokensJson), &allCTokens)
+
+	cTokensJson, err := getStoreValueFromKey("ctokens")
+	if err != nil {
+		return redisKeyNotFound(ctx, "ctokens")
+	}
+	err = json.Unmarshal([]byte(cTokensJson), &allCTokens)
 
 	if err != nil {
 		return redisKeyNotFound(ctx, "lending")
