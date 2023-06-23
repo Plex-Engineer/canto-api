@@ -11,8 +11,15 @@ func Run(ctx context.Context) {
 			AppName:      "Canto API",
 			ServerHeader: "Fiber",
 		})
-	app.Get("/", GetSmartContractDataFiber)
 
+	app.Get("/", GetGeneralContractDataFiber)
+
+	// get all general contract routes
+	routes := GetGeneralContractRoutes()
+
+	for _, route := range routes {
+		app.Get(route, GetGeneralContractDataFiber)
+	}
 
 	routerCSR(app)
 	routerGovernance(app)

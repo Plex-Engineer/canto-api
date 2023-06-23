@@ -32,7 +32,7 @@ func invalidParameters(ctx *fiber.Ctx, err error) error {
 	return ctx.Status(StatusBadRequest.Code).SendString(err.Error())
 }
 
-//TODO: function not used
+
 func GetGeneralContractDataFiber(ctx *fiber.Ctx) error {
 
 	// assemble key from route
@@ -49,17 +49,6 @@ func GetGeneralContractDataFiber(ctx *fiber.Ctx) error {
 
 	rdb := config.RDB
 	val, err := rdb.Get(context.Background(), key).Result()
-	if err != nil {
-		panic(err)
-	}
-	return ctx.SendString(val)
-}
-
-func GetSmartContractDataFiber(ctx *fiber.Ctx) error {
-
-	rdb := config.RDB
-
-	val, err := rdb.Get(context.Background(), rediskeys.Pairs).Result()
 	if err != nil {
 		panic(err)
 	}
