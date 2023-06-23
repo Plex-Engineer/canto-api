@@ -24,6 +24,7 @@ func TestGetCallData(t *testing.T) {
 			name: "function with no argument",
 			args: args{
 				vcs: multicall.ViewCalls{multicall.NewViewCall(
+					"name",
 					"decimals:0x0000",
 					"0x0000",
 					"decimals()",
@@ -42,6 +43,7 @@ func TestGetCallData(t *testing.T) {
 			name: "function with one argument",
 			args: args{
 				vcs: multicall.ViewCalls{multicall.NewViewCall(
+					"name",
 					"balanceof:0x0000",
 					"0x0000",
 					"balanceOf(address)(uint256)",
@@ -62,6 +64,7 @@ func TestGetCallData(t *testing.T) {
 			name: "function with multiple arguments",
 			args: args{
 				vcs: multicall.ViewCalls{multicall.NewViewCall(
+					"name",
 					"dosomething:0x0000",
 					"0x0000",
 					"doSomething(address,address,uint256)(uint256)",

@@ -37,6 +37,7 @@ func NewQueryEngine() *QueryEngine {
 	if err != nil {
 		log.Fatal(err)
 	}
+
 	return &QueryEngine{
 		redisclient: config.RDB,
 		interval:    time.Duration(config.QueryInterval),
@@ -56,6 +57,7 @@ func ProcessContractCalls(contracts []config.Contract) (multicall.ViewCalls, err
 				return nil, err
 			}
 			vc := multicall.NewViewCall(
+				contract.Name,
 				contract.Keys[index],
 				contract.Address,
 				method,
@@ -79,11 +81,10 @@ func (qe *QueryEngine) ProcessMulticallResults(ctx context.Context, results *mul
 	pairs := make(PairsMap)
 	others := make(map[string]interface{})
 
-	// Iterate the results to segregate them into ctokens, pairs and other according to their keys
+	// Iterate the results to separate them into ctokens, pairs and other according to their keys
 	for key, value := range results.Calls {
 		// split the keys at ':'
 		keys := strings.Split(key, ":")
-
 		if keys[0] == "cTokens" {
 			// Check if the keys[1] map(ex: cCanto) is already initialized
 			if ctokens[keys[1]] == nil {

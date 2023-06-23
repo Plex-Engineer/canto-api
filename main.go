@@ -22,7 +22,18 @@ func main() {
 		AppName:      "Canto API",
 		ServerHeader: "Fiber",
 	})
-	app.Get("/", re.GetSmartContractDataFiber)
+	app.Get("/", re.GetGeneralContractDataFiber)
+
+	routes := []string{
+		"/pricefeed/getUnderlyingPrice/0xB65Ec550ff356EcA6150F733bA9B954b2e0Ca488",
+		"/comptroller/borrowCaps/0xB65Ec550ff356EcA6150F733bA9B954b2e0Ca488",
+		"/comptroller/compSupplySpeeds/0xB65Ec550ff356EcA6150F733bA9B954b2e0Ca488",
+		"/factory/admin",
+	}
+
+	for _, route := range routes {
+		app.Get(route, re.GetGeneralContractDataFiber)
+	}
 
 	routerValidator(app)
 	routerCSR(app)
@@ -43,7 +54,7 @@ func routerLiquidityPool(app *fiber.App) {
 }
 
 func routerLending(app *fiber.App) {
-	lending := app.Group("/lending")
+	lending := app.Group("/ctokens")
 	lending.Get("/", re.QueryLending)
 	lending.Get("/:address", re.QueryLendingByAddress)
 }
