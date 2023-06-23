@@ -10,7 +10,6 @@ import (
 
 	contracts "canto-api/query/contracts"
 
-	cantoConfig "github.com/Canto-Network/Canto/v6/cmd/config"
 
 	"canto-api/config"
 	"canto-api/rediskeys"
@@ -28,13 +27,9 @@ func redisKeyNotFound(ctx *fiber.Ctx, key string) error {
 	//key there are looking for is not in redis
 	return ctx.Status(StatusNotFound.Code).SendString(fmt.Sprintf("%s not found", key))
 }
-
-// check parameter functions
-func checkValidatorAddress(address string) error {
-	if !(strings.HasPrefix(address, cantoConfig.Bech32PrefixValAddr)) {
-		return fmt.Errorf("invalid bech32 validator address: %s", address)
-	}
-	return nil
+func invalidParameters(ctx *fiber.Ctx, err error) error {
+	//invalid parameters
+	return ctx.Status(StatusBadRequest.Code).SendString(err.Error())
 }
 
 func GetGeneralContractDataFiber(ctx *fiber.Ctx) error {
@@ -156,9 +151,9 @@ func QueryValidators(ctx *fiber.Ctx) error {
 	return ctx.Status(StatusOkay).SendString(val)
 }
 func QueryValidatorByAddress(ctx *fiber.Ctx) error {
-	err := checkValidatorAddress(ctx.Params("address"))
+	err := CheckValidatorAddress(ctx.Params("address"))
 	if err != nil {
-		return ctx.Status(StatusBadRequest.Code).SendString(err.Error())
+		return invalidParameters(ctx, err)
 	}
 	val, err := config.RDB.HGet(context.Background(), rediskeys.ValidatorMap, ctx.Params("address")).Result()
 	if err != nil {
@@ -176,6 +171,10 @@ func QueryCSRs(ctx *fiber.Ctx) error {
 	return ctx.Status(StatusOkay).SendString(val)
 }
 func QueryCSRByID(ctx *fiber.Ctx) error {
+	err := CheckIdString(ctx.Params("id"))
+	if err != nil {
+		return invalidParameters(ctx, err)
+	}
 	val, err := config.RDB.HGet(context.Background(), rediskeys.CSRMap, ctx.Params("id")).Result()
 	if err != nil {
 		return redisKeyNotFound(ctx, fmt.Sprintf("csr nft id: %s ", ctx.Params("id")))
@@ -192,6 +191,10 @@ func QueryProposals(ctx *fiber.Ctx) error {
 	return ctx.Status(StatusOkay).SendString(val)
 }
 func QueryProposalByID(ctx *fiber.Ctx) error {
+	err := CheckIdString(ctx.Params("id"))
+	if err != nil {
+		return invalidParameters(ctx, err)
+	}
 	val, err := config.RDB.HGet(context.Background(), rediskeys.ProposalMap, ctx.Params("id")).Result()
 	if err != nil {
 		return redisKeyNotFound(ctx, fmt.Sprintf("proposal id: %s ", ctx.Params("id")))
