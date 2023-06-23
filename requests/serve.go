@@ -4,6 +4,8 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"strings"
+
 
 	"github.com/gofiber/fiber/v2"
 
@@ -13,16 +15,41 @@ import (
 	"canto-api/rediskeys"
 )
 
+
 var (
 	StatusBadRequest          = fiber.ErrBadRequest
 	StatusInternalServerError = fiber.ErrInternalServerError
 	StatusOkay                = fiber.StatusOK
 )
 
+func GetGeneralContractDataFiber(ctx *fiber.Ctx) error {
+
+	// assemble key from route
+	var key string
+	route := strings.Split(ctx.Route().Path, `/`)
+
+	for index, part := range route {
+		if index > 1 {
+			key += ":" + part
+		} else if index == 1 {
+			key += part
+		}
+	}
+
+	rdb := config.RDB
+	val, err := rdb.Get(context.Background(), key).Result()
+	if err != nil {
+		panic(err)
+	}
+	return ctx.SendString(val)
+}
+
+
 func GetSmartContractDataFiber(ctx *fiber.Ctx) error {
+
 	rdb := config.RDB
 
-	val, err := rdb.Get(context.Background(), "ctokens").Result()
+	val, err := rdb.Get(context.Background(), "supplyspeeds:ccanto:0xB65Ec550ff356EcA6150F733bA9B954b2e0Ca488").Result()
 	if err != nil {
 		panic(err)
 	}
@@ -73,16 +100,14 @@ func QueryLpByAddress(ctx *fiber.Ctx) error {
 }
 
 func QueryLending(ctx *fiber.Ctx) error {
-	val, err := getStoreValueFromKey("lending")
-	if err != nil {
-		return redisKeyNotFound(ctx, "lending")
-	}
-	return ctx.Status(StatusOkay).SendString(val)
+	return ctx.SendString(getStoreValueFromKey("ctokens"))
 }
 
 func QueryLendingByAddress(ctx *fiber.Ctx) error {
 	allCTokens := new([]config.Token)
-	cTokensJson, err := getStoreValueFromKey("lending")
+	cTokensJson := getStoreValueFromKey("ctokens")
+	err := json.Unmarshal([]byte(cTokensJson), &allCTokens)
+
 	if err != nil {
 		return redisKeyNotFound(ctx, "lending")
 	}
