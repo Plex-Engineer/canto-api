@@ -22,11 +22,13 @@ type CSR struct {
 
 // get all CSRS
 // will return full response string and mapping of nft id to response string
-func GetCSRS(ctx context.Context, queryClient csr.QueryClient) ([]CSR, map[string]string) {
+func GetCSRS(ctx context.Context, queryClient csr.QueryClient) ([]CSR, map[string]string, error) {
 	resp, err := queryClient.CSRs(ctx, &csr.QueryCSRsRequest{Pagination: &query.PageRequest{
 		Limit: 1000,
 	}})
-	CheckError(err)
+	if err != nil {
+		return nil, nil, err
+	}
 	allCsrs := new([]CSR)
 	csrMap := make(map[string]string)
 	for _, csr := range resp.GetCsrs() {
@@ -39,5 +41,5 @@ func GetCSRS(ctx context.Context, queryClient csr.QueryClient) ([]CSR, map[strin
 		*allCsrs = append(*allCsrs, csrResponse)
 		csrMap[strconv.Itoa(int(csr.GetId()))] = GeneralResultToString(csrResponse)
 	}
-	return *allCsrs, csrMap
+	return *allCsrs, csrMap, nil
 }

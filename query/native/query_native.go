@@ -3,6 +3,7 @@ package query
 import (
 	"context"
 	"errors"
+	"fmt"
 	"time"
 
 	"canto-api/config"
@@ -10,17 +11,15 @@ import (
 
 	"github.com/redis/go-redis/v9"
 
-	"google.golang.org/grpc"
-
 	csr "github.com/Canto-Network/Canto/v6/x/csr/types"
 	inflation "github.com/Canto-Network/Canto/v6/x/inflation/types"
 	gov "github.com/cosmos/cosmos-sdk/x/gov/types"
 	staking "github.com/cosmos/cosmos-sdk/x/staking/types"
 )
 
-func CheckError(err error) {
+func printError(err error) {
 	if err != nil {
-		panic(err)
+		fmt.Println("NativeQueryEngine::StartQueryEngine - " + err.Error())
 	}
 }
 
@@ -75,47 +74,39 @@ func (nqe *NativeQueryEngine) StartQueryEngine(ctx context.Context) {
 		//
 		// STAKING
 		//
-		// get pool
-		pool, err := nqe.StakingQueryHandler.Pool(ctx, &staking.QueryPoolRequest{})
-		CheckError(err)
-
-		// get mint provision
-		mintProvision, err := nqe.InflationQueryHandler.EpochMintProvision(ctx, &inflation.QueryEpochMintProvisionRequest{}, &grpc.EmptyCallOption{})
-		CheckError(err)
-
-		// get global staking apr
-		stakingApr := GetStakingAPR(*pool, *mintProvision)
-
+		stakingApr, err := GetStakingAPR(ctx, nqe.StakingQueryHandler, nqe.InflationQueryHandler)
+		printError(err)
 		// save to cache
 		err = nqe.SetJsonToCache(ctx, rediskeys.StakingAPR, stakingApr)
-		CheckError(err)
+		printError(err)
 
 		// get and save all validators to cache
-		validators, validatorMap := GetValidators(ctx, nqe.StakingQueryHandler)
+		validators, validatorMap, err := GetValidators(ctx, nqe.StakingQueryHandler)
+		printError(err)
 		err = nqe.SetJsonToCache(ctx, rediskeys.AllValidators, validators)
-		CheckError(err)
+		printError(err)
 		err = nqe.SetMappingToCache(ctx, rediskeys.ValidatorMap, validatorMap)
-		CheckError(err)
+		printError(err)
 
 		//
 		// CSR
 		//
-		csrs, csrMap := GetCSRS(ctx, nqe.CSRQueryHandler)
+		csrs, csrMap, err := GetCSRS(ctx, nqe.CSRQueryHandler)
+		printError(err)
 		err = nqe.SetJsonToCache(ctx, rediskeys.AllCSRs, csrs)
-		CheckError(err)
+		printError(err)
 		err = nqe.SetMappingToCache(ctx, rediskeys.CSRMap, csrMap)
-		CheckError(err)
+		printError(err)
 
 		//
 		// GOVSHUTTLE
 		//
-		proposals, proposalMap := GetAllProposals(ctx, nqe.GovQueryHandler)
+		proposals, proposalMap, err := GetAllProposals(ctx, nqe.GovQueryHandler)
+		printError(err)
 		err = nqe.SetJsonToCache(ctx, rediskeys.AllProposals, proposals)
-		CheckError(err)
+		printError(err)
 		err = nqe.SetMappingToCache(ctx, rediskeys.ProposalMap, proposalMap)
-		CheckError(err)
-
-		GetUserDelegations(ctx, nqe.StakingQueryHandler, "0x8915da99B69e84DE6C97928d378D9887482C671c")
+		printError(err)
 	}
 }
 

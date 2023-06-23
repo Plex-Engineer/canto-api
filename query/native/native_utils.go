@@ -12,8 +12,8 @@ import (
 	staking "github.com/cosmos/cosmos-sdk/x/staking/types"
 )
 
-// GetStakingAPR returns the APR for a all bonded tokens and mint provision for current epoch
-func GetStakingAPR(pool staking.QueryPoolResponse, mintProvision inflation.QueryEpochMintProvisionResponse) sdk.Dec {
+// CalculateStakingAPR returns the APR for a all bonded tokens and mint provision for current epoch
+func CalculateStakingAPR(pool staking.QueryPoolResponse, mintProvision inflation.QueryEpochMintProvisionResponse) sdk.Dec {
 	//get bonded tokens from pool
 	bondedTokens := pool.GetPool().BondedTokens
 	//get mint provision amount from epoch (in acanto)
@@ -35,7 +35,6 @@ func GeneralResultToString(results interface{}) string {
 	}
 	return string(ret)
 }
-
 
 func EthToCantoAddress(ethAddress string) (string, error) {
 	emvosQuery := evmos.NewQueryClient(config.GrpcClient)

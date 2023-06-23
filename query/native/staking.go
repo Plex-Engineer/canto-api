@@ -3,11 +3,28 @@ package query
 import (
 	"context"
 
+	inflation "github.com/Canto-Network/Canto/v6/x/inflation/types"
 	query "github.com/cosmos/cosmos-sdk/types/query"
 	staking "github.com/cosmos/cosmos-sdk/x/staking/types"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
+
+func GetStakingAPR(ctx context.Context, stakingQueryClient staking.QueryClient, inflationQueryClient inflation.QueryClient) (string, error) {
+	//get pool
+	pool, err := stakingQueryClient.Pool(ctx, &staking.QueryPoolRequest{})
+	if err != nil {
+		return "", err
+	}
+	// get mint provision
+	mintProvision, err := inflationQueryClient.EpochMintProvision(ctx, &inflation.QueryEpochMintProvisionRequest{})
+	if err != nil {
+		return "", err
+	}
+	// get global staking apr
+	stakingApr := CalculateStakingAPR(*pool, *mintProvision)
+	return stakingApr.String(), nil
+}
 
 type Validator struct {
 	// operator_address defines the address of the validator's operator; bech encoded in JSON.
@@ -26,13 +43,15 @@ type Validator struct {
 
 // get all Validators for staking
 // will return full response string and mapping of operator address to response string
-func GetValidators(ctx context.Context, queryClient staking.QueryClient) ([]Validator, map[string]string) {
+func GetValidators(ctx context.Context, queryClient staking.QueryClient) ([]Validator, map[string]string, error) {
 	respValidators, err := queryClient.Validators(ctx, &staking.QueryValidatorsRequest{
 		Pagination: &query.PageRequest{
 			Limit: 1000,
 		},
 	})
-	CheckError(err)
+	if err != nil {
+		return nil, nil, err
+	}
 	allValidators := new([]Validator)
 	validatorMap := make(map[string]string)
 	for _, validator := range respValidators.Validators {
@@ -47,7 +66,7 @@ func GetValidators(ctx context.Context, queryClient staking.QueryClient) ([]Vali
 		*allValidators = append(*allValidators, valResponse)
 		validatorMap[validator.OperatorAddress] = GeneralResultToString(valResponse)
 	}
-	return *allValidators, validatorMap
+	return *allValidators, validatorMap, nil
 }
 
 type Delegation struct {

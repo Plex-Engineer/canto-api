@@ -32,9 +32,11 @@ type Proposal struct {
 
 // get all proposals from gov shuttle
 // will return full response string and mapping of proposal id to response string
-func GetAllProposals(ctx context.Context, queryClient gov.QueryClient) ([]Proposal, map[string]string) {
+func GetAllProposals(ctx context.Context, queryClient gov.QueryClient) ([]Proposal, map[string]string, error) {
 	resp, err := queryClient.Proposals(ctx, &gov.QueryProposalsRequest{})
-	CheckError(err)
+	if err != nil {
+		return nil, nil, err
+	}
 	allProposals := new([]Proposal)
 	proposalMap := make(map[string]string)
 	for _, proposal := range resp.GetProposals() {
@@ -52,7 +54,7 @@ func GetAllProposals(ctx context.Context, queryClient gov.QueryClient) ([]Propos
 		*allProposals = append(*allProposals, proposalResponse)
 		proposalMap[strconv.Itoa(int(proposal.ProposalId))] = GeneralResultToString(proposalResponse)
 	}
-	return *allProposals, proposalMap
+	return *allProposals, proposalMap, nil
 }
 // get user vote on active proposal
 // will not work if proposal is not active
