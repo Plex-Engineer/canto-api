@@ -32,6 +32,7 @@ func invalidParameters(ctx *fiber.Ctx, err error) error {
 	return ctx.Status(StatusBadRequest.Code).SendString(err.Error())
 }
 
+//TODO: function not used
 func GetGeneralContractDataFiber(ctx *fiber.Ctx) error {
 
 	// assemble key from route
@@ -101,8 +102,10 @@ func QueryLpByAddress(ctx *fiber.Ctx) error {
 	return ctx.SendString("address not found")
 }
 
+
+// LENDING
 func QueryLending(ctx *fiber.Ctx) error {
-	val, err := getStoreValueFromKey("ctokens")
+	val, err := getStoreValueFromKey(rediskeys.CTokens)
 	if err != nil {
 		return redisKeyNotFound(ctx, "ctokens")
 	}

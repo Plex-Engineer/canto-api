@@ -10,7 +10,11 @@ import (
 
 // Processed Pairs
 func QueryPairs(ctx *fiber.Ctx) error {
-	return ctx.SendString(getStoreValueFromKey(rediskeys.ProcessedPairs))
+	val, err := getStoreValueFromKey(rediskeys.ProcessedPairs)
+	if err != nil {
+		return redisKeyNotFound(ctx, rediskeys.ProcessedPairs)
+	}
+	return ctx.Status(StatusOkay).SendString(val)
 }
 
 func QueryPairsByAddress(ctx *fiber.Ctx) error {

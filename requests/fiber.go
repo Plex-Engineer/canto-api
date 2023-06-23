@@ -28,8 +28,8 @@ func Run(ctx context.Context) {
 
 func routerLiquidityPool(app *fiber.App) {
 	liquidity := app.Group("/v1/lp")
-	liquidity.Get("/", QueryLP)
-	liquidity.Get("/:address", QueryLpByAddress)
+	liquidity.Get("/", QueryPairs)
+	liquidity.Get("/:address", QueryPairsByAddress)
 }
 
 func routerLending(app *fiber.App) {
