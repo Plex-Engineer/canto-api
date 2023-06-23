@@ -24,7 +24,6 @@ func Run(ctx context.Context) {
 	routerCSR(app)
 	routerGovernance(app)
 	routerStaking(app)
-	routerLending(app)
 	routerLiquidityPool(app)
 
 	err := app.Listen(":3000")
@@ -39,11 +38,7 @@ func routerLiquidityPool(app *fiber.App) {
 	liquidity.Get("/:address", QueryPairsByAddress)
 }
 
-func routerLending(app *fiber.App) {
-	lending := app.Group("/v1/lending")
-	lending.Get("/", QueryLending)
-	lending.Get("/:address", QueryLendingByAddress)
-}
+
 
 func routerCSR(app *fiber.App) {
 	csr := app.Group("/v1/csr")
