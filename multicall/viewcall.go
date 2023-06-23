@@ -14,7 +14,6 @@ import (
 )
 
 type ViewCall struct {
-	contract  string
 	key       string
 	target    string
 	method    string
@@ -31,9 +30,8 @@ type Result struct {
 var insideParens = regexp.MustCompile("\\(.*?\\)")
 var numericArg = regexp.MustCompile("u?int(256)|(8)")
 
-func NewViewCall(contract string, key string, target string, method string, arguments []interface{}) ViewCall {
+func NewViewCall(key string, target string, method string, arguments []interface{}) ViewCall {
 	return ViewCall{
-		contract:  contract,
 		key:       key,
 		target:    target,
 		method:    method,
@@ -215,7 +213,11 @@ func (call ViewCall) decode(raw []byte) ([]interface{}, error) {
 	for index := range retTypes {
 		key := fmt.Sprintf("ret%d", index)
 		item := decoded[key]
-		returns[index] = item
+		if bigint, ok := item.(*big.Int); ok {
+			returns[index] = bigint.String()
+		} else {
+			returns[index] = decoded[key]
+		}
 	}
 	return returns, nil
 }
@@ -237,23 +239,7 @@ func (calls ViewCalls) Decode(raw struct {
 			callResult = returnValues
 
 		}
-
-		// store ctokens and lppairs in separate maps
-		if strings.Split(call.key, ":")[0] == "cTokens" {
-			result.Calls[call.key] = callResult
-		} else if strings.Split(call.key, ":")[0] == "lpPairs" {
-			result.Calls[call.key] = callResult
-		}
-
-		if len(call.arguments) == 0 {
-			result.Calls[call.contract+":"+strings.Split(call.method, "(")[0]] = callResult
-		} else {
-			// create key string
-			argumentString := call.arguments[0].(string)
-			contractString := call.contract
-			methodString := strings.Split(call.method, "(")[0]
-			result.Calls[contractString+":"+methodString+":"+argumentString] = callResult
-		}
+		result.Calls[call.key] = callResult
 	}
 	return result, nil
 }

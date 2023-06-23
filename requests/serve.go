@@ -58,7 +58,7 @@ func GetSmartContractDataFiber(ctx *fiber.Ctx) error {
 
 	rdb := config.RDB
 
-	val, err := rdb.Get(context.Background(), "supplyspeeds:ccanto:0xB65Ec550ff356EcA6150F733bA9B954b2e0Ca488").Result()
+	val, err := rdb.Get(context.Background(), rediskeys.Pairs).Result()
 	if err != nil {
 		panic(err)
 	}

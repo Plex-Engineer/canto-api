@@ -1,12 +1,5 @@
 package config
 
-import (
-	"encoding/json"
-	"fmt"
-	"io"
-	"os"
-)
-
 // this function generates and returns required contract calls for all ctokens in TokensConfig
 func getCTokenContractCalls() []Contract {
 	// Declare and initialize a list of Contracts
@@ -19,10 +12,10 @@ func getCTokenContractCalls() []Contract {
 			Name:    token.Symbol,
 			Address: token.Address,
 			Keys: []string{
-				"cTokens:" + token.Symbol + ":cash",
-				"cTokens:" + token.Symbol + ":exchangeRateStored",
-				"cTokens:" + token.Symbol + ":supplyRatePerBlock",
-				"cTokens:" + token.Symbol + ":borrowRatePerBlock",
+				"cTokens:" + token.Address + ":cash",
+				"cTokens:" + token.Address + ":exchangeRateStored",
+				"cTokens:" + token.Address + ":supplyRatePerBlock",
+				"cTokens:" + token.Address + ":borrowRatePerBlock",
 			},
 			Methods: []string{
 				"getCash()(uint256)",
@@ -43,7 +36,7 @@ func getCTokenContractCalls() []Contract {
 			Name:    token.Symbol + "pricefeed",
 			Address: ContractAddressesConfig.Mainnet.Router,
 			Keys: []string{
-				"cTokens:" + token.Symbol + ":underlyingPrice",
+				"cTokens:" + token.Address + ":underlyingPrice",
 			},
 			Methods: []string{
 				"getUnderlyingPrice(address)(uint256)",
@@ -58,9 +51,9 @@ func getCTokenContractCalls() []Contract {
 			Name:    token.Symbol + "comptroller",
 			Address: ContractAddressesConfig.Mainnet.Comptroller,
 			Keys: []string{
-				"cTokens:" + token.Symbol + ":markets",
-				"cTokens:" + token.Symbol + ":compSupplySpeeds",
-				"cTokens:" + token.Symbol + ":borrowCaps",
+				"cTokens:" + token.Address + ":markets",
+				"cTokens:" + token.Address + ":compSupplySpeeds",
+				"cTokens:" + token.Address + ":borrowCaps",
 			},
 			Methods: []string{
 				"markets(address)(bool, uint256, bool)",
@@ -78,24 +71,6 @@ func getCTokenContractCalls() []Contract {
 	return calls
 }
 
-// this function returns the ctoken address of the token having address equal to underlyingAddress
-func getCTokenAddress(underlyingAddress string) string {
-	// Declare cTokenAddress
-	var cTokenAddress string
-
-	// iterate through ctokens config to get the ctoken address of the token with underlyingAddress
-	for _, token := range TokensConfig.CTokens {
-		// check if the current ctoken has given underlying address and return ctoken address if true
-		if token.Underlying == underlyingAddress {
-			cTokenAddress = token.Address
-			break
-		}
-	}
-
-	// return cTokenAddress
-	return cTokenAddress
-}
-
 // this function generates and returns required contract calls for all pairs in TokensConfig
 func getPairsContractsCalls() []Contract {
 	// Declare and initialize a list of Contracts
@@ -108,10 +83,10 @@ func getPairsContractsCalls() []Contract {
 			Name:    pair.Symbol,
 			Address: pair.Address,
 			Keys: []string{
-				"lpPairs:" + pair.Symbol + ":reserves",
-				"lpPairs:" + pair.Symbol + ":tokens",
-				"lpPairs:" + pair.Symbol + ":stable",
-				"lpPairs:" + pair.Symbol + ":totalSupply",
+				"lpPairs:" + pair.Address + ":reserves",
+				"lpPairs:" + pair.Address + ":tokens",
+				"lpPairs:" + pair.Address + ":stable",
+				"lpPairs:" + pair.Address + ":totalSupply",
 			},
 			Methods: []string{
 				"getReserves()(uint256,uint256,uint256)",
@@ -132,10 +107,10 @@ func getPairsContractsCalls() []Contract {
 			Name:    pair.Symbol + "pricefeed",
 			Address: ContractAddressesConfig.Mainnet.Router,
 			Keys: []string{
-				"lpPairs:" + pair.Symbol + ":reserves",
-				"lpPairs:" + pair.Symbol + ":underlyingPriceTokenA",
-				"lpPairs:" + pair.Symbol + ":underlyingPriceTokenB",
-				"lpPairs:" + pair.Symbol + ":underlyingPriceLp",
+				"lpPairs:" + pair.Address + ":reserves",
+				"lpPairs:" + pair.Address + ":underlyingPriceTokenA",
+				"lpPairs:" + pair.Address + ":underlyingPriceTokenB",
+				"lpPairs:" + pair.Address + ":underlyingPriceLp",
 			},
 			Methods: []string{
 				"getReserves(address,address,bool)(uint256, uint256)",
@@ -145,64 +120,14 @@ func getPairsContractsCalls() []Contract {
 			},
 			Args: [][]interface{}{
 				{pair.TokenA, pair.TokenB, pair.Stable},
-				{getCTokenAddress(pair.TokenA)},
-				{getCTokenAddress(pair.TokenB)},
-				{getCTokenAddress(pair.Address)},
+				{GetCTokenAddress(pair.TokenA)},
+				{GetCTokenAddress(pair.TokenB)},
+				{GetCTokenAddress(pair.Address)},
 			},
 		})
 	}
 	return calls
 
-}
-
-// parses tokens.json and returns tokens data
-func getAllTokensFromJson(path string) TokensInfo {
-	var TokensInfo TokensInfo
-
-	tokensFile, err := os.Open(path)
-
-	if err != nil {
-		fmt.Println(err)
-	}
-
-	defer tokensFile.Close()
-
-	tokensByteValue, _ := io.ReadAll(tokensFile)
-	tokens, err := UnmarshalTokens(tokensByteValue)
-
-	if err != nil {
-		fmt.Println(err)
-	}
-
-	TokensInfo.CTokens = tokens.CTokens
-	TokensInfo.Pairs = tokens.Pairs
-	return TokensInfo
-}
-
-// parses contract_addresses.json and returns contract addresses for all chains
-func getContractAddressesFromJson(path string) ContractAddresses {
-	var contractAddresses ContractAddresses
-
-	// Open the JSON file
-	file, err := os.Open(path)
-
-	if err != nil {
-		fmt.Println(err)
-	}
-
-	defer file.Close()
-
-	// Read the file content
-	fileContent, _ := io.ReadAll(file)
-
-	//Umarshall the data and store in contractAddresses
-	err = json.Unmarshal(fileContent, &contractAddresses)
-
-	if err != nil {
-		fmt.Println(err)
-	}
-
-	return contractAddresses
 }
 
 func getAllFPI(path string) []Contract {
