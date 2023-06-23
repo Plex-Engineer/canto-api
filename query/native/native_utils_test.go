@@ -78,7 +78,7 @@ func TestGetStakingAPR(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got := GetStakingAPR(tt.args.pool, tt.args.mintProvision); !reflect.DeepEqual(got, tt.want) {
+			if got := CalculateStakingAPR(tt.args.pool, tt.args.mintProvision); !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("GetStakingAPR() = %v, want %v", got, tt.want)
 			}
 		})
