@@ -6,7 +6,7 @@ import (
 	"canto-api/config"
 	cqe "canto-api/queryengine/contracts"
 	nqe "canto-api/queryengine/native"
-	re "canto-api/requests"
+	re "canto-api/requestengine"
 )
 
 func main() {
