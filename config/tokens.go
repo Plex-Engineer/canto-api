@@ -8,6 +8,7 @@ package config
 
 import (
 	"encoding/json"
+	"fmt"
 	"io"
 	"os"
 )
@@ -54,7 +55,7 @@ func getAllTokensFromJson(path string) TokensInfo {
 	tokensFile, err := os.Open(path)
 
 	if err != nil {
-		panic(err)
+		panic(fmt.Sprintf("Error opening tokens.json: %v", err))
 	}
 
 	defer tokensFile.Close()
@@ -62,7 +63,7 @@ func getAllTokensFromJson(path string) TokensInfo {
 	tokensByteValue, _ := io.ReadAll(tokensFile)
 	err = json.Unmarshal(tokensByteValue, &TokensInfo)
 	if err != nil {
-		panic(err)
+		panic(fmt.Sprintf("Error unmarshalling tokens.json: %v", err))
 	}
 
 	return TokensInfo

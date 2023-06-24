@@ -41,7 +41,7 @@ func NewConfig() {
 	GrpcClient, _ = grpc.Dial("143.198.228.162:9090", grpc.WithInsecure())
 
 	// get tokens data from tokens.json
-	FPIConfig = getAllTokensFromJson("./config/jsons/fpi.json")
+	FPIConfig = getAllTokensFromJson("./config/jsons/fpi_mainnet.json")
 
 	// set multicall address
 	MulticallAddress = common.HexToAddress(FPIConfig.MulticallV3)
@@ -52,7 +52,7 @@ func NewConfig() {
 	// get general contracts from contracts.json
 	generalCalls, err := getContractsFromJson("./config/jsons/contracts.json")
 	if err != nil {
-		fmt.Println("Error getting contracts from json:", err)
+		panic(fmt.Sprintf("Error getting general contracts: %v", err))
 	}
 
 	// get FPI contracts from tokens.json
