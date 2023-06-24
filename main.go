@@ -4,8 +4,8 @@ import (
 	"context"
 
 	"canto-api/config"
-	cqe "canto-api/query/contracts"
-	nqe "canto-api/query/native"
+	cqe "canto-api/queryengine/contracts"
+	nqe "canto-api/queryengine/native"
 	re "canto-api/requests"
 )
 
@@ -14,5 +14,5 @@ func main() {
 	ctx := context.Background()
 	go cqe.Run(ctx) // run contract query engine
 	go nqe.Run(ctx) // run native query engine
-	re.Run(ctx)  // run request engine
+	re.Run(ctx)     // run request engine
 }

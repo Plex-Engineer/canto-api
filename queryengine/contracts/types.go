@@ -1,4 +1,4 @@
-package query
+package queryengine
 
 import "canto-api/config"
 
