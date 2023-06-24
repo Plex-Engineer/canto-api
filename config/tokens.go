@@ -8,19 +8,22 @@ package config
 
 import (
 	"encoding/json"
-	"fmt"
 	"io"
 	"os"
 )
 
 type TokensInfo struct {
-	Name     string   `json:"name"`
-	Version  float64  `json:"version"`
-	Keywords []string `json:"keywords"`
-	ChainID  string   `json:"chainId"`
-	CTokens  []Token  `json:"cTokens"`
-	Tokens   []Token  `json:"tokens"`
-	Pairs    []Pair   `json:"pairs"`
+	Name        string   `json:"name"`
+	Version     float64  `json:"version"`
+	Keywords    []string `json:"keywords"`
+	ChainID     string   `json:"chainid"`
+	Comptroller string   `json:"comptroller"`
+	Router      string   `json:"router"`
+	Reservoir   string   `json:"reservoir"`
+	MulticallV3 string   `json:"multicallV3"`
+	CTokens     []Token  `json:"ctokens"`
+	Tokens      []Token  `json:"tokens"`
+	Pairs       []Pair   `json:"pairs"`
 }
 
 type Token struct {
@@ -51,16 +54,15 @@ func getAllTokensFromJson(path string) TokensInfo {
 	tokensFile, err := os.Open(path)
 
 	if err != nil {
-		fmt.Println(err)
+		panic(err)
 	}
 
 	defer tokensFile.Close()
 
 	tokensByteValue, _ := io.ReadAll(tokensFile)
 	err = json.Unmarshal(tokensByteValue, &TokensInfo)
-
 	if err != nil {
-		fmt.Println(err)
+		panic(err)
 	}
 
 	return TokensInfo
@@ -69,7 +71,7 @@ func getAllTokensFromJson(path string) TokensInfo {
 // this function returns the ctoken address of the token having address equal to underlyingAddress
 func GetCTokenAddress(underlyingAddress string) (cTokenAddress string) {
 	// iterate through ctokens config to get the ctoken address of the token with underlyingAddress
-	for _, token := range TokensConfig.CTokens {
+	for _, token := range FPIConfig.CTokens {
 		// check if the current ctoken has given underlying address and return ctoken address if true
 		if token.Underlying == underlyingAddress {
 			cTokenAddress = token.Address
@@ -83,7 +85,7 @@ func GetCTokenAddress(underlyingAddress string) (cTokenAddress string) {
 func GetCTokenDecimals(underlyingAddress string) (decimals int64) {
 
 	// iterate through ctokens config to get the ctoken decimals of the token with underlyingAddress
-	for _, token := range TokensConfig.CTokens {
+	for _, token := range FPIConfig.CTokens {
 		// check if the current ctoken has given underlying address and return ctoken address if true
 		if token.Underlying == underlyingAddress {
 			decimals = token.Decimals
@@ -95,7 +97,7 @@ func GetCTokenDecimals(underlyingAddress string) (decimals int64) {
 
 // get token data from tokens config using token address and return
 func GetTokenData(address string) (result Token) {
-	for _, token := range TokensConfig.Tokens {
+	for _, token := range FPIConfig.Tokens {
 		if token.Address == address {
 			result = token
 			return
@@ -106,7 +108,7 @@ func GetTokenData(address string) (result Token) {
 
 // get lp pair data (Address, Decimals, Token1, Token2, Stable, CDecimal, cLPaddress) from tokens config using pair symbol and return
 func GetLpPairData(address string) (symbol string, decimals int64, token1 Token, token2 Token, stable bool, cDecimals int64, cLpAddress string) {
-	for _, pair := range TokensConfig.Pairs {
+	for _, pair := range FPIConfig.Pairs {
 		if pair.Address == address {
 			symbol = pair.Symbol
 			decimals = pair.Decimals

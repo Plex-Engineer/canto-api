@@ -6,7 +6,7 @@ func getCTokenContractCalls() []Contract {
 	calls := []Contract{}
 
 	// iterate over all ctokens in config and generate contract calls to query required ctoken data
-	for _, token := range TokensConfig.CTokens {
+	for _, token := range FPIConfig.CTokens {
 		// get required ctoken data from its contract
 		calls = append(calls, Contract{
 			Name:    token.Symbol,
@@ -34,7 +34,7 @@ func getCTokenContractCalls() []Contract {
 		// getUnderlyingPrice data of ctoken from router contract
 		calls = append(calls, Contract{
 			Name:    token.Symbol + "pricefeed",
-			Address: ContractAddressesConfig.Mainnet.Router,
+			Address: FPIConfig.Router,
 			Keys: []string{
 				"cTokens:" + token.Address + ":underlyingPrice",
 			},
@@ -49,7 +49,7 @@ func getCTokenContractCalls() []Contract {
 		// get markets, compSupplySpeeds and borrowCaps data of ctoken from comptroller contract
 		calls = append(calls, Contract{
 			Name:    token.Symbol + "comptroller",
-			Address: ContractAddressesConfig.Mainnet.Comptroller,
+			Address: FPIConfig.Comptroller,
 			Keys: []string{
 				"cTokens:" + token.Address + ":markets",
 				"cTokens:" + token.Address + ":compSupplySpeeds",
@@ -77,7 +77,7 @@ func getPairsContractsCalls() []Contract {
 	calls := []Contract{}
 
 	// iterare over all the pairs in config and generate contract calls to query required pair data
-	for _, pair := range TokensConfig.Pairs {
+	for _, pair := range FPIConfig.Pairs {
 		// get required pair data from its contract
 		calls = append(calls, Contract{
 			Name:    pair.Symbol,
@@ -105,7 +105,7 @@ func getPairsContractsCalls() []Contract {
 		// get reserves, underlying prices of tokenA, tokenB and Lp from router contract
 		calls = append(calls, Contract{
 			Name:    pair.Symbol + "pricefeed",
-			Address: ContractAddressesConfig.Mainnet.Router,
+			Address: FPIConfig.Router,
 			Keys: []string{
 				"lpPairs:" + pair.Address + ":reserves",
 				"lpPairs:" + pair.Address + ":underlyingPriceTokenA",
@@ -130,7 +130,7 @@ func getPairsContractsCalls() []Contract {
 
 }
 
-func getAllFPI(path string) []Contract {
+func getAllFPI() []Contract {
 	// Declare and initialize a list of Contracts
 	calls := []Contract{}
 
