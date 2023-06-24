@@ -143,3 +143,30 @@ func GetProcessedPairs(ctx context.Context, pairs PairsMap) ([]ProcessedPair, ma
 	}
 	return processedPairs, processedPairsMap
 }
+
+func GetProcessedCTokens(ctx context.Context, ctokens TokensMap) ([]ProcessedCToken, map[string]string) {
+	processedCTokens := []ProcessedCToken{}
+	processedCTokensMap := make(map[string]string)
+
+	// loop over all ctokens
+	// key is address of ctoken and value is a map of ctoken data
+	for key, _ := range ctokens {
+		// get all the data and process
+
+		symbol, decimals, underlying, price, totalSupply, exchangeRate, cTokenAddress := config.GetCTokenData(key)
+		processedCToken := ProcessedCToken{
+			Address:       key,
+			Symbol:        symbol,
+			Decimals:      decimals,
+			Underlying:    underlying,
+			Price:         price,
+			TotalSupply:   totalSupply,
+			ExchangeRate:  exchangeRate,
+			CTokenAddress: cTokenAddress,
+		}
+
+		processedCTokens = append(processedCTokens, processedCToken)
+		processedCTokensMap[key] = ResultToString(processedCToken)
+	}
+	return processedCTokens, processedCTokensMap
+}

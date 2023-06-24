@@ -123,3 +123,20 @@ func GetLpPairData(address string) (symbol string, decimals int64, token1 Token,
 	}
 	return
 }
+
+// get ctoken data (Symbol, Decimals, Underlying, Price, TotalSupply, ExchangeRate, cTokenAddress) from tokens config using ctoken address and return
+func GetCTokenData(address string) (symbol string, decimals int64, underlying Token, price string, totalSupply string, exchangeRate string, cTokenAddress string) {
+	for _, ctoken := range FPIConfig.CTokens {
+		if ctoken.Address == address {
+			symbol = ctoken.Symbol
+			decimals = ctoken.Decimals
+			underlying = GetTokenData(ctoken.Underlying)
+			price = GetTokenData(ctoken.Underlying).LogoURI
+			totalSupply = "0"
+			exchangeRate = "0"
+			cTokenAddress = ctoken.Address
+			return
+		}
+	}
+	return
+}

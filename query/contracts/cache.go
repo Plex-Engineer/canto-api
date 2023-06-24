@@ -49,7 +49,6 @@ func (qe *QueryEngine) SetCacheWithFpi(ctx context.Context, ctokens TokensMap, p
 // SetCacheWithResult sets the result of a multicall query in Redis
 // and returns an error if any occur.
 func (qe *QueryEngine) SetCacheWithGeneral(ctx context.Context, results map[string][]interface{}) error {
-
 	// iterate others map and set keys in redis
 	for key, value := range results {
 		// convert result slice to string
@@ -78,6 +77,25 @@ func (qe *QueryEngine) SetCacheWithProcessedPairs(ctx context.Context, pairs Pai
 	err = qe.SetMapToCache(ctx, config.ProcessedPairsMap, processedPairsMap)
 	if err != nil {
 		return errors.New("QueryEngine::SetCacheWithProcessedPairs - " + err.Error())
+	}
+
+	return nil
+}
+
+func (qe *QueryEngine) SetCacheWithProcessedCTokens(ctx context.Context, ctokens TokensMap) error {
+	// get processed ctokens data
+	processedCTokens, processedCTokensMap := GetProcessedCTokens(ctx, ctokens)
+
+	// set processed ctokens as a json string to redis
+	err := qe.SetJsonToCache(ctx, config.ProcessedCTokens, processedCTokens)
+	if err != nil {
+		return errors.New("QueryEngine::SetCacheWithProcessedCTokens - " + err.Error())
+	}
+
+	// set processed ctokens map as a json string to redis
+	err = qe.SetMapToCache(ctx, config.ProcessedCTokensMap, processedCTokensMap)
+	if err != nil {
+		return errors.New("QueryEngine::SetCacheWithProcessedCTokens - " + err.Error())
 	}
 
 	return nil

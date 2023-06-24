@@ -21,3 +21,14 @@ type ProcessedPair struct {
 	Reserve1    string       `json:"reserve1"`
 	Reserve2    string       `json:"reserve2"`
 }
+
+type ProcessedCToken struct {
+	Address       string       `json:"address"`
+	Symbol        string       `json:"symbol"`
+	Decimals      int64        `json:"decimals"`
+	Underlying    config.Token `json:"underlying"`
+	Price         string       `json:"price"`
+	TotalSupply   string       `json:"totalSupply"`
+	ExchangeRate  string       `json:"exchangeRate"`
+	CTokenAddress string       `json:"cTokenAddress"`
+}

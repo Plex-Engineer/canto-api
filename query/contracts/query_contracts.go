@@ -137,34 +137,36 @@ func (qe *QueryEngine) StartQueryEngine(ctx context.Context) {
 		// call functions in multicall contract
 		res, err := qe.mcinstance.Aggregate(nil, calldata)
 		if err != nil {
-			log.Fatal(err)
+			log.Fatal(fmt.Errorf("QueryEngine::StartQueryEngine - %v", err))
 		}
 
 		// decode results
 		ret, err := qe.viewcalls.Decode(res)
 		if err != nil {
-			log.Fatal(err)
+			log.Fatal(fmt.Errorf("QueryEngine::StartQueryEngine - %v", err))
 		}
 
 		// get ctokens, pairs and others from multicall results
 		ctokens, pairs, others := qe.ProcessMulticallResults(ctx, ret)
 
-		// set ctokens, pairs to redis cache with fpi
-		err = qe.SetCacheWithFpi(ctx, ctokens, pairs)
-		if err != nil {
-			log.Fatal(err)
-		}
+		fmt.Println(ctokens)
 
 		// set general contracts to redis cache
 		err = qe.SetCacheWithGeneral(ctx, others)
 		if err != nil {
-			log.Fatal(err)
+			log.Fatal(fmt.Errorf("QueryEngine::StartQueryEngine - %v", err))
 		}
 
 		// process pairs data and set to redis
 		err = qe.SetCacheWithProcessedPairs(ctx, pairs)
 		if err != nil {
-			log.Fatal(err)
+			log.Fatal(fmt.Errorf("QueryEngine::StartQueryEngine - %v", err))
+		}
+
+		// process ctokens data and set to redis
+		err = qe.SetCacheWithProcessedCTokens(ctx, ctokens)
+		if err != nil {
+			log.Fatal(fmt.Errorf("QueryEngine::StartQueryEngine - %v", err))
 		}
 	}
 }

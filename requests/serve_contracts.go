@@ -19,21 +19,17 @@ func GetGeneralContractRoutes() []string {
 			if len(contract.Keys) == 0 {
 				// generate route from name, method and argument of contracts
 				route := contract.Name + "/" + strings.Split(method, "(")[0]
-
 				if len(contract.Args[index]) != 0 {
 					route += "/" + fmt.Sprintf("%v", contract.Args[index][0])
 				}
-
 				routes = append(routes, route)
 			}
 		}
 	}
-
 	return routes
 }
 
 func GetGeneralContractDataFiber(ctx *fiber.Ctx) error {
-
 	// assemble key from route
 	var key string
 	route := strings.Split(ctx.Route().Path, `/`)
@@ -67,6 +63,22 @@ func QueryPairsByAddress(ctx *fiber.Ctx) error {
 	val, err := config.RDB.HGet(context.Background(), config.ProcessedPairsMap, ctx.Params("address")).Result()
 	if err != nil {
 		return RedisKeyNotFound(ctx, config.ProcessedPairsMap)
+	}
+	return ctx.SendString(val)
+}
+
+func QueryCTokens(ctx *fiber.Ctx) error {
+	val, err := GetStoreValueFromKey(config.ProcessedCTokens)
+	if err != nil {
+		return RedisKeyNotFound(ctx, config.ProcessedCTokens)
+	}
+	return ctx.SendString(val)
+}
+
+func QueryCTokenByAddress(ctx *fiber.Ctx) error {
+	val, err := config.RDB.HGet(context.Background(), config.ProcessedCTokensMap, ctx.Params("address")).Result()
+	if err != nil {
+		return RedisKeyNotFound(ctx, config.ProcessedCTokensMap)
 	}
 	return ctx.SendString(val)
 }
