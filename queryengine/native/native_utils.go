@@ -27,7 +27,7 @@ func CalculateStakingAPR(pool staking.QueryPoolResponse, mintProvision inflation
 func GeneralResultToString(results interface{}) string {
 	ret, err := json.Marshal(results)
 	if err != nil {
-		return "QueryEngine::GeneralResultToString - " + err.Error()
+		return "GeneralResultToString:" + err.Error()
 	}
 	return string(ret)
 }

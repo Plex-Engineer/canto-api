@@ -3,12 +3,12 @@ package queryengine
 import (
 	"context"
 	"errors"
-	"fmt"
 	"time"
 
 	"canto-api/config"
 
 	"github.com/redis/go-redis/v9"
+	"github.com/rs/zerolog/log"
 
 	csr "github.com/Canto-Network/Canto/v6/x/csr/types"
 	inflation "github.com/Canto-Network/Canto/v6/x/inflation/types"
@@ -18,7 +18,7 @@ import (
 
 func printError(err error) {
 	if err != nil {
-		fmt.Println("NativeQueryEngine::StartQueryEngine - " + err.Error())
+		log.Fatal().Err(err).Msg("NativeQueryEngine:" + err.Error())
 	}
 }
 
@@ -50,7 +50,7 @@ func (nqe *NativeQueryEngine) SetJsonToCache(ctx context.Context, key string, re
 	ret := GeneralResultToString(result)
 	err := nqe.redisclient.Set(ctx, key, ret, 0).Err()
 	if err != nil {
-		return errors.New("NativeQueryEngine::SetJsonToCache - " + err.Error())
+		return errors.New("SetJsonToCache:" + err.Error())
 	}
 	return nil
 }
@@ -60,7 +60,7 @@ func (nqe *NativeQueryEngine) SetMappingToCache(ctx context.Context, key string,
 	//set key in redis
 	err := nqe.redisclient.HSet(ctx, key, result).Err()
 	if err != nil {
-		return errors.New("NativeQueryEngine::SetMappingToCache - " + err.Error())
+		return errors.New("SetMappingToCache:" + err.Error())
 	}
 	return nil
 }
