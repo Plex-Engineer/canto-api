@@ -12,16 +12,16 @@ func getCTokenContractCalls() []Contract {
 			Name:    token.Symbol,
 			Address: token.Address,
 			Keys: []string{
-				"cTokens:" + token.Address + ":cash",
 				"cTokens:" + token.Address + ":exchangeRateStored",
 				"cTokens:" + token.Address + ":supplyRatePerBlock",
 				"cTokens:" + token.Address + ":borrowRatePerBlock",
+				"cTokens:" + token.Address + ":totalSupply",
 			},
 			Methods: []string{
-				"getCash()(uint256)",
 				"exchangeRateStored()(uint256)",
 				"supplyRatePerBlock()(uint256)",
 				"borrowRatePerBlock()(uint256)",
+				"totalSupply()(uint256)",
 			},
 			Args: [][]interface{}{
 				{},
@@ -53,14 +53,17 @@ func getCTokenContractCalls() []Contract {
 			Keys: []string{
 				"cTokens:" + token.Address + ":markets",
 				"cTokens:" + token.Address + ":compSupplySpeeds",
+				"cTokens:" + token.Address + ":compBorrowSpeeds",
 				"cTokens:" + token.Address + ":borrowCaps",
 			},
 			Methods: []string{
 				"markets(address)(bool, uint256, bool)",
 				"compSupplySpeeds(address)(uint256)",
+				"compBorrowSpeeds(address)(uint256)",
 				"borrowCaps(address)(uint256)",
 			},
 			Args: [][]interface{}{
+				{token.Address},
 				{token.Address},
 				{token.Address},
 				{token.Address},

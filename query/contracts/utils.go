@@ -150,19 +150,30 @@ func GetProcessedCTokens(ctx context.Context, ctokens TokensMap) ([]ProcessedCTo
 
 	// loop over all ctokens
 	// key is address of ctoken and value is a map of ctoken data
-	for key, _ := range ctokens {
+	for key, value := range ctokens {
 		// get all the data and process
+		borrowCaps, _ := InterfaceToBigInt(value["borrowCaps"][0])
+		borrowRatePerBlock, _ := InterfaceToBigInt(value["borrowRatePerBlock"][0])
+		compSupplySpeeds, _ := InterfaceToBigInt(value["compSupplySpeeds"][0])
+		compBorrowSpeeds, _ := InterfaceToBigInt(value["compBorrowSpeeds"][0])
+		exchangeRateStored, _ := InterfaceToBigInt(value["exchangeRateStored"][0])
+		supplyRatePerBlock, _ := InterfaceToBigInt(value["supplyRatePerBlock"][0])
+		underlyingPrice, _ := InterfaceToBigInt(value["underlyingPrice"][0])
+		totalSupply, _ := InterfaceToBigInt(value["totalSupply"][0])
 
-		symbol, decimals, underlying, price, totalSupply, exchangeRate, cTokenAddress := config.GetCTokenData(key)
+		symbol, decimals := config.GetCTokenData(key)
 		processedCToken := ProcessedCToken{
-			Address:       key,
-			Symbol:        symbol,
-			Decimals:      decimals,
-			Underlying:    underlying,
-			Price:         price,
-			TotalSupply:   totalSupply,
-			ExchangeRate:  exchangeRate,
-			CTokenAddress: cTokenAddress,
+			Symbol:           symbol,
+			Address:          key,
+			Decimals:         decimals,
+			TotalSupply:      totalSupply.String(),
+			Price:            underlyingPrice.String(),
+			SupplyRate:       supplyRatePerBlock.String(),
+			BorrowRate:       borrowRatePerBlock.String(),
+			BorrowCaps:       borrowCaps.String(),
+			CompSupplySpeeds: compSupplySpeeds.String(),
+			CompBorrowSpeeds: compBorrowSpeeds.String(),
+			ExchangeRate:     exchangeRateStored.String(),
 		}
 
 		processedCTokens = append(processedCTokens, processedCToken)

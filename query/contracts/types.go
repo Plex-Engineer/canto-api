@@ -23,12 +23,15 @@ type ProcessedPair struct {
 }
 
 type ProcessedCToken struct {
-	Address       string       `json:"address"`
-	Symbol        string       `json:"symbol"`
-	Decimals      int64        `json:"decimals"`
-	Underlying    config.Token `json:"underlying"`
-	Price         string       `json:"price"`
-	TotalSupply   string       `json:"totalSupply"`
-	ExchangeRate  string       `json:"exchangeRate"`
-	CTokenAddress string       `json:"cTokenAddress"`
+	Symbol           string `json:"symbol"`
+	Address          string `json:"address"`
+	Decimals         int64  `json:"decimals"`
+	TotalSupply      string `json:"totalSupply"`
+	Price            string `json:"underlyingPrice"`
+	ExchangeRate     string `json:"exchangeRate"`
+	SupplyRate       string `json:"supplyRate"`
+	BorrowRate       string `json:"borrowRate"`
+	BorrowCaps       string `json:"borrowCaps"`
+	CompSupplySpeeds string `json:"compSupplySpeeds"`
+	CompBorrowSpeeds string `json:"compBorrowSpeeds"`
 }

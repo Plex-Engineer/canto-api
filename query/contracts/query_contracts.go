@@ -149,8 +149,6 @@ func (qe *QueryEngine) StartQueryEngine(ctx context.Context) {
 		// get ctokens, pairs and others from multicall results
 		ctokens, pairs, others := qe.ProcessMulticallResults(ctx, ret)
 
-		fmt.Println(ctokens)
-
 		// set general contracts to redis cache
 		err = qe.SetCacheWithGeneral(ctx, others)
 		if err != nil {
