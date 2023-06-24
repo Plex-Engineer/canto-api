@@ -4,7 +4,6 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"log"
 	"strings"
 	"time"
 
@@ -12,6 +11,7 @@ import (
 	"canto-api/multicall"
 
 	"github.com/redis/go-redis/v9"
+	"github.com/rs/zerolog/log"
 )
 
 type TokensMap map[string]map[string][]interface{}
@@ -31,12 +31,12 @@ type QueryEngine struct {
 func NewQueryEngine() *QueryEngine {
 	mc, err := multicall.NewMulticall(config.MulticallAddress, config.EthClient)
 	if err != nil {
-		log.Fatal(err)
+		log.Fatal().Msg("QueryEngine::NewQueryEngine" + err.Error())
 	}
 
 	vcs, err := ProcessContractCalls(config.ContractCalls)
 	if err != nil {
-		log.Fatal(err)
+		log.Fatal().Msg("QueryEngine::NewQueryEngine" + err.Error())
 	}
 
 	return &QueryEngine{
@@ -76,7 +76,7 @@ func ProcessContractCalls(contracts []config.Contract) (multicall.ViewCalls, err
 			)
 
 			if err := vc.Validate(); err != nil {
-				return nil, errors.New("QueryEngine::ProcessContractCalls - " + err.Error())
+				return nil, errors.New("QueryEngine::ProcessContractCalls" + err.Error())
 			}
 
 			vcs = append(vcs, vc)
@@ -127,23 +127,26 @@ func (qe *QueryEngine) ProcessMulticallResults(ctx context.Context, results *mul
 // StartQueryEngine starts the query engine and runs the ticker
 // on the interval specified in config .
 func (qe *QueryEngine) StartQueryEngine(ctx context.Context) {
+	log.Info().Msg("QueryEngine::StartQueryEngine: query engine started")
+	// get calldata from multicall contract
 	calldata, err := GetCallData(qe.viewcalls)
 	if err != nil {
-		log.Fatal(err)
+		log.Fatal().Msg("QueryEngine::StartQueryEngine:" + err.Error())
 	}
 
 	ticker := time.NewTicker(qe.interval * time.Second)
 	for range ticker.C {
+		log.Info().Msg("QueryEngine::StartQueryEngine: querying contracts")
 		// call functions in multicall contract
 		res, err := qe.mcinstance.Aggregate(nil, calldata)
 		if err != nil {
-			log.Fatal(fmt.Errorf("QueryEngine::StartQueryEngine - %v", err))
+			log.Fatal().Msg("QueryEngine::StartQueryEngine:" + err.Error())
 		}
 
 		// decode results
 		ret, err := qe.viewcalls.Decode(res)
 		if err != nil {
-			log.Fatal(fmt.Errorf("QueryEngine::StartQueryEngine - %v", err))
+			log.Fatal().Msg("QueryEngine::StartQueryEngine:" + err.Error())
 		}
 
 		// get ctokens, pairs and others from multicall results
@@ -152,19 +155,19 @@ func (qe *QueryEngine) StartQueryEngine(ctx context.Context) {
 		// set general contracts to redis cache
 		err = qe.SetCacheWithGeneral(ctx, others)
 		if err != nil {
-			log.Fatal(fmt.Errorf("QueryEngine::StartQueryEngine - %v", err))
+			log.Fatal().Msg("QueryEngine::StartQueryEngine:" + err.Error())
 		}
 
 		// process pairs data and set to redis
 		err = qe.SetCacheWithProcessedPairs(ctx, pairs)
 		if err != nil {
-			log.Fatal(fmt.Errorf("QueryEngine::StartQueryEngine - %v", err))
+			log.Fatal().Msg("QueryEngine::StartQueryEngine:" + err.Error())
 		}
 
 		// process ctokens data and set to redis
 		err = qe.SetCacheWithProcessedCTokens(ctx, ctokens)
 		if err != nil {
-			log.Fatal(fmt.Errorf("QueryEngine::StartQueryEngine - %v", err))
+			log.Fatal().Msg("QueryEngine::StartQueryEngine:" + err.Error())
 		}
 	}
 }
