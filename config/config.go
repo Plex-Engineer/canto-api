@@ -41,7 +41,7 @@ func NewConfig() {
 	GrpcClient, _ = grpc.Dial("143.198.228.162:9090", grpc.WithInsecure())
 
 	// get tokens data from tokens.json
-	FPIConfig = getAllTokensFromJson("./config/jsons/fpi_mainnet.json")
+	FPIConfig = getFPIFromJson("./config/jsons/fpi_mainnet.json")
 
 	// set multicall address
 	MulticallAddress = common.HexToAddress(FPIConfig.MulticallV3)

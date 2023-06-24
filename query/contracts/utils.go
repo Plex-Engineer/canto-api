@@ -1,9 +1,12 @@
 package query
 
 import (
-	"canto-api/multicall"
+	"context"
 	"encoding/json"
 	"math/big"
+
+	"canto-api/config"
+	"canto-api/multicall"
 
 	"errors"
 	"regexp"
@@ -86,4 +89,57 @@ func GetLpPairRatio(reserve1 *big.Int, reserve2 *big.Int) (*big.Int, bool) {
 		ratio.Div(ratio, reserve1)
 		return ratio, false
 	}
+}
+
+// This function takes symbol and data of a pair(ex:CantoAtomLP), calculates and adds additional required data and returns the processed pair data
+func GetProcessedPairs(ctx context.Context, pairs PairsMap) ([]ProcessedPair, map[string]string) {
+	processedPairs := []ProcessedPair{}
+	processedPairsMap := make(map[string]string)
+
+	// loop over all pairs
+	// key is address of lp pair and value is a map of pair data
+	for key, value := range pairs {
+		// get all the data and process
+		reserve1, _ := InterfaceToBigInt(value["reserves"][0])
+		reserve2, _ := InterfaceToBigInt(value["reserves"][1])
+		totalSupply, _ := InterfaceToBigInt(value["totalSupply"][0])
+		price1, _ := InterfaceToString(value["underlyingPriceTokenA"][0])
+		price2, _ := InterfaceToString(value["underlyingPriceTokenB"][0])
+		lpPrice, _ := InterfaceToBigInt(value["underlyingPriceLp"][0])
+
+		// calculate total value locked by multiplying lp price and total supply using Mul() method
+		var tvl = new(big.Int).Mul(lpPrice, totalSupply)
+
+		// divide tvl with 1e18 using Div() method
+		tvl.Div(tvl, new(big.Int).Exp(big.NewInt(10), big.NewInt(18), nil))
+
+		// get ratio of reserve and reserve2
+		ratio, aTob := GetLpPairRatio(reserve1, reserve2)
+
+		// get lp pair data
+		symbol, decimals, token1, token2, stable, cDecimals, cLpAddress := config.GetLpPairData(key)
+		processedPair := ProcessedPair{
+			Address:     key,
+			Symbol:      symbol,
+			Decimals:    decimals,
+			Token1:      token1,
+			Token2:      token2,
+			Stable:      stable,
+			CDecimal:    cDecimals,
+			CLpAddress:  cLpAddress,
+			TotalSupply: totalSupply.String(),
+			Tvl:         tvl.String(),
+			Ratio:       ratio.String(),
+			AToB:        aTob,
+			Price1:      price1,
+			Price2:      price2,
+			LpPrice:     lpPrice.String(),
+			Reserve1:    reserve1.String(),
+			Reserve2:    reserve2.String(),
+		}
+
+		processedPairs = append(processedPairs, processedPair)
+		processedPairsMap[key] = ResultToString(processedPair)
+	}
+	return processedPairs, processedPairsMap
 }

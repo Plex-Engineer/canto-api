@@ -49,7 +49,7 @@ type Pair struct {
 }
 
 // parses tokens.json and returns tokens data
-func getAllTokensFromJson(path string) TokensInfo {
+func getFPIFromJson(path string) TokensInfo {
 	var TokensInfo TokensInfo
 
 	tokensFile, err := os.Open(path)
