@@ -7,7 +7,6 @@ import (
 	"time"
 
 	"canto-api/config"
-	"canto-api/rediskeys"
 
 	"github.com/redis/go-redis/v9"
 
@@ -77,15 +76,15 @@ func (nqe *NativeQueryEngine) StartQueryEngine(ctx context.Context) {
 		stakingApr, err := GetStakingAPR(ctx, nqe.StakingQueryHandler, nqe.InflationQueryHandler)
 		printError(err)
 		// save to cache
-		err = nqe.SetJsonToCache(ctx, rediskeys.StakingAPR, stakingApr)
+		err = nqe.SetJsonToCache(ctx, config.StakingAPR, stakingApr)
 		printError(err)
 
 		// get and save all validators to cache
 		validators, validatorMap, err := GetValidators(ctx, nqe.StakingQueryHandler)
 		printError(err)
-		err = nqe.SetJsonToCache(ctx, rediskeys.AllValidators, validators)
+		err = nqe.SetJsonToCache(ctx, config.AllValidators, validators)
 		printError(err)
-		err = nqe.SetMappingToCache(ctx, rediskeys.ValidatorMap, validatorMap)
+		err = nqe.SetMappingToCache(ctx, config.ValidatorMap, validatorMap)
 		printError(err)
 
 		//
@@ -93,9 +92,9 @@ func (nqe *NativeQueryEngine) StartQueryEngine(ctx context.Context) {
 		//
 		csrs, csrMap, err := GetCSRS(ctx, nqe.CSRQueryHandler)
 		printError(err)
-		err = nqe.SetJsonToCache(ctx, rediskeys.AllCSRs, csrs)
+		err = nqe.SetJsonToCache(ctx, config.AllCSRs, csrs)
 		printError(err)
-		err = nqe.SetMappingToCache(ctx, rediskeys.CSRMap, csrMap)
+		err = nqe.SetMappingToCache(ctx, config.CSRMap, csrMap)
 		printError(err)
 
 		//
@@ -103,9 +102,9 @@ func (nqe *NativeQueryEngine) StartQueryEngine(ctx context.Context) {
 		//
 		proposals, proposalMap, err := GetAllProposals(ctx, nqe.GovQueryHandler)
 		printError(err)
-		err = nqe.SetJsonToCache(ctx, rediskeys.AllProposals, proposals)
+		err = nqe.SetJsonToCache(ctx, config.AllProposals, proposals)
 		printError(err)
-		err = nqe.SetMappingToCache(ctx, rediskeys.ProposalMap, proposalMap)
+		err = nqe.SetMappingToCache(ctx, config.ProposalMap, proposalMap)
 		printError(err)
 	}
 }

@@ -12,7 +12,6 @@ import (
 
 	"canto-api/config"
 	"canto-api/multicall"
-	"canto-api/rediskeys"
 
 	"github.com/redis/go-redis/v9"
 )
@@ -131,14 +130,14 @@ func (qe *QueryEngine) ProcessMulticallResults(ctx context.Context, results *mul
 // and returns an error if any occurs.
 func (qe *QueryEngine) SetCacheWithFpi(ctx context.Context, redisclient *redis.Client, ctokens TokensMap, pairs PairsMap) error {
 	// set ctokens as a json string in redis
-	err := qe.SetJsonToCache(ctx, redisclient, rediskeys.CTokens, ctokens)
+	err := qe.SetJsonToCache(ctx, redisclient, config.CTokens, ctokens)
 
 	if err != nil {
 		return errors.New("QueryEngine::SetCacheWithFpi - " + err.Error())
 	}
 
 	// set pairs as a json string in redis
-	err = qe.SetJsonToCache(ctx, redisclient, rediskeys.Pairs, pairs)
+	err = qe.SetJsonToCache(ctx, redisclient, config.Pairs, pairs)
 
 	if err != nil {
 		return errors.New("QueryEngine::SetCacheWithFpi - " + err.Error())
@@ -262,7 +261,7 @@ func (qe *QueryEngine) SetMapToCache(ctx context.Context, redisclient *redis.Cli
 // This function gets the pairs data from redis, processes it and sets the processed pairs data to redis
 func (qe *QueryEngine) SetCacheWithProcessedPairs(ctx context.Context, redisclient *redis.Client) error {
 	//get pairs data
-	val, err := redisclient.Get(context.Background(), rediskeys.Pairs).Result()
+	val, err := redisclient.Get(context.Background(), config.Pairs).Result()
 	if err != nil {
 		return errors.New("QueryEngine::SetCacheWithProcessedPairs - " + err.Error())
 	}
@@ -281,14 +280,14 @@ func (qe *QueryEngine) SetCacheWithProcessedPairs(ctx context.Context, redisclie
 	processedPairs, processedPairsMap := qe.GetProcessedPairs(ctx, pairs)
 
 	//  set processed pairs as a json string to redis
-	err = qe.SetJsonToCache(ctx, redisclient, rediskeys.ProcessedPairs, processedPairs)
+	err = qe.SetJsonToCache(ctx, redisclient, config.ProcessedPairs, processedPairs)
 
 	if err != nil {
 		return errors.New("QueryEngine::SetCacheWithProcessedPairs - " + err.Error())
 	}
 
 	//  set processed pairs map as a json string to redis
-	err = qe.SetMapToCache(ctx, redisclient, rediskeys.ProcessedPairsMap, processedPairsMap)
+	err = qe.SetMapToCache(ctx, redisclient, config.ProcessedPairsMap, processedPairsMap)
 
 	if err != nil {
 		return errors.New("QueryEngine::SetCacheWithProcessedPairs - " + err.Error())

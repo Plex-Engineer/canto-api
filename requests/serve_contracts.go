@@ -5,7 +5,6 @@ import (
 	"strings"
 
 	"canto-api/config"
-	"canto-api/rediskeys"
 	"context"
 
 	"github.com/gofiber/fiber/v2"
@@ -57,17 +56,17 @@ func GetGeneralContractDataFiber(ctx *fiber.Ctx) error {
 
 // Processed Pairs
 func QueryPairs(ctx *fiber.Ctx) error {
-	val, err := GetStoreValueFromKey(rediskeys.ProcessedPairs)
+	val, err := GetStoreValueFromKey(config.ProcessedPairs)
 	if err != nil {
-		return RedisKeyNotFound(ctx, rediskeys.ProcessedPairs)
+		return RedisKeyNotFound(ctx, config.ProcessedPairs)
 	}
 	return ctx.Status(StatusOkay).SendString(val)
 }
 
 func QueryPairsByAddress(ctx *fiber.Ctx) error {
-	val, err := config.RDB.HGet(context.Background(), rediskeys.ProcessedPairsMap, ctx.Params("address")).Result()
+	val, err := config.RDB.HGet(context.Background(), config.ProcessedPairsMap, ctx.Params("address")).Result()
 	if err != nil {
-		return RedisKeyNotFound(ctx, rediskeys.ProcessedPairsMap)
+		return RedisKeyNotFound(ctx, config.ProcessedPairsMap)
 	}
 	return ctx.SendString(val)
 }
