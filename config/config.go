@@ -1,11 +1,10 @@
 package config
 
 import (
-	"fmt"
-
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/ethclient"
 	"github.com/redis/go-redis/v9"
+	"github.com/rs/zerolog/log"
 	"google.golang.org/grpc"
 )
 
@@ -51,10 +50,17 @@ func NewConfig() {
 	})
 
 	// Initialize eth client using mainnet rpc
-	EthClient, _ = ethclient.Dial("https://mainnode.plexnode.org:8545")
+	ethclient, err := ethclient.Dial("https://mainnode.plexnode.org:8545")
+	if err != nil {
+		log.Fatal().Msgf("Error initializing eth client: %v", err)
+	}
+	EthClient = ethclient
 
 	// Initialize grpc client using mainnet rpc
-	GrpcClient, _ = grpc.Dial("143.198.228.162:9090", grpc.WithInsecure())
+	GrpcClient, err = grpc.Dial("143.198.228.162:9090", grpc.WithInsecure())
+	if err != nil {
+		log.Fatal().Msgf("Error initializing grpc client: %v", err)
+	}
 
 	// get tokens data from tokens.json
 	FPIConfig = getFPIFromJson("./config/jsons/fpi_mainnet.json")
@@ -68,7 +74,7 @@ func NewConfig() {
 	// get general contracts from contracts.json
 	generalCalls, err := getContractsFromJson("./config/jsons/contracts.json")
 	if err != nil {
-		panic(fmt.Sprintf("Error getting general contracts: %v", err))
+		log.Fatal().Msgf("Error getting general contracts from json: %v", err)
 	}
 
 	// get FPI contracts from tokens.json
