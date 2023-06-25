@@ -8,7 +8,9 @@ import (
 	"strings"
 
 	cantoConfig "github.com/Canto-Network/Canto/v6/cmd/config"
+
 	"github.com/gofiber/fiber/v2"
+	"github.com/rs/zerolog/log"
 )
 
 var (
@@ -21,10 +23,12 @@ var (
 // functions to return status errors
 func RedisKeyNotFound(ctx *fiber.Ctx, key string) error {
 	//key there are looking for is not in redis
+	log.Error().Msgf("Error getting key '%s' from redis", key)
 	return ctx.Status(StatusNotFound.Code).SendString(fmt.Sprintf("%s not found", key))
 }
 func InvalidParameters(ctx *fiber.Ctx, err error) error {
 	//invalid parameters
+	log.Error().Msgf("Invalid parameters: %v", err)
 	return ctx.Status(StatusBadRequest.Code).SendString(err.Error())
 }
 

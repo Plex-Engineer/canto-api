@@ -7,6 +7,7 @@ import (
 	"context"
 
 	"github.com/gofiber/fiber/v2"
+	"github.com/rs/zerolog/log"
 )
 
 func GetGeneralContractDataFiber(ctx *fiber.Ctx) error {
@@ -25,7 +26,9 @@ func GetGeneralContractDataFiber(ctx *fiber.Ctx) error {
 	rdb := config.RDB
 	val, err := rdb.Get(context.Background(), key).Result()
 	if err != nil {
-		panic(err)
+		log.Error().
+			Err(err).
+			Msgf("Error getting key '%s' from redis", key)
 	}
 	return ctx.SendString(val)
 }

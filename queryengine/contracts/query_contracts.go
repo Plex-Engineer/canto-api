@@ -149,7 +149,7 @@ func (qe *QueryEngine) StartContractQueryEngine(ctx context.Context) {
 
 	ticker := time.NewTicker(qe.interval * time.Second)
 	for range ticker.C {
-		log.Info().Msg("querying contracts")
+		log.Info().Msg("querying contracts...")
 		// call functions in multicall contract
 		res, err := qe.mcinstance.Aggregate(nil, calldata)
 		if err != nil {
@@ -185,6 +185,7 @@ func (qe *QueryEngine) StartContractQueryEngine(ctx context.Context) {
 		if err != nil {
 			contractQueryEngineFatalLog(err, "StartContractQueryEngine", "failed to set processed ctokens to redis cache")
 		}
+		log.Info().Msg("successfully queried contracts...")
 	}
 }
 
