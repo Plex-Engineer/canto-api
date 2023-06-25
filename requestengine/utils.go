@@ -1,14 +1,14 @@
 package requestengine
 
 import (
-	"canto-api/config"
 	"context"
 	"fmt"
 	"strconv"
 	"strings"
 
-	cantoConfig "github.com/Canto-Network/Canto/v6/cmd/config"
+	"canto-api/config"
 
+	cantoConfig "github.com/Canto-Network/Canto/v6/cmd/config"
 	"github.com/gofiber/fiber/v2"
 	"github.com/rs/zerolog/log"
 )
