@@ -7,6 +7,7 @@ import (
 	"strings"
 
 	"github.com/gofiber/fiber/v2"
+	"github.com/rs/zerolog/log"
 )
 
 // GetGeneralContractRoutes returns a slice of routes for general contracts
@@ -80,6 +81,6 @@ func Run(ctx context.Context) {
 
 	err := app.Listen(":3000")
 	if err != nil {
-		panic(err)
+		log.Fatal().Err(err).Msg("Error fiber server")
 	}
 }
