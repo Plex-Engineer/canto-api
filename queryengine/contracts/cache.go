@@ -13,7 +13,7 @@ func (qe *QueryEngine) SetJsonToCache(ctx context.Context, key string, result in
 	ret := ResultToString(result)
 	err := qe.redisclient.Set(ctx, key, ret, 0).Err()
 	if err != nil {
-		return errors.New("SetJsonToCache:" + err.Error())
+		return err
 	}
 	return nil
 }

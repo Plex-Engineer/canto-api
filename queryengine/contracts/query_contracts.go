@@ -31,12 +31,12 @@ type QueryEngine struct {
 func NewQueryEngine() *QueryEngine {
 	mc, err := multicall.NewMulticall(config.MulticallAddress, config.EthClient)
 	if err != nil {
-		log.Fatal().Msg("QueryEngine::NewQueryEngine" + err.Error())
+		contractQueryEngineFatalLog(err, "NewQueryEngine", "failed to create multicall instance")
 	}
 
 	vcs, err := ProcessContractCalls(config.ContractCalls)
 	if err != nil {
-		log.Fatal().Msg("QueryEngine::NewQueryEngine" + err.Error())
+		contractQueryEngineFatalLog(err, "NewQueryEngine", "failed to process contract calls")
 	}
 
 	return &QueryEngine{
@@ -86,7 +86,7 @@ func ProcessContractCalls(contracts []config.Contract) (multicall.ViewCalls, err
 	return vcs, nil
 }
 
-func (qe *QueryEngine) ProcessMulticallResults(ctx context.Context, results *multicall.Result) (TokensMap, PairsMap, map[string][]interface{}) {
+func (qe *QueryEngine) ProcessMulticallResults(ctx context.Context, results *multicall.Result) (TokensMap, PairsMap, map[string][]interface{}, error) {
 	// Declare and initialize maps for ctokens, pairs and others
 	ctokens := make(TokensMap)
 	pairs := make(PairsMap)
@@ -97,6 +97,9 @@ func (qe *QueryEngine) ProcessMulticallResults(ctx context.Context, results *mul
 		// split the keys at ':'
 		keys := strings.Split(key, ":")
 		if keys[0] == "cTokens" {
+			if len(keys) < 3 {
+				return nil, nil, nil, errors.New("ProcessMulticallResults: invalid key for cTokens")
+			}
 			// Check if the keys[1] map(ex: address of cCanto) is already initialized
 			if ctokens[keys[1]] == nil {
 				// Initialize the keys[1] map(ex: address of cCanto)
@@ -107,6 +110,9 @@ func (qe *QueryEngine) ProcessMulticallResults(ctx context.Context, results *mul
 			ctokens[keys[1]][keys[2]] = value
 
 		} else if keys[0] == "lpPairs" {
+			if len(keys) < 3 {
+				return nil, nil, nil, errors.New("ProcessMulticallResults: invalid key for lpPairs")
+			}
 			// Check if the keys[1] map(ex: address of CantoNoteLP) is already initialized
 			if pairs[keys[1]] == nil {
 				// Initialize the keys[1] map(ex: CantoNoteLP)
@@ -121,53 +127,63 @@ func (qe *QueryEngine) ProcessMulticallResults(ctx context.Context, results *mul
 		}
 
 	}
-	return ctokens, pairs, others
+	return ctokens, pairs, others, nil
+}
+
+func contractQueryEngineFatalLog(err error, function string, msg string) {
+	log.Fatal().
+		Err(err).
+		Str("func", function).
+		Msg(msg)
 }
 
 // StartQueryEngine starts the query engine and runs the ticker
 // on the interval specified in config .
-func (qe *QueryEngine) StartQueryEngine(ctx context.Context) {
-	log.Info().Msg("QueryEngine::StartQueryEngine: query engine started")
+func (qe *QueryEngine) StartContractQueryEngine(ctx context.Context) {
+	log.Info().Msg("starting query engine")
 	// get calldata from multicall contract
 	calldata, err := GetCallData(qe.viewcalls)
 	if err != nil {
-		log.Fatal().Msg("QueryEngine::StartQueryEngine:" + err.Error())
+		contractQueryEngineFatalLog(err, "StartContractQueryEngine", "failed to get calldata")
 	}
 
 	ticker := time.NewTicker(qe.interval * time.Second)
 	for range ticker.C {
-		log.Info().Msg("QueryEngine::StartQueryEngine: querying contracts")
+		log.Info().Msg("querying contracts")
 		// call functions in multicall contract
 		res, err := qe.mcinstance.Aggregate(nil, calldata)
 		if err != nil {
-			log.Fatal().Msg("QueryEngine::StartQueryEngine:" + err.Error())
+			contractQueryEngineFatalLog(err, "StartContractQueryEngine", "failed to aggregate")
 		}
 
 		// decode results
 		ret, err := qe.viewcalls.Decode(res)
 		if err != nil {
-			log.Fatal().Msg("QueryEngine::StartQueryEngine:" + err.Error())
+			contractQueryEngineFatalLog(err, "StartContractQueryEngine", "failed to decode results")
 		}
 
 		// get ctokens, pairs and others from multicall results
-		ctokens, pairs, others := qe.ProcessMulticallResults(ctx, ret)
+		ctokens, pairs, others, err := qe.ProcessMulticallResults(ctx, ret)
+		if err != nil {
+			contractQueryEngineFatalLog(err, "StartContractQueryEngine", "failed to process multicall results")
+		}
 
 		// set general contracts to redis cache
 		err = qe.SetCacheWithGeneral(ctx, others)
 		if err != nil {
-			log.Fatal().Msg("QueryEngine::StartQueryEngine:" + err.Error())
+			contractQueryEngineFatalLog(err, "StartContractQueryEngine", "failed to set general contracts to redis cache")
 		}
 
 		// process pairs data and set to redis
 		err = qe.SetCacheWithProcessedPairs(ctx, pairs)
 		if err != nil {
-			log.Fatal().Msg("QueryEngine::StartQueryEngine:" + err.Error())
+			contractQueryEngineFatalLog(err, "StartContractQueryEngine", "failed to set processed pairs to redis cache")
 		}
 
 		// process ctokens data and set to redis
 		err = qe.SetCacheWithProcessedCTokens(ctx, ctokens)
 		if err != nil {
-			log.Fatal().Msg("QueryEngine::StartQueryEngine:" + err.Error())
+			contractQueryEngineFatalLog(err, "StartContractQueryEngine", "failed to set processed ctokens to redis cache")
 		}
 	}
 }
@@ -175,5 +191,5 @@ func (qe *QueryEngine) StartQueryEngine(ctx context.Context) {
 // Run initializes a QueryEngine instance and starts it.
 func Run(ctx context.Context) {
 	qe := NewQueryEngine()
-	qe.StartQueryEngine(ctx)
+	qe.StartContractQueryEngine(ctx)
 }

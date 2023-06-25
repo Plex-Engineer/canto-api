@@ -16,12 +16,6 @@ import (
 	staking "github.com/cosmos/cosmos-sdk/x/staking/types"
 )
 
-func printError(err error) {
-	if err != nil {
-		log.Fatal().Err(err).Msg("NativeQueryEngine:" + err.Error())
-	}
-}
-
 type NativeQueryEngine struct {
 	redisclient *redis.Client
 	interval    time.Duration
@@ -56,7 +50,7 @@ func (nqe *NativeQueryEngine) SetJsonToCache(ctx context.Context, key string, re
 }
 
 // set mapping to cache (to easy lookup by id in queries)
-func (nqe *NativeQueryEngine) SetMappingToCache(ctx context.Context, key string, result map[string]string) error {
+func (nqe *NativeQueryEngine) SetMapToCache(ctx context.Context, key string, result map[string]string) error {
 	//set key in redis
 	err := nqe.redisclient.HSet(ctx, key, result).Err()
 	if err != nil {
@@ -65,52 +59,80 @@ func (nqe *NativeQueryEngine) SetMappingToCache(ctx context.Context, key string,
 	return nil
 }
 
+func nativeQueryEngineFatalLog(err error, function string, msg string) {
+	log.Fatal().
+		Err(err).
+		Str("func", function).
+		Msg(msg)
+}
+
 // StartNativeQueryEngine starts the query engine and runs the ticker
 // on the interval specified in config
-func (nqe *NativeQueryEngine) StartQueryEngine(ctx context.Context) {
+func (nqe *NativeQueryEngine) StartNativeQueryEngine(ctx context.Context) {
 	ticker := time.NewTicker(nqe.interval * time.Second)
 	for range ticker.C {
 		//
 		// STAKING
 		//
 		stakingApr, err := GetStakingAPR(ctx, nqe.StakingQueryHandler, nqe.InflationQueryHandler)
-		printError(err)
+		if err != nil {
+			nativeQueryEngineFatalLog(err, "StartNativeQueryEngine", "failed to get staking APR")
+		}
 		// save to cache
 		err = nqe.SetJsonToCache(ctx, config.StakingAPR, stakingApr)
-		printError(err)
-
+		if err != nil {
+			nativeQueryEngineFatalLog(err, "StartNativeQueryEngine", "failed to set staking APR")
+		}
 		// get and save all validators to cache
 		validators, validatorMap, err := GetValidators(ctx, nqe.StakingQueryHandler)
-		printError(err)
+		if err != nil {
+			nativeQueryEngineFatalLog(err, "StartNativeQueryEngine", "failed to get validators")
+		}
 		err = nqe.SetJsonToCache(ctx, config.AllValidators, validators)
-		printError(err)
-		err = nqe.SetMappingToCache(ctx, config.ValidatorMap, validatorMap)
-		printError(err)
+		if err != nil {
+			nativeQueryEngineFatalLog(err, "StartNativeQueryEngine", "failed to set validators")
+		}
+		err = nqe.SetMapToCache(ctx, config.ValidatorMap, validatorMap)
+		if err != nil {
+			nativeQueryEngineFatalLog(err, "StartNativeQueryEngine", "failed to set validator map")
+		}
 
 		//
 		// CSR
 		//
 		csrs, csrMap, err := GetCSRS(ctx, nqe.CSRQueryHandler)
-		printError(err)
+		if err != nil {
+			nativeQueryEngineFatalLog(err, "StartNativeQueryEngine", "failed to get CSRs")
+		}
 		err = nqe.SetJsonToCache(ctx, config.AllCSRs, csrs)
-		printError(err)
-		err = nqe.SetMappingToCache(ctx, config.CSRMap, csrMap)
-		printError(err)
+		if err != nil {
+			nativeQueryEngineFatalLog(err, "StartNativeQueryEngine", "failed to set CSRs")
+		}
+		err = nqe.SetMapToCache(ctx, config.CSRMap, csrMap)
+		if err != nil {
+			nativeQueryEngineFatalLog(err, "StartNativeQueryEngine", "failed to set CSR map")
+		}
 
 		//
 		// GOVSHUTTLE
 		//
 		proposals, proposalMap, err := GetAllProposals(ctx, nqe.GovQueryHandler)
-		printError(err)
+		if err != nil {
+			nativeQueryEngineFatalLog(err, "StartNativeQueryEngine", "failed to get proposals")
+		}
 		err = nqe.SetJsonToCache(ctx, config.AllProposals, proposals)
-		printError(err)
-		err = nqe.SetMappingToCache(ctx, config.ProposalMap, proposalMap)
-		printError(err)
+		if err != nil {
+			nativeQueryEngineFatalLog(err, "StartNativeQueryEngine", "failed to set proposals")
+		}
+		err = nqe.SetMapToCache(ctx, config.ProposalMap, proposalMap)
+		if err != nil {
+			nativeQueryEngineFatalLog(err, "StartNativeQueryEngine", "failed to set proposal map")
+		}
 	}
 }
 
 // RunNative initializes a NativeQueryEngine and starts it
 func Run(ctx context.Context) {
 	nqe := NewNativeQueryEngine()
-	nqe.StartQueryEngine(ctx)
+	nqe.StartNativeQueryEngine(ctx)
 }
