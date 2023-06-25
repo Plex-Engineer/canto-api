@@ -76,7 +76,7 @@ func ProcessContractCalls(contracts []config.Contract) (multicall.ViewCalls, err
 			)
 
 			if err := vc.Validate(); err != nil {
-				return nil, errors.New("QueryEngine::ProcessContractCalls" + err.Error())
+				return nil, errors.New("ProcessContractCalls: " + err.Error())
 			}
 
 			vcs = append(vcs, vc)

@@ -44,7 +44,7 @@ func (nqe *NativeQueryEngine) SetJsonToCache(ctx context.Context, key string, re
 	ret := GeneralResultToString(result)
 	err := nqe.redisclient.Set(ctx, key, ret, 0).Err()
 	if err != nil {
-		return errors.New("SetJsonToCache:" + err.Error())
+		return errors.New("SetJsonToCache: " + err.Error())
 	}
 	return nil
 }
@@ -54,7 +54,7 @@ func (nqe *NativeQueryEngine) SetMapToCache(ctx context.Context, key string, res
 	//set key in redis
 	err := nqe.redisclient.HSet(ctx, key, result).Err()
 	if err != nil {
-		return errors.New("SetMappingToCache:" + err.Error())
+		return errors.New("SetMappingToCache: " + err.Error())
 	}
 	return nil
 }
