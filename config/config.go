@@ -63,7 +63,10 @@ func NewConfig() {
 	}
 
 	// get tokens data from tokens.json
-	FPIConfig = getFPIFromJson("./config/jsons/fpi_mainnet.json")
+	FPIConfig, err = getFPIFromJson("./config/jsons/fpi_mainnet.json")
+	if err != nil {
+		log.Fatal().Msgf("Error getting tokens data from json: %v", err)
+	}
 
 	// set multicall address
 	MulticallAddress = common.HexToAddress(FPIConfig.MulticallV3)

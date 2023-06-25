@@ -49,13 +49,13 @@ type Pair struct {
 }
 
 // parses tokens.json and returns tokens data
-func getFPIFromJson(path string) TokensInfo {
+func getFPIFromJson(path string) (TokensInfo, error) {
 	var TokensInfo TokensInfo
 
 	tokensFile, err := os.Open(path)
 
 	if err != nil {
-		panic(fmt.Sprintf("Error opening tokens.json: %v", err))
+		return TokensInfo, err
 	}
 
 	defer tokensFile.Close()
@@ -63,10 +63,10 @@ func getFPIFromJson(path string) TokensInfo {
 	tokensByteValue, _ := io.ReadAll(tokensFile)
 	err = json.Unmarshal(tokensByteValue, &TokensInfo)
 	if err != nil {
-		panic(fmt.Sprintf("Error unmarshalling tokens.json: %v", err))
+		return TokensInfo, fmt.Errorf("error unmarshalling tokens.json: %v", err)
 	}
 
-	return TokensInfo
+	return TokensInfo, nil
 }
 
 // this function returns the ctoken address of the token having address equal to underlyingAddress
