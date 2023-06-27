@@ -20,8 +20,8 @@ const (
 	ProcessedPairs      = "PROCESSED_PAIRS"
 	ProcessedPairsMap   = "PROCESSED_PAIRS_MAP"
 	CTokens             = "CTOKENS"
-	ProcessedCTokens    = "PROCESSED_CTokens"
-	ProcessedCTokensMap = "PROCESSED_CTokens_MAP"
+	ProcessedCTokens    = "PROCESSED_CTOKENS"
+	ProcessedCTokensMap = "PROCESSED_CTOKENS_MAP"
 )
 
 var (

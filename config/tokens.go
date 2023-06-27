@@ -27,6 +27,14 @@ type TokensInfo struct {
 	Pairs       []Pair   `json:"pairs"`
 }
 
+// this stores data of underlying token/pair of ctoken
+type Underlying struct {
+	Address  string `json:"address"`
+	Symbol   string `json:"symbol"`
+	Name     string `json:"name"`
+	Decimals int64  `json:"decimals"`
+}
+
 type Token struct {
 	Name       string `json:"name"`
 	Address    string `json:"address"`
@@ -82,6 +90,19 @@ func GetCTokenAddress(underlyingAddress string) (cTokenAddress string) {
 	return
 }
 
+// this function returns the ctoken address of the token having given sumbol
+func GetCTokenAddressBySymbol(symbol string) (cTokenAddress string) {
+	// iterate through ctokens config to get the ctoken address of the token with given symbol
+	for _, token := range FPIConfig.CTokens {
+		// check if the current ctoken has given symbol
+		if token.Symbol == symbol {
+			cTokenAddress = token.Address
+			return
+		}
+	}
+	return
+}
+
 // this function returns the ctoken decimals of the token having address equal to underlyingAddress
 func GetCTokenDecimals(underlyingAddress string) (decimals int64) {
 
@@ -107,6 +128,35 @@ func GetTokenData(address string) (result Token) {
 	return
 }
 
+// get underying data of ctoken from tokens config using token address
+func GetUnderlyingData(address string) (result Underlying) {
+	// iterate over all tokens and return data if token found
+	for _, token := range FPIConfig.Tokens {
+		if token.Address == address {
+			result = Underlying{
+				Name:     token.Name,
+				Address:  token.Address,
+				Decimals: token.Decimals,
+				Symbol:   token.Symbol,
+			}
+			return
+		}
+	}
+	// iterate over all pairs and return data if pair found
+	for _, pair := range FPIConfig.Pairs {
+		if pair.Address == address {
+			result = Underlying{
+				Name:     pair.Name,
+				Address:  pair.Address,
+				Decimals: pair.Decimals,
+				Symbol:   pair.Symbol,
+			}
+			return
+		}
+	}
+	return
+}
+
 // get lp pair data (Address, Decimals, Token1, Token2, Stable, CDecimal, cLPaddress) from tokens config using pair symbol and return
 func GetLpPairData(address string) (symbol string, decimals int64, token1 Token, token2 Token, stable bool, cDecimals int64, cLpAddress string) {
 	for _, pair := range FPIConfig.Pairs {
@@ -124,12 +174,14 @@ func GetLpPairData(address string) (symbol string, decimals int64, token1 Token,
 	return
 }
 
-// get ctoken data (Symbol, Decimals, Underlying, Price, TotalSupply, ExchangeRate, cTokenAddress) from tokens config using ctoken address and return
-func GetCTokenData(address string) (symbol string, decimals int64) {
-	for _, ctoken := range FPIConfig.CTokens {
-		if ctoken.Address == address {
-			symbol = ctoken.Symbol
-			decimals = ctoken.Decimals
+// get ctoken data (Symbol, Name, Decimals, Underlying) from tokens config using cToken address
+func GetCTokenData(address string) (symbol string, name string, decimals int64, underlying Underlying) {
+	for _, cToken := range FPIConfig.CTokens {
+		if cToken.Address == address {
+			symbol = cToken.Symbol
+			name = cToken.Name
+			decimals = cToken.Decimals
+			underlying = GetUnderlyingData(cToken.Underlying)
 			return
 		}
 	}

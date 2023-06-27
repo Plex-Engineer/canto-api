@@ -3,6 +3,8 @@ package queryengine
 import (
 	"context"
 	"encoding/json"
+	"fmt"
+	"math"
 	"math/big"
 
 	"canto-api/config"
@@ -11,6 +13,10 @@ import (
 	"errors"
 	"regexp"
 )
+
+var SecondsPerBlock float64 = 5.8
+var BlocksPerDay float64 = 86400 / SecondsPerBlock
+var DaysPerYear float64 = 365
 
 func ResultToString(results interface{}) string {
 	ret, err := json.Marshal(results)
@@ -53,6 +59,24 @@ func InterfaceToString(value interface{}) (string, error) {
 	return "", errors.New("QueryEngine::InterfaceToString - Interface value is not a string")
 }
 
+// This function takes  an interface value and returns a boolean
+func InterfaceToBool(value interface{}) (bool, error) {
+	//Convert interface{} type to bool
+	if boolean, ok := value.(bool); ok {
+		return boolean, nil
+	}
+	return false, errors.New("QueryEngine::InterfaceToBool - Interface value is not a boolean")
+}
+
+// FormatUnits() scales down big Int value by 1e(decimals) and returns a float64 value
+func FormatUnits(value *big.Int, decimals int64) float64 {
+	//divide  value with 1e(decimals) using Quo() method
+	formattedValue := new(big.Float).Quo(new(big.Float).SetInt(value), new(big.Float).SetInt(new(big.Int).Exp(big.NewInt(10), big.NewInt(int64(decimals)), nil)))
+	// convert formattedValue to float
+	formattedFloatValue, _ := formattedValue.Float64()
+	return formattedFloatValue
+}
+
 // This function takes  an interface value and returns a bigInt number
 func InterfaceToBigInt(value interface{}) (*big.Int, error) {
 	// Declare a num variable to store bigInt
@@ -91,35 +115,50 @@ func GetLpPairRatio(reserve1 *big.Int, reserve2 *big.Int) (*big.Int, bool) {
 	}
 }
 
-// This function takes symbol and data of a pair(ex:CantoAtomLP), calculates and adds additional required data and returns the processed pair data
+// APY takes the block rate, calculates APY and returns
+func APY(blockRate *big.Int) float64 {
+	// format blockRate by 1e18
+	formattedBlockRate := FormatUnits(blockRate, 18)
+	return (math.Pow(formattedBlockRate*BlocksPerDay+1, float64(DaysPerYear)) - 1) * 100
+}
+
+// distributionAPY takes the block rate, calculates distAPY and returns
+func distributionAPY(compSupplySpeed float64, tokenSupply float64, tokenPrice float64, cantoPrice float64) float64 {
+	if tokenSupply == 0 || tokenPrice == 0 {
+		return 0
+	}
+	return ((compSupplySpeed * (BlocksPerDay * DaysPerYear)) / tokenSupply) * (cantoPrice / tokenPrice) * 100
+}
+
+// This function takes unprocessed pairs data, calculates, adds additional required data and returns the processed pair data
 func GetProcessedPairs(ctx context.Context, pairs PairsMap) ([]ProcessedPair, map[string]string) {
 	processedPairs := []ProcessedPair{}
 	processedPairsMap := make(map[string]string)
 
 	// loop over all pairs
 	// key is address of lp pair and value is a map of pair data
-	for key, value := range pairs {
+	for address, pair := range pairs {
 		// get all the data and process
-		reserve1, _ := InterfaceToBigInt(value["reserves"][0])
-		reserve2, _ := InterfaceToBigInt(value["reserves"][1])
-		totalSupply, _ := InterfaceToBigInt(value["totalSupply"][0])
-		price1, _ := InterfaceToString(value["underlyingPriceTokenA"][0])
-		price2, _ := InterfaceToString(value["underlyingPriceTokenB"][0])
-		lpPrice, _ := InterfaceToBigInt(value["underlyingPriceLp"][0])
+		reserve1, _ := InterfaceToBigInt(pair["reserves"][0])
+		reserve2, _ := InterfaceToBigInt(pair["reserves"][1])
+		totalSupply, _ := InterfaceToBigInt(pair["totalSupply"][0])
+		price1, _ := InterfaceToString(pair["underlyingPriceTokenA"][0])
+		price2, _ := InterfaceToString(pair["underlyingPriceTokenB"][0])
+		lpPrice, _ := InterfaceToBigInt(pair["underlyingPriceLp"][0])
 
 		// calculate total value locked by multiplying lp price and total supply using Mul() method
-		var tvl = new(big.Int).Mul(lpPrice, totalSupply)
+		var tvl = new(big.Float).Mul(new(big.Float).SetInt(lpPrice), new(big.Float).SetInt(totalSupply))
 
-		// divide tvl with 1e18 using Div() method
-		tvl.Div(tvl, new(big.Int).Exp(big.NewInt(10), big.NewInt(18), nil))
+		// divide tvl with 1e18 using Quo() method
+		tvl.Quo(tvl, new(big.Float).SetInt(new(big.Int).Exp(big.NewInt(10), big.NewInt(18), nil)))
 
 		// get ratio of reserve and reserve2
 		ratio, aTob := GetLpPairRatio(reserve1, reserve2)
 
 		// get lp pair data
-		symbol, decimals, token1, token2, stable, cDecimals, cLpAddress := config.GetLpPairData(key)
+		symbol, decimals, token1, token2, stable, cDecimals, cLpAddress := config.GetLpPairData(address)
 		processedPair := ProcessedPair{
-			Address:     key,
+			Address:     address,
 			Symbol:      symbol,
 			Decimals:    decimals,
 			Token1:      token1,
@@ -128,7 +167,7 @@ func GetProcessedPairs(ctx context.Context, pairs PairsMap) ([]ProcessedPair, ma
 			CDecimal:    cDecimals,
 			CLpAddress:  cLpAddress,
 			TotalSupply: totalSupply.String(),
-			Tvl:         tvl.String(),
+			Tvl:         fmt.Sprintf("%.2f", tvl),
 			Ratio:       ratio.String(),
 			AToB:        aTob,
 			Price1:      price1,
@@ -139,45 +178,93 @@ func GetProcessedPairs(ctx context.Context, pairs PairsMap) ([]ProcessedPair, ma
 		}
 
 		processedPairs = append(processedPairs, processedPair)
-		processedPairsMap[key] = ResultToString(processedPair)
+		processedPairsMap[address] = ResultToString(processedPair)
 	}
 	return processedPairs, processedPairsMap
 }
 
-func GetProcessedCTokens(ctx context.Context, ctokens TokensMap) ([]ProcessedCToken, map[string]string) {
+// This function takes unprocessed ctokens data, calculates, adds additional required data and returns the processed ctokens data
+func GetProcessedCTokens(ctx context.Context, cTokens TokensMap) ([]ProcessedCToken, map[string]string) {
 	processedCTokens := []ProcessedCToken{}
 	processedCTokensMap := make(map[string]string)
 
-	// loop over all ctokens
-	// key is address of ctoken and value is a map of ctoken data
-	for key, value := range ctokens {
-		// get all the data and process
-		borrowCaps, _ := InterfaceToBigInt(value["borrowCaps"][0])
-		borrowRatePerBlock, _ := InterfaceToBigInt(value["borrowRatePerBlock"][0])
-		compSupplySpeeds, _ := InterfaceToBigInt(value["compSupplySpeeds"][0])
-		compBorrowSpeeds, _ := InterfaceToBigInt(value["compBorrowSpeeds"][0])
-		exchangeRateStored, _ := InterfaceToBigInt(value["exchangeRateStored"][0])
-		supplyRatePerBlock, _ := InterfaceToBigInt(value["supplyRatePerBlock"][0])
-		underlyingPrice, _ := InterfaceToBigInt(value["underlyingPrice"][0])
-		totalSupply, _ := InterfaceToBigInt(value["totalSupply"][0])
+	// get ccanto address by symbol
+	cCantoAddress := config.GetCTokenAddressBySymbol("cCANTO")
+	// get canto price from cTokens data
+	cantoPrice, _ := InterfaceToBigInt(cTokens[cCantoAddress]["underlyingPrice"][0])
 
-		symbol, decimals := config.GetCTokenData(key)
+	// format canto price by 1e18
+	formattedCantoPrice := FormatUnits(cantoPrice, 18)
+
+	// loop over all cTokens
+	// key is address of cToken and value is a map of cToken data
+	for address, cToken := range cTokens {
+		// get cToken data
+		symbol, name, decimals, underlying := config.GetCTokenData(address)
+
+		// process data
+		cash, _ := InterfaceToBigInt(cToken["cash"][0])
+		exchangeRate, _ := InterfaceToString(cToken["exchangeRateStored"][0])
+		isListed, _ := InterfaceToBool(cToken["markets"][0])
+		collateralFactor, _ := InterfaceToString(cToken["markets"][1])
+		price, _ := InterfaceToBigInt(cToken["underlyingPrice"][0])
+		borrowCap, _ := InterfaceToBigInt(cToken["borrowCaps"][0])
+
+		if borrowCap.Cmp(big.NewInt(0)) == 0 {
+			borrowCap = big.NewInt(math.MaxInt64 - 1)
+		}
+
+		// calculate liquidity by multiplying cash and price using Mul() method
+		liquidity := new(big.Float).Mul(new(big.Float).SetInt(cash), new(big.Float).SetInt(price))
+
+		// divide liquidity by 1e36 using Quo() method
+		liquidity.Quo(liquidity, new(big.Float).SetInt(new(big.Int).Exp(big.NewInt(10), big.NewInt(36), nil)))
+
+		// get supplyApy using APY()
+		supplyBlockRate, _ := InterfaceToBigInt(cToken["supplyRatePerBlock"][0])
+		supplyApy := APY(supplyBlockRate)
+
+		// get borrowApy using APY()
+		borrowBlockRate, _ := InterfaceToBigInt(cToken["borrowRatePerBlock"][0])
+		borrowApy := APY(borrowBlockRate)
+
+		compSupplySpeed, _ := InterfaceToBigInt(cToken["compSupplySpeeds"][0])
+		// format compSupplySpeed by 1e18
+		formattedCompSupplySpeed := FormatUnits(compSupplySpeed, 18)
+
+		// format cash by 1e(decimals)
+		formattedTokenSupply := FormatUnits(cash, underlying.Decimals)
+
+		// format token price by 1e(36-decimals)
+		formattedTokenPrice := FormatUnits(price, int64(36)-underlying.Decimals)
+
+		distApy := distributionAPY(formattedCompSupplySpeed, formattedTokenSupply, formattedTokenPrice, formattedCantoPrice)
+
+		// Set price of cNOTE, cUSDC, cUSDT to exactly 1USD scaled by 1e(36-decimals)
+		if symbol == "cNOTE" || symbol == "cUSDC" || symbol == "cUSDT" {
+			price.Exp(big.NewInt(10), big.NewInt(36-underlying.Decimals), nil)
+		}
+
 		processedCToken := ProcessedCToken{
+			Address:          address,
 			Symbol:           symbol,
-			Address:          key,
+			Name:             name,
 			Decimals:         decimals,
-			TotalSupply:      totalSupply.String(),
-			Price:            underlyingPrice.String(),
-			SupplyRate:       supplyRatePerBlock.String(),
-			BorrowRate:       borrowRatePerBlock.String(),
-			BorrowCaps:       borrowCaps.String(),
-			CompSupplySpeeds: compSupplySpeeds.String(),
-			CompBorrowSpeeds: compBorrowSpeeds.String(),
-			ExchangeRate:     exchangeRateStored.String(),
+			Underlying:       underlying,
+			Cash:             cash.String(),
+			ExchangeRate:     exchangeRate,
+			IsListed:         isListed,
+			CollateralFactor: collateralFactor,
+			Price:            price.String(),
+			BorrowCap:        borrowCap.String(),
+			Liquidity:        fmt.Sprintf("%.2f", liquidity),
+			SupplyApy:        fmt.Sprintf("%.2f", supplyApy),
+			BorrowApy:        fmt.Sprintf("%.2f", borrowApy),
+			DistApy:          fmt.Sprintf("%.2f", distApy),
 		}
 
 		processedCTokens = append(processedCTokens, processedCToken)
-		processedCTokensMap[key] = ResultToString(processedCToken)
+		processedCTokensMap[address] = ResultToString(processedCToken)
 	}
 	return processedCTokens, processedCTokensMap
 }

@@ -21,17 +21,20 @@ type ProcessedPair struct {
 	Reserve1    string       `json:"reserve1"`
 	Reserve2    string       `json:"reserve2"`
 }
-
 type ProcessedCToken struct {
-	Symbol           string `json:"symbol"`
-	Address          string `json:"address"`
-	Decimals         int64  `json:"decimals"`
-	TotalSupply      string `json:"totalSupply"`
-	Price            string `json:"underlyingPrice"`
-	ExchangeRate     string `json:"exchangeRate"`
-	SupplyRate       string `json:"supplyRate"`
-	BorrowRate       string `json:"borrowRate"`
-	BorrowCaps       string `json:"borrowCaps"`
-	CompSupplySpeeds string `json:"compSupplySpeeds"`
-	CompBorrowSpeeds string `json:"compBorrowSpeeds"`
+	Address          string            `json:"address"`
+	Symbol           string            `json:"symbol"`
+	Name             string            `json:"name"`
+	Decimals         int64             `json:"decimals"`
+	Underlying       config.Underlying `json:"underlying"`
+	Cash             string            `json:"cash"`
+	ExchangeRate     string            `json:"exchangeRate"`
+	CollateralFactor string            `json:"collateralFactor"`
+	Price            string            `json:"price"`
+	BorrowCap        string            `json:"borrowCap"`
+	IsListed         bool              `json:"isListed"`
+	Liquidity        string            `json:"liquidity"`
+	SupplyApy        string            `json:"supplyApy"`
+	BorrowApy        string            `json:"borrowApy"`
+	DistApy          string            `json:"distApy"`
 }
