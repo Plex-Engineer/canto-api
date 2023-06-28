@@ -1,33 +1,14 @@
 package requestengine
 
 import (
-	"fmt"
+	"context"
 	"strings"
 
 	"canto-api/config"
-	"context"
 
 	"github.com/gofiber/fiber/v2"
+	"github.com/rs/zerolog/log"
 )
-
-// GetGeneralContractRoutes returns a slice of routes for general contracts
-func GetGeneralContractRoutes() []string {
-	routes := []string{}
-	for _, contract := range config.ContractCalls {
-		for index, method := range contract.Methods {
-			// check if the contract has keys
-			if len(contract.Keys) == 0 {
-				// generate route from name, method and argument of contracts
-				route := contract.Name + "/" + strings.Split(method, "(")[0]
-				if len(contract.Args[index]) != 0 {
-					route += "/" + fmt.Sprintf("%v", contract.Args[index][0])
-				}
-				routes = append(routes, route)
-			}
-		}
-	}
-	return routes
-}
 
 func GetGeneralContractDataFiber(ctx *fiber.Ctx) error {
 	// assemble key from route
@@ -45,7 +26,9 @@ func GetGeneralContractDataFiber(ctx *fiber.Ctx) error {
 	rdb := config.RDB
 	val, err := rdb.Get(context.Background(), key).Result()
 	if err != nil {
-		panic(err)
+		log.Error().
+			Err(err).
+			Msgf("Error getting key '%s' from redis", key)
 	}
 	return ctx.SendString(val)
 }

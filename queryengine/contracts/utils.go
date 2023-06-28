@@ -61,7 +61,7 @@ func InterfaceToBigInt(value interface{}) (*big.Int, error) {
 	// convert value to string type
 	str, err := InterfaceToString(value)
 	if err != nil {
-		return num, errors.New("QueryEngine::InterfaceToBigInt -" + err.Error())
+		return num, errors.New("InterfaceToBigInt" + err.Error())
 	}
 
 	// assign bigInt value to num from its string representation

@@ -8,6 +8,7 @@ require (
 	github.com/ethereum/go-ethereum v1.10.19
 	github.com/gofiber/fiber/v2 v2.46.0
 	github.com/redis/go-redis/v9 v9.0.5
+	github.com/rs/zerolog v1.29.1
 	google.golang.org/grpc v1.50.1
 )
 

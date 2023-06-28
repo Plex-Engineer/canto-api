@@ -3,24 +3,18 @@ package queryengine
 import (
 	"context"
 	"errors"
-	"fmt"
 	"time"
 
 	"canto-api/config"
 
 	"github.com/redis/go-redis/v9"
+	"github.com/rs/zerolog/log"
 
 	csr "github.com/Canto-Network/Canto/v6/x/csr/types"
 	inflation "github.com/Canto-Network/Canto/v6/x/inflation/types"
 	gov "github.com/cosmos/cosmos-sdk/x/gov/types"
 	staking "github.com/cosmos/cosmos-sdk/x/staking/types"
 )
-
-func printError(err error) {
-	if err != nil {
-		fmt.Println("NativeQueryEngine::StartQueryEngine - " + err.Error())
-	}
-}
 
 type NativeQueryEngine struct {
 	redisclient *redis.Client
@@ -50,67 +44,95 @@ func (nqe *NativeQueryEngine) SetJsonToCache(ctx context.Context, key string, re
 	ret := GeneralResultToString(result)
 	err := nqe.redisclient.Set(ctx, key, ret, 0).Err()
 	if err != nil {
-		return errors.New("NativeQueryEngine::SetJsonToCache - " + err.Error())
+		return errors.New("SetJsonToCache: " + err.Error())
 	}
 	return nil
 }
 
 // set mapping to cache (to easy lookup by id in queries)
-func (nqe *NativeQueryEngine) SetMappingToCache(ctx context.Context, key string, result map[string]string) error {
+func (nqe *NativeQueryEngine) SetMapToCache(ctx context.Context, key string, result map[string]string) error {
 	//set key in redis
 	err := nqe.redisclient.HSet(ctx, key, result).Err()
 	if err != nil {
-		return errors.New("NativeQueryEngine::SetMappingToCache - " + err.Error())
+		return errors.New("SetMappingToCache: " + err.Error())
 	}
 	return nil
 }
 
+func nativeQueryEngineFatalLog(err error, function string, msg string) {
+	log.Fatal().
+		Err(err).
+		Str("func", function).
+		Msg(msg)
+}
+
 // StartNativeQueryEngine starts the query engine and runs the ticker
 // on the interval specified in config
-func (nqe *NativeQueryEngine) StartQueryEngine(ctx context.Context) {
+func (nqe *NativeQueryEngine) StartNativeQueryEngine(ctx context.Context) {
 	ticker := time.NewTicker(nqe.interval * time.Second)
 	for range ticker.C {
 		//
 		// STAKING
 		//
 		stakingApr, err := GetStakingAPR(ctx, nqe.StakingQueryHandler, nqe.InflationQueryHandler)
-		printError(err)
+		if err != nil {
+			nativeQueryEngineFatalLog(err, "StartNativeQueryEngine", "failed to get staking APR")
+		}
 		// save to cache
 		err = nqe.SetJsonToCache(ctx, config.StakingAPR, stakingApr)
-		printError(err)
-
+		if err != nil {
+			nativeQueryEngineFatalLog(err, "StartNativeQueryEngine", "failed to set staking APR")
+		}
 		// get and save all validators to cache
 		validators, validatorMap, err := GetValidators(ctx, nqe.StakingQueryHandler)
-		printError(err)
+		if err != nil {
+			nativeQueryEngineFatalLog(err, "StartNativeQueryEngine", "failed to get validators")
+		}
 		err = nqe.SetJsonToCache(ctx, config.AllValidators, validators)
-		printError(err)
-		err = nqe.SetMappingToCache(ctx, config.ValidatorMap, validatorMap)
-		printError(err)
+		if err != nil {
+			nativeQueryEngineFatalLog(err, "StartNativeQueryEngine", "failed to set validators")
+		}
+		err = nqe.SetMapToCache(ctx, config.ValidatorMap, validatorMap)
+		if err != nil {
+			nativeQueryEngineFatalLog(err, "StartNativeQueryEngine", "failed to set validator map")
+		}
 
 		//
 		// CSR
 		//
 		csrs, csrMap, err := GetCSRS(ctx, nqe.CSRQueryHandler)
-		printError(err)
+		if err != nil {
+			nativeQueryEngineFatalLog(err, "StartNativeQueryEngine", "failed to get CSRs")
+		}
 		err = nqe.SetJsonToCache(ctx, config.AllCSRs, csrs)
-		printError(err)
-		err = nqe.SetMappingToCache(ctx, config.CSRMap, csrMap)
-		printError(err)
+		if err != nil {
+			nativeQueryEngineFatalLog(err, "StartNativeQueryEngine", "failed to set CSRs")
+		}
+		err = nqe.SetMapToCache(ctx, config.CSRMap, csrMap)
+		if err != nil {
+			nativeQueryEngineFatalLog(err, "StartNativeQueryEngine", "failed to set CSR map")
+		}
 
 		//
 		// GOVSHUTTLE
 		//
 		proposals, proposalMap, err := GetAllProposals(ctx, nqe.GovQueryHandler)
-		printError(err)
+		if err != nil {
+			nativeQueryEngineFatalLog(err, "StartNativeQueryEngine", "failed to get proposals")
+		}
 		err = nqe.SetJsonToCache(ctx, config.AllProposals, proposals)
-		printError(err)
-		err = nqe.SetMappingToCache(ctx, config.ProposalMap, proposalMap)
-		printError(err)
+		if err != nil {
+			nativeQueryEngineFatalLog(err, "StartNativeQueryEngine", "failed to set proposals")
+		}
+		err = nqe.SetMapToCache(ctx, config.ProposalMap, proposalMap)
+		if err != nil {
+			nativeQueryEngineFatalLog(err, "StartNativeQueryEngine", "failed to set proposal map")
+		}
 	}
 }
 
 // RunNative initializes a NativeQueryEngine and starts it
 func Run(ctx context.Context) {
 	nqe := NewNativeQueryEngine()
-	nqe.StartQueryEngine(ctx)
+	nqe.StartNativeQueryEngine(ctx)
 }

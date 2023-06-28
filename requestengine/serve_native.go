@@ -4,9 +4,9 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/gofiber/fiber/v2"
-
 	"canto-api/config"
+
+	"github.com/gofiber/fiber/v2"
 )
 
 // STAKING
