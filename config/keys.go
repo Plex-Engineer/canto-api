@@ -1,4 +1,4 @@
-package rediskeys
+package config
 
 const (
 	StakingAPR          = "STAKING_APR"

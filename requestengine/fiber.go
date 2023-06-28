@@ -1,7 +1,8 @@
-package requests
+package requestengine
 
 import (
 	"context"
+
 	"github.com/gofiber/fiber/v2"
 )
 
@@ -12,11 +13,8 @@ func Run(ctx context.Context) {
 			ServerHeader: "Fiber",
 		})
 
-	app.Get("/", GetGeneralContractDataFiber)
-
 	// get all general contract routes
 	routes := GetGeneralContractRoutes()
-
 	for _, route := range routes {
 		app.Get(route, GetGeneralContractDataFiber)
 	}
@@ -25,6 +23,7 @@ func Run(ctx context.Context) {
 	routerGovernance(app)
 	routerStaking(app)
 	routerLiquidityPool(app)
+	routerCtokens(app)
 
 	err := app.Listen(":3000")
 	if err != nil {
@@ -32,13 +31,17 @@ func Run(ctx context.Context) {
 	}
 }
 
-func routerLiquidityPool(app *fiber.App) {
-	liquidity := app.Group("/v1/lp")
-	liquidity.Get("/", QueryPairs)
-	liquidity.Get("/:address", QueryPairsByAddress)
+func routerCtokens(app *fiber.App) {
+	lending := app.Group("/v1/lending")
+	lending.Get("/ctokens", QueryCTokens)
+	lending.Get("/ctoken/:address", QueryCTokenByAddress)
 }
 
-
+func routerLiquidityPool(app *fiber.App) {
+	liquidity := app.Group("/v1/dex")
+	liquidity.Get("/pairs", QueryPairs)
+	liquidity.Get("/pair/:address", QueryPairsByAddress)
+}
 
 func routerCSR(app *fiber.App) {
 	csr := app.Group("/v1/csr")

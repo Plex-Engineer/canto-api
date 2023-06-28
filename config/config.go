@@ -10,14 +10,13 @@ import (
 )
 
 var (
-	RDB                     *redis.Client
-	EthClient               *ethclient.Client
-	GrpcClient              *grpc.ClientConn
-	ContractCalls           []Contract // list of calls to make
-	MulticallAddress        common.Address
-	QueryInterval           uint
-	TokensConfig            TokensInfo
-	ContractAddressesConfig ContractAddresses
+	RDB              *redis.Client
+	EthClient        *ethclient.Client
+	GrpcClient       *grpc.ClientConn
+	ContractCalls    []Contract // list of calls to make
+	MulticallAddress common.Address
+	QueryInterval    uint
+	FPIConfig        TokensInfo
 )
 
 /*
@@ -26,7 +25,6 @@ var (
  * @return: none
  * @desc: initialize config variables (acts as a constructor)
  */
-
 func NewConfig() {
 
 	// Initialize redis client
@@ -42,29 +40,23 @@ func NewConfig() {
 	// Initialize grpc client using mainnet rpc
 	GrpcClient, _ = grpc.Dial("143.198.228.162:9090", grpc.WithInsecure())
 
+	// get tokens data from tokens.json
+	FPIConfig = getFPIFromJson("./config/jsons/fpi_mainnet.json")
+
 	// set multicall address
-	MulticallAddress = common.HexToAddress("0xcA11bde05977b3631167028862bE2a173976CA11")
+	MulticallAddress = common.HexToAddress(FPIConfig.MulticallV3)
 
 	// set query interval per block (5 seconds)
 	QueryInterval = 5
 
-	// get tokens data from tokens.json
-	TokensConfig = getAllTokensFromJson("./config/jsons/tokens.json")
-
-	// get contract addresses data from contract_addresses.json
-	ContractAddressesConfig = getContractAddressesFromJson("./config/jsons/contract_addresses.json")
-
 	// get general contracts from contracts.json
 	generalCalls, err := getContractsFromJson("./config/jsons/contracts.json")
 	if err != nil {
-		fmt.Println("Error getting contracts from json:", err)
+		panic(fmt.Sprintf("Error getting general contracts: %v", err))
 	}
 
 	// get FPI contracts from tokens.json
-	fpiCalls := getAllFPI("./config/jsons/tokens.json")
-
-	// append calls to get all contract calls
+	fpiCalls := getAllFPI()
 	calls := append(fpiCalls, generalCalls...)
 	ContractCalls = calls
-
 }

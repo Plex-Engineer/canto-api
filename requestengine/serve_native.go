@@ -1,4 +1,4 @@
-package requests
+package requestengine
 
 import (
 	"context"
@@ -7,21 +7,20 @@ import (
 	"github.com/gofiber/fiber/v2"
 
 	"canto-api/config"
-	"canto-api/rediskeys"
 )
 
 // STAKING
 func QueryStakingAPR(ctx *fiber.Ctx) error {
-	val, err := GetStoreValueFromKey(rediskeys.StakingAPR)
+	val, err := GetStoreValueFromKey(config.StakingAPR)
 	if err != nil {
-		return RedisKeyNotFound(ctx, rediskeys.StakingAPR)
+		return RedisKeyNotFound(ctx, config.StakingAPR)
 	}
 	return ctx.Status(StatusOkay).SendString(val)
 }
 func QueryValidators(ctx *fiber.Ctx) error {
-	val, err := GetStoreValueFromKey(rediskeys.AllValidators)
+	val, err := GetStoreValueFromKey(config.AllValidators)
 	if err != nil {
-		return RedisKeyNotFound(ctx, rediskeys.AllValidators)
+		return RedisKeyNotFound(ctx, config.AllValidators)
 
 	}
 	return ctx.Status(StatusOkay).SendString(val)
@@ -31,7 +30,7 @@ func QueryValidatorByAddress(ctx *fiber.Ctx) error {
 	if err != nil {
 		return InvalidParameters(ctx, err)
 	}
-	val, err := config.RDB.HGet(context.Background(), rediskeys.ValidatorMap, ctx.Params("address")).Result()
+	val, err := config.RDB.HGet(context.Background(), config.ValidatorMap, ctx.Params("address")).Result()
 	if err != nil {
 		return RedisKeyNotFound(ctx, fmt.Sprintf("validator address: %s ", ctx.Params("address")))
 	}
@@ -40,9 +39,9 @@ func QueryValidatorByAddress(ctx *fiber.Ctx) error {
 
 // CSR
 func QueryCSRs(ctx *fiber.Ctx) error {
-	val, err := GetStoreValueFromKey(rediskeys.AllCSRs)
+	val, err := GetStoreValueFromKey(config.AllCSRs)
 	if err != nil {
-		return RedisKeyNotFound(ctx, rediskeys.AllCSRs)
+		return RedisKeyNotFound(ctx, config.AllCSRs)
 	}
 	return ctx.Status(StatusOkay).SendString(val)
 }
@@ -51,7 +50,7 @@ func QueryCSRByID(ctx *fiber.Ctx) error {
 	if err != nil {
 		return InvalidParameters(ctx, err)
 	}
-	val, err := config.RDB.HGet(context.Background(), rediskeys.CSRMap, ctx.Params("id")).Result()
+	val, err := config.RDB.HGet(context.Background(), config.CSRMap, ctx.Params("id")).Result()
 	if err != nil {
 		return RedisKeyNotFound(ctx, fmt.Sprintf("csr nft id: %s ", ctx.Params("id")))
 	}
@@ -60,9 +59,9 @@ func QueryCSRByID(ctx *fiber.Ctx) error {
 
 // GOVSHUTTLE
 func QueryProposals(ctx *fiber.Ctx) error {
-	val, err := GetStoreValueFromKey(rediskeys.AllProposals)
+	val, err := GetStoreValueFromKey(config.AllProposals)
 	if err != nil {
-		return RedisKeyNotFound(ctx, rediskeys.AllProposals)
+		return RedisKeyNotFound(ctx, config.AllProposals)
 	}
 	return ctx.Status(StatusOkay).SendString(val)
 }
@@ -71,7 +70,7 @@ func QueryProposalByID(ctx *fiber.Ctx) error {
 	if err != nil {
 		return InvalidParameters(ctx, err)
 	}
-	val, err := config.RDB.HGet(context.Background(), rediskeys.ProposalMap, ctx.Params("id")).Result()
+	val, err := config.RDB.HGet(context.Background(), config.ProposalMap, ctx.Params("id")).Result()
 	if err != nil {
 		return RedisKeyNotFound(ctx, fmt.Sprintf("proposal id: %s ", ctx.Params("id")))
 	}

@@ -1,11 +1,10 @@
-package requests
+package requestengine
 
 import (
 	"fmt"
 	"strings"
 
 	"canto-api/config"
-	"canto-api/rediskeys"
 	"context"
 
 	"github.com/gofiber/fiber/v2"
@@ -20,21 +19,17 @@ func GetGeneralContractRoutes() []string {
 			if len(contract.Keys) == 0 {
 				// generate route from name, method and argument of contracts
 				route := contract.Name + "/" + strings.Split(method, "(")[0]
-
 				if len(contract.Args[index]) != 0 {
 					route += "/" + fmt.Sprintf("%v", contract.Args[index][0])
 				}
-
 				routes = append(routes, route)
 			}
 		}
 	}
-
 	return routes
 }
 
 func GetGeneralContractDataFiber(ctx *fiber.Ctx) error {
-
 	// assemble key from route
 	var key string
 	route := strings.Split(ctx.Route().Path, `/`)
@@ -57,17 +52,33 @@ func GetGeneralContractDataFiber(ctx *fiber.Ctx) error {
 
 // Processed Pairs
 func QueryPairs(ctx *fiber.Ctx) error {
-	val, err := GetStoreValueFromKey(rediskeys.ProcessedPairs)
+	val, err := GetStoreValueFromKey(config.ProcessedPairs)
 	if err != nil {
-		return RedisKeyNotFound(ctx, rediskeys.ProcessedPairs)
+		return RedisKeyNotFound(ctx, config.ProcessedPairs)
 	}
 	return ctx.Status(StatusOkay).SendString(val)
 }
 
 func QueryPairsByAddress(ctx *fiber.Ctx) error {
-	val, err := config.RDB.HGet(context.Background(), rediskeys.ProcessedPairsMap, ctx.Params("address")).Result()
+	val, err := config.RDB.HGet(context.Background(), config.ProcessedPairsMap, ctx.Params("address")).Result()
 	if err != nil {
-		return RedisKeyNotFound(ctx, rediskeys.ProcessedPairsMap)
+		return RedisKeyNotFound(ctx, config.ProcessedPairsMap)
+	}
+	return ctx.SendString(val)
+}
+
+func QueryCTokens(ctx *fiber.Ctx) error {
+	val, err := GetStoreValueFromKey(config.ProcessedCTokens)
+	if err != nil {
+		return RedisKeyNotFound(ctx, config.ProcessedCTokens)
+	}
+	return ctx.SendString(val)
+}
+
+func QueryCTokenByAddress(ctx *fiber.Ctx) error {
+	val, err := config.RDB.HGet(context.Background(), config.ProcessedCTokensMap, ctx.Params("address")).Result()
+	if err != nil {
+		return RedisKeyNotFound(ctx, config.ProcessedCTokensMap)
 	}
 	return ctx.SendString(val)
 }
