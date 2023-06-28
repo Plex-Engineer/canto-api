@@ -12,18 +12,21 @@ func getCTokenContractCalls() []Contract {
 			Name:    token.Symbol,
 			Address: token.Address,
 			Keys: []string{
+				"cTokens:" + token.Address + ":cash",
 				"cTokens:" + token.Address + ":exchangeRateStored",
 				"cTokens:" + token.Address + ":supplyRatePerBlock",
 				"cTokens:" + token.Address + ":borrowRatePerBlock",
 				"cTokens:" + token.Address + ":totalSupply",
 			},
 			Methods: []string{
+				"getCash()(uint256)",
 				"exchangeRateStored()(uint256)",
 				"supplyRatePerBlock()(uint256)",
 				"borrowRatePerBlock()(uint256)",
 				"totalSupply()(uint256)",
 			},
 			Args: [][]interface{}{
+				{},
 				{},
 				{},
 				{},
