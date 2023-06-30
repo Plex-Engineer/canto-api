@@ -8,7 +8,7 @@ package config
 
 import (
 	"encoding/json"
-	"fmt"
+	"errors"
 	"io"
 	"os"
 )
@@ -63,15 +63,14 @@ func getFPIFromJson(path string) (TokensInfo, error) {
 	tokensFile, err := os.Open(path)
 
 	if err != nil {
-		return TokensInfo, err
+		return TokensInfo, errors.New("Config::getFPIFromJson - " + err.Error())
 	}
-
 	defer tokensFile.Close()
 
 	tokensByteValue, _ := io.ReadAll(tokensFile)
 	err = json.Unmarshal(tokensByteValue, &TokensInfo)
 	if err != nil {
-		return TokensInfo, fmt.Errorf("error unmarshalling tokens.json: %v", err)
+		return TokensInfo, errors.New("Config::getFPIFromJson - " + err.Error())
 	}
 
 	return TokensInfo, nil
@@ -128,7 +127,7 @@ func GetTokenData(address string) (result Token) {
 	return
 }
 
-// get underying data of ctoken from tokens config using token address
+// get underying data of ctoken from tokens config using token/pair address
 func GetUnderlyingData(address string) (result Underlying) {
 	// iterate over all tokens and return data if token found
 	for _, token := range FPIConfig.Tokens {
