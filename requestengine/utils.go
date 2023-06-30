@@ -41,6 +41,19 @@ func GetStoreValueFromKey(key string) (string, error) {
 	return val, nil
 }
 
+func GetBlockNumber() (string, error) {
+	// get block number from cache
+	blockNumber, err := GetStoreValueFromKey(config.BlockNumber)
+	if err != nil {
+		return "", err
+	}
+	blockNumber, err = strconv.Unquote(blockNumber)
+	if err != nil {
+		return "", err
+	}
+	return blockNumber, nil
+}
+
 // CheckValidatorAddress checks if the given address is a valid validator address
 func CheckValidatorAddress(address string) error {
 	if !(strings.HasPrefix(address, cantoConfig.Bech32PrefixValAddr)) {

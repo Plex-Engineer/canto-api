@@ -9,6 +9,7 @@ import (
 )
 
 const (
+	BlockNumber         = "BLOCK_NUMBER"
 	StakingAPR          = "STAKING_APR"
 	AllValidators       = "ALL_VALIDATORS"
 	ValidatorMap        = "VALIDATOR_MAP"
@@ -40,7 +41,7 @@ var (
  * @return: none
  * @desc: initialize config variables (acts as a constructor)
  */
-func NewConfig() {
+func NewConfig(fpiJsonFile string, contractsJsonFile string) {
 
 	// Initialize redis client
 	RDB = redis.NewClient(&redis.Options{
@@ -63,7 +64,7 @@ func NewConfig() {
 	}
 
 	// get tokens data from tokens.json
-	FPIConfig, err = getFPIFromJson("./config/jsons/fpi_mainnet.json")
+	FPIConfig, err = getFPIFromJson(fpiJsonFile)
 	if err != nil {
 		log.Fatal().Msgf("Error getting tokens data from json: %v", err)
 	}
@@ -75,7 +76,7 @@ func NewConfig() {
 	QueryInterval = 5
 
 	// get general contracts from contracts.json
-	generalCalls, err := getContractsFromJson("./config/jsons/contracts.json")
+	generalCalls, err := getContractsFromJson(contractsJsonFile)
 	if err != nil {
 		log.Fatal().Msgf("Error getting general contracts from json: %v", err)
 	}
