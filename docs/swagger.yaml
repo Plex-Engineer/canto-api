@@ -1,0 +1,22 @@
+basePath: /v1
+host: localhost:3000
+info:
+  contact: {}
+  description: Swagger UI for Cantor API
+  title: Canto API
+  version: "1.0"
+paths:
+  /dex/pairs:
+    get:
+      consumes:
+      - application/json
+      description: return json array of all pairs in Canto dex
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: string
+      summary: Query all pairs in Canto dex
+swagger: "2.0"

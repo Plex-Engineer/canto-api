@@ -1,0 +1,33 @@
+{
+    "swagger": "2.0",
+    "info": {
+        "description": "Swagger UI for Cantor API",
+        "title": "Canto API",
+        "contact": {},
+        "version": "1.0"
+    },
+    "host": "localhost:3000",
+    "basePath": "/v1",
+    "paths": {
+        "/dex/pairs": {
+            "get": {
+                "description": "return json array of all pairs in Canto dex",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "Query all pairs in Canto dex",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        }
+    }
+}

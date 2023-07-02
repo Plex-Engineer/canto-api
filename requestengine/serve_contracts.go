@@ -35,7 +35,13 @@ func GetGeneralContractDataFiber(ctx *fiber.Ctx) error {
 	return ctx.SendString(val)
 }
 
-// Processed Pairs
+// QueryPairs godoc
+// @Summary      Query all pairs in Canto dex
+// @Description  return json array of all pairs in Canto dex
+// @Accept       json
+// @Produce      json
+// @Success      200  {object}  string
+// @Router       /dex/pairs [get]
 func QueryPairs(ctx *fiber.Ctx) error {
 	// get block number from cache
 	blockNumber, err := GetBlockNumber()
