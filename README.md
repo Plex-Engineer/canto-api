@@ -3,8 +3,9 @@
 
 Open-source backend for efficiently serving Canto data built using [Redis](https://github.com/redis/redis), [Fiber](https://github.com/gofiber/fiber) and [Go](https://github.com/golang/go). Built to minimize load on nodes to allow applications to scale better. 
 
-# WIP 🚧
-
+## Dependencies
+- `golang 1.18` or above
+- `redis 7.0` ([install here](https://redis.io/docs/getting-started/installation/))
 ## Quickstart
 ```bash
 # clone repo
@@ -19,3 +20,4 @@ redis-server
 
 # run binary
 ./canto-api
+```
