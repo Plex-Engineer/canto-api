@@ -68,6 +68,38 @@ info:
   title: Canto API
   version: "1.0"
 paths:
+  /csr:
+    get:
+      consumes:
+      - application/json
+      description: return json list of CSRs
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: string
+      summary: Query CSR list
+  /csr/{id}:
+    get:
+      consumes:
+      - application/json
+      description: return json object of CSR
+      parameters:
+      - description: CSR nft id
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: string
+      summary: Query CSR by id
   /dex/pairs:
     get:
       consumes:
@@ -81,6 +113,38 @@ paths:
           schema:
             $ref: '#/definitions/requestengine.Pairs'
       summary: Query all pairs in Canto dex
+  /gov/proposals:
+    get:
+      consumes:
+      - application/json
+      description: return json list of proposals
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: string
+      summary: Query proposal list
+  /gov/proposals/{id}:
+    get:
+      consumes:
+      - application/json
+      description: return json object of proposal
+      parameters:
+      - description: proposal id
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: string
+      summary: Query proposal by id
   /lending/ctokens:
     get:
       consumes:
@@ -94,4 +158,49 @@ paths:
           schema:
             type: string
       summary: Query all cTokens in CLM
+  /staking/apr:
+    get:
+      consumes:
+      - application/json
+      description: return string of current staking APR
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: string
+      summary: Query current staking APR
+  /staking/validators:
+    get:
+      consumes:
+      - application/json
+      description: return json list of validators
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: string
+      summary: Query validator list
+  /staking/validators/{address}:
+    get:
+      consumes:
+      - application/json
+      description: return json object of validator
+      parameters:
+      - description: validator address
+        in: path
+        name: address
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: string
+      summary: Query validator by address
 swagger: "2.0"

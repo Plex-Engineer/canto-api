@@ -16,6 +16,55 @@ const docTemplate = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
+        "/csr": {
+            "get": {
+                "description": "return json list of CSRs",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "Query CSR list",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/csr/{id}": {
+            "get": {
+                "description": "return json object of CSR",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "Query CSR by id",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "CSR nft id",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
         "/dex/pairs": {
             "get": {
                 "description": "return json array of all pairs in Canto dex",
@@ -36,6 +85,55 @@ const docTemplate = `{
                 }
             }
         },
+        "/gov/proposals": {
+            "get": {
+                "description": "return json list of proposals",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "Query proposal list",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/gov/proposals/{id}": {
+            "get": {
+                "description": "return json object of proposal",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "Query proposal by id",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "proposal id",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
         "/lending/ctokens": {
             "get": {
                 "description": "return json array of all pairs in CLM",
@@ -46,6 +144,75 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "summary": "Query all cTokens in CLM",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/staking/apr": {
+            "get": {
+                "description": "return string of current staking APR",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "Query current staking APR",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/staking/validators": {
+            "get": {
+                "description": "return json list of validators",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "Query validator list",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/staking/validators/{address}": {
+            "get": {
+                "description": "return json object of validator",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "Query validator by address",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "validator address",
+                        "name": "address",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
                 "responses": {
                     "200": {
                         "description": "OK",
