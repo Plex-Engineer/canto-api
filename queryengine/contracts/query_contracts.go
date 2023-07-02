@@ -86,11 +86,15 @@ func ProcessContractCalls(contracts []config.Contract) (multicall.ViewCalls, err
 	return vcs, nil
 }
 
-func (qe *QueryEngine) ProcessMulticallResults(ctx context.Context, results *multicall.Result) (TokensMap, PairsMap, map[string][]interface{}, error) {
+func ProcessMulticallResults(ctx context.Context, results *multicall.Result) (TokensMap, PairsMap, map[string][]interface{}, error) {
 	// Declare and initialize maps for ctokens, pairs and others
 	ctokens := make(TokensMap)
 	pairs := make(PairsMap)
 	others := make(map[string][]interface{})
+
+	if results == nil {
+		return nil, nil, nil, errors.New("ProcessMulticallResults: Empty multicall results")
+	}
 
 	// Iterate the results to separate them into ctokens, pairs and other according to their keys
 	for key, value := range results.Calls {
@@ -161,9 +165,15 @@ func (qe *QueryEngine) StartContractQueryEngine(ctx context.Context) {
 		if err != nil {
 			contractQueryEngineFatalLog(err, "StartContractQueryEngine", "failed to decode results")
 		}
+		// set blocknumber to redis
+		err = qe.SetJsonToCache(ctx, config.BlockNumber, ResultToString(ret.BlockNumber))
+
+		if err != nil {
+			contractQueryEngineFatalLog(err, "StartContractQueryEngine", "failed to set block number to redis cache")
+		}
 
 		// get ctokens, pairs and others from multicall results
-		ctokens, pairs, others, err := qe.ProcessMulticallResults(ctx, ret)
+		ctokens, pairs, others, err := ProcessMulticallResults(ctx, ret)
 		if err != nil {
 			contractQueryEngineFatalLog(err, "StartContractQueryEngine", "failed to process multicall results")
 		}

@@ -96,9 +96,9 @@ func InterfaceToBigInt(value interface{}) (*big.Int, error) {
 
 // Takes reserve1 and reserve2 bigInt inputs and returns their ratio scaled by 1e18 and boolean a value which is true if reserves1 >= reserves2, false otherwise
 func GetLpPairRatio(reserve1 *big.Int, reserve2 *big.Int) (*big.Int, bool) {
-	// Check if either reserve1 or reserve2 is nil
-	if reserve1 == nil || reserve2 == nil {
-		return big.NewInt(1), true // Return [1, true] if either is nil
+	// Check if either reserve1 or reserve2 is nil/zero
+	if reserve1 == nil || reserve2 == nil || reserve1.Cmp(big.NewInt(0)) == 0 || reserve2.Cmp(big.NewInt(0)) == 0 {
+		return new(big.Int).Exp(big.NewInt(10), big.NewInt(18), nil), true // Return [1e18, true] if either is nil/zero
 	}
 
 	// check if reserve1 is greater than or equal to reserve2

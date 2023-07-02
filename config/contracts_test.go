@@ -84,11 +84,11 @@ func TestGetContractsFromJson(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			got, err := getContractsFromJson(tt.args)
-			if (err != nil) && tt.wantErr {
+			if (err != nil) != tt.wantErr {
 				t.Errorf("getContractsFromJson() error = %v, wantErr %v", err, tt.wantErr)
 				return
 			}
-			if !reflect.DeepEqual(got, tt.want) != tt.wantErr {
+			if !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("getContractsFromJson() = %v, want %v", got, tt.want)
 			}
 		})

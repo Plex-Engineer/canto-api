@@ -1,11 +1,11 @@
 package queryengine
 
 import (
-	"reflect"
-	"testing"
-
 	"canto-api/config"
 	"canto-api/multicall"
+	"context"
+	"reflect"
+	"testing"
 )
 
 func TestProcessContractCalls(t *testing.T) {
@@ -227,6 +227,196 @@ func TestProcessContractCalls(t *testing.T) {
 			}
 			if !reflect.DeepEqual(got, tt.want) && !tt.wantErr {
 				t.Errorf("ProcessContractCalls() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func TestProcessMulticallResults(t *testing.T) {
+	fpiJsonFile := "../../config/jsons/fpi_mainnet.json"
+	contractsJsonFile := "../../config/jsons/contracts.json"
+	config.NewConfig(fpiJsonFile, contractsJsonFile)
+	type args struct {
+		ctx     context.Context
+		results *multicall.Result
+	}
+	tests := []struct {
+		name    string
+		args    args
+		want    TokensMap
+		want1   PairsMap
+		want2   map[string][]interface{}
+		wantErr bool
+	}{
+		{
+			name: "nil input",
+			args: args{
+				ctx:     context.Background(),
+				results: nil,
+			},
+			want:    nil,
+			want1:   nil,
+			want2:   nil,
+			wantErr: true,
+		},
+		{
+			name: "nil calls input",
+			args: args{
+				ctx: context.Background(),
+				results: &multicall.Result{
+					BlockNumber: 4885700,
+					Calls:       nil,
+				},
+			},
+			want:    TokensMap{},
+			want1:   PairsMap{},
+			want2:   map[string][]interface{}{},
+			wantErr: false,
+		},
+		{
+			name: "only ctoken input",
+			args: args{
+				ctx: context.Background(),
+				results: &multicall.Result{
+					BlockNumber: 4885700,
+					Calls: map[string][]interface{}{
+						"cTokens:0xB65Ec550ff356EcA6150F733bA9B954b2e0Ca488:borrowCaps":         {1},
+						"cTokens:0xB65Ec550ff356EcA6150F733bA9B954b2e0Ca488:borrowRatePerBlock": {0},
+					},
+				},
+			},
+			want: TokensMap{
+				"0xB65Ec550ff356EcA6150F733bA9B954b2e0Ca488": {
+					"borrowCaps":         {1},
+					"borrowRatePerBlock": {0},
+				},
+			},
+			want1:   PairsMap{},
+			want2:   map[string][]interface{}{},
+			wantErr: false,
+		},
+		{
+			name: "only pair input",
+			args: args{
+				ctx: context.Background(),
+				results: &multicall.Result{
+					BlockNumber: 4885700,
+					Calls: map[string][]interface{}{
+						"lpPairs:0x1D20635535307208919f0b67c3B2065965A85aA9:totalSupply": {1143452325947156014},
+						"lpPairs:0x1D20635535307208919f0b67c3B2065965A85aA9:reserves":    {3583523874919165340, 364880926971712949},
+					},
+				},
+			},
+			want: TokensMap{},
+			want1: PairsMap{
+				"0x1D20635535307208919f0b67c3B2065965A85aA9": map[string][]interface{}{
+					"totalSupply": {1143452325947156014},
+					"reserves":    {3583523874919165340, 364880926971712949},
+				},
+			},
+			want2:   map[string][]interface{}{},
+			wantErr: false,
+		},
+		{
+			name: "only other input",
+			args: args{
+				ctx: context.Background(),
+				results: &multicall.Result{
+					BlockNumber: 4885700,
+					Calls: map[string][]interface{}{
+						"pricefeed:getUnderlyingPrice:0xB65Ec550ff356EcA6150F733bA9B954b2e0Ca488": {1143452325947156014},
+					},
+				},
+			},
+			want:  TokensMap{},
+			want1: PairsMap{},
+			want2: map[string][]interface{}{
+				"pricefeed:getUnderlyingPrice:0xB65Ec550ff356EcA6150F733bA9B954b2e0Ca488": {1143452325947156014},
+			},
+			wantErr: false,
+		},
+		{
+			name: "invalid pair input",
+			args: args{
+				ctx: context.Background(),
+				results: &multicall.Result{
+					BlockNumber: 4885700,
+					Calls: map[string][]interface{}{
+						"lpPairs:totalSupply": {1143452325947156014},
+						"lpPairs:0x1D20635535307208919f0b67c3B2065965A85aA9:reserves": {3583523874919165340, 364880926971712949},
+					},
+				},
+			},
+			want:    nil,
+			want1:   nil,
+			want2:   nil,
+			wantErr: true,
+		},
+		{
+			name: "invalid ctoken input",
+			args: args{
+				ctx: context.Background(),
+				results: &multicall.Result{
+					BlockNumber: 4885700,
+					Calls: map[string][]interface{}{
+						"cTokens:0xB65Ec550ff356EcA6150F733bA9B954b2e0Ca488:borrowCaps": {1},
+						"cTokens:0xB65Ec550ff356EcA6150F733bA9B954b2e0Ca488":            {0},
+					},
+				},
+			},
+			want:    nil,
+			want1:   nil,
+			want2:   nil,
+			wantErr: true,
+		},
+		{
+			name: "ctoken, pair and other input",
+			args: args{
+				ctx: context.Background(),
+				results: &multicall.Result{
+					BlockNumber: 4885700,
+					Calls: map[string][]interface{}{
+						"cTokens:0xB65Ec550ff356EcA6150F733bA9B954b2e0Ca488:borrowCaps":           {1},
+						"cTokens:0xB65Ec550ff356EcA6150F733bA9B954b2e0Ca488:borrowRatePerBlock":   {0},
+						"lpPairs:0x1D20635535307208919f0b67c3B2065965A85aA9:totalSupply":          {1143452325947156014},
+						"lpPairs:0x1D20635535307208919f0b67c3B2065965A85aA9:reserves":             {3583523874919165340, 364880926971712949},
+						"pricefeed:getUnderlyingPrice:0xB65Ec550ff356EcA6150F733bA9B954b2e0Ca488": {1143452325947156014},
+					},
+				},
+			},
+			want: TokensMap{
+				"0xB65Ec550ff356EcA6150F733bA9B954b2e0Ca488": {
+					"borrowCaps":         {1},
+					"borrowRatePerBlock": {0},
+				},
+			},
+			want1: PairsMap{
+				"0x1D20635535307208919f0b67c3B2065965A85aA9": map[string][]interface{}{
+					"totalSupply": {1143452325947156014},
+					"reserves":    {3583523874919165340, 364880926971712949},
+				},
+			},
+			want2: map[string][]interface{}{
+				"pricefeed:getUnderlyingPrice:0xB65Ec550ff356EcA6150F733bA9B954b2e0Ca488": {1143452325947156014},
+			},
+			wantErr: false,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got, got1, got2, err := ProcessMulticallResults(tt.args.ctx, tt.args.results)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("ProcessMulticallResults() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+			if !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("ProcessMulticallResults() got = %v, want %v", got, tt.want)
+			}
+			if !reflect.DeepEqual(got1, tt.want1) {
+				t.Errorf("ProcessMulticallResults() got1 = %v, want %v", got1, tt.want1)
+			}
+			if !reflect.DeepEqual(got2, tt.want2) {
+				t.Errorf("ProcessMulticallResults() got2 = %v, want %v", got2, tt.want2)
 			}
 		})
 	}
