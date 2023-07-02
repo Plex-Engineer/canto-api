@@ -40,7 +40,7 @@ func GetGeneralContractDataFiber(ctx *fiber.Ctx) error {
 // @Description  return json array of all pairs in Canto dex
 // @Accept       json
 // @Produce      json
-// @Success      200  {object}  string
+// @Success      200  {object}  Pairs
 // @Router       /dex/pairs [get]
 func QueryPairs(ctx *fiber.Ctx) error {
 	// get block number from cache
@@ -92,6 +92,13 @@ func QueryPairsByAddress(ctx *fiber.Ctx) error {
 	return ctx.Status(StatusOkay).SendString(result)
 }
 
+// QueryCtokens godoc
+// @Summary      Query all cTokens in CLM
+// @Description  return json array of all pairs in CLM
+// @Accept       json
+// @Produce      json
+// @Success      200  {object}  string
+// @Router       /lending/ctokens [get]
 func QueryCTokens(ctx *fiber.Ctx) error {
 	// get block number from cache
 	blockNumber, err := GetBlockNumber()

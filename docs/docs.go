@@ -30,9 +30,124 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
+                            "$ref": "#/definitions/requestengine.Pairs"
+                        }
+                    }
+                }
+            }
+        },
+        "/lending/ctokens": {
+            "get": {
+                "description": "return json array of all pairs in CLM",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "Query all cTokens in CLM",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
                             "type": "string"
                         }
                     }
+                }
+            }
+        }
+    },
+    "definitions": {
+        "requestengine.Pairs": {
+            "type": "object",
+            "properties": {
+                "blockNumber": {
+                    "type": "string"
+                },
+                "pairsStruct": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/requestengine.ProcessedPair"
+                    }
+                }
+            }
+        },
+        "requestengine.ProcessedPair": {
+            "type": "object",
+            "properties": {
+                "address": {
+                    "type": "string"
+                },
+                "atob": {
+                    "type": "boolean"
+                },
+                "cdecimals": {
+                    "type": "integer"
+                },
+                "clpaddress": {
+                    "type": "string"
+                },
+                "decimals": {
+                    "type": "integer"
+                },
+                "lpPrice": {
+                    "type": "string"
+                },
+                "price1": {
+                    "type": "string"
+                },
+                "price2": {
+                    "type": "string"
+                },
+                "ratio": {
+                    "type": "string"
+                },
+                "reserve1": {
+                    "type": "string"
+                },
+                "reserve2": {
+                    "type": "string"
+                },
+                "stable": {
+                    "type": "boolean"
+                },
+                "symbol": {
+                    "type": "string"
+                },
+                "token0": {
+                    "$ref": "#/definitions/requestengine.Token"
+                },
+                "token1": {
+                    "$ref": "#/definitions/requestengine.Token"
+                },
+                "totalSupply": {
+                    "type": "string"
+                },
+                "tvl": {
+                    "type": "string"
+                }
+            }
+        },
+        "requestengine.Token": {
+            "type": "object",
+            "properties": {
+                "address": {
+                    "type": "string"
+                },
+                "chainId": {
+                    "type": "integer"
+                },
+                "decimals": {
+                    "type": "integer"
+                },
+                "logoURI": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "symbol": {
+                    "type": "string"
                 }
             }
         }
