@@ -8,7 +8,10 @@ import (
 	"canto-api/config"
 
 	"github.com/gofiber/fiber/v2"
+	"github.com/gofiber/swagger"
 	"github.com/rs/zerolog/log"
+
+	_ "canto-api/docs"
 )
 
 // GetGeneralContractRoutes returns a slice of routes for general contracts
@@ -61,6 +64,11 @@ func routerStaking(app *fiber.App) {
 	staking.Get("/validators/:address", QueryValidatorByAddress)
 }
 
+// @title Canto API
+// @version 1.0
+// @description Swagger UI for Cantor API
+// @host localhost:3000
+// @BasePath /v1
 func Run(ctx context.Context) {
 	app := fiber.New(
 		fiber.Config{
@@ -79,6 +87,8 @@ func Run(ctx context.Context) {
 	routerStaking(app)
 	routerLiquidityPool(app)
 	routerCtokens(app)
+
+	app.Get("/swagger/*", swagger.HandlerDefault) // default
 
 	err := app.Listen(":3000")
 	if err != nil {

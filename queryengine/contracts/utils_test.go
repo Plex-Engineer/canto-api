@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"math/big"
 	"reflect"
+	"sort"
 	"testing"
 
 	"github.com/ethereum/go-ethereum/common"
@@ -813,6 +814,12 @@ func TestGetProcessedPairs(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			got, got1 := GetProcessedPairs(tt.args.ctx, tt.args.pairs)
+			sort.Slice(got, func(i, j int) bool {
+				return got[i].Address < got[j].Address
+			})
+			sort.Slice(tt.want, func(i, j int) bool {
+				return tt.want[i].Address < tt.want[j].Address
+			})
 			if !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("GetProcessedPairs() got = %v, want %v", got, tt.want)
 			}
@@ -970,6 +977,12 @@ func TestGetProcessedCTokens(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			got, got1 := GetProcessedCTokens(tt.args.ctx, tt.args.cTokens)
+			sort.Slice(got, func(i, j int) bool {
+				return got[i].Address < got[j].Address
+			})
+			sort.Slice(tt.want, func(i, j int) bool {
+				return tt.want[i].Address < tt.want[j].Address
+			})
 			if !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("GetProcessedCTokens() got = %v, want %v", got, tt.want)
 			}
