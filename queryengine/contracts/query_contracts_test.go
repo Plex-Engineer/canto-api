@@ -401,7 +401,7 @@ func TestProcessMulticallResults(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, got1, got2, err := ProcessMulticallResults(tt.args.ctx, tt.args.results)
+			_, got, got1, got2, err := ProcessMulticallResults(tt.args.ctx, tt.args.results)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("ProcessMulticallResults() error = %v, wantErr %v", err, tt.wantErr)
 				return

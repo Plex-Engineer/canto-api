@@ -8,10 +8,15 @@ import (
 )
 
 // SetJsonToCache will take key, result and sets the resulte as a json string to redis
-func (qe *QueryEngine) SetJsonToCache(ctx context.Context, key string, result interface{}) error {
+func (qe *QueryEngine) SetJsonToCache(ctx context.Context, key string, blocknumber string, result interface{}) error {
 	// convert result to json string
 	ret := ResultToString(result)
-	err := qe.redisclient.Set(ctx, key, ret, 0).Err()
+	// generate json result string
+	result = ResultToString(map[string]interface{}{
+		"block":   blocknumber,
+		"results": ret,
+	})
+	err := qe.redisclient.Set(ctx, key, result, 0).Err()
 	if err != nil {
 		return err
 	}
@@ -25,24 +30,6 @@ func (qe *QueryEngine) SetMapToCache(ctx context.Context, key string, result map
 	if err != nil {
 		return errors.New("SetMapToCache: " + err.Error())
 	}
-	return nil
-}
-
-// SetCacheWithFpi sets the result of ctokens and pairs in Redis
-// and returns an error if any occurs.
-func (qe *QueryEngine) SetCacheWithFpi(ctx context.Context, ctokens TokensMap, pairs PairsMap) error {
-	// set ctokens as a json string in redis
-	err := qe.SetJsonToCache(ctx, config.CTokens, ctokens)
-	if err != nil {
-		return errors.New("SetCacheWithFpi: " + err.Error())
-	}
-
-	// set pairs as a json string in redis
-	err = qe.SetJsonToCache(ctx, config.Pairs, pairs)
-	if err != nil {
-		return errors.New("SetCacheWithFpi: " + err.Error())
-	}
-
 	return nil
 }
 
@@ -63,12 +50,12 @@ func (qe *QueryEngine) SetCacheWithGeneral(ctx context.Context, results map[stri
 }
 
 // This function gets the pairs data from redis, processes it and sets the processed pairs data to redis
-func (qe *QueryEngine) SetCacheWithProcessedPairs(ctx context.Context, pairs PairsMap) error {
+func (qe *QueryEngine) SetCacheWithProcessedPairs(ctx context.Context, blocknumber string, pairs PairsMap) error {
 	// get processed pairs data
-	processedPairs, processedPairsMap := GetProcessedPairs(ctx, pairs)
+	processedPairs, processedPairsMap := GetProcessedPairs(ctx, blocknumber, pairs)
 
 	// set processed pairs as a json string to redis
-	err := qe.SetJsonToCache(ctx, config.ProcessedPairs, processedPairs)
+	err := qe.SetJsonToCache(ctx, config.ProcessedPairs, blocknumber, processedPairs)
 	if err != nil {
 		return errors.New("SetCacheWithProcessedPairs: " + err.Error())
 	}
@@ -82,12 +69,12 @@ func (qe *QueryEngine) SetCacheWithProcessedPairs(ctx context.Context, pairs Pai
 	return nil
 }
 
-func (qe *QueryEngine) SetCacheWithProcessedCTokens(ctx context.Context, ctokens TokensMap) error {
+func (qe *QueryEngine) SetCacheWithProcessedCTokens(ctx context.Context, blocknumber string, ctokens TokensMap) error {
 	// get processed ctokens data
 	processedCTokens, processedCTokensMap := GetProcessedCTokens(ctx, ctokens)
 
 	// set processed ctokens as a json string to redis
-	err := qe.SetJsonToCache(ctx, config.ProcessedCTokens, processedCTokens)
+	err := qe.SetJsonToCache(ctx, config.ProcessedCTokens, blocknumber, processedCTokens)
 	if err != nil {
 		return errors.New("SetCacheWithProcessedCTokens: " + err.Error())
 	}
