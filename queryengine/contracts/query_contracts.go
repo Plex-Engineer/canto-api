@@ -161,7 +161,9 @@ func (qe *QueryEngine) StartContractQueryEngine(ctx context.Context) {
 		// call functions in multicall contract
 		res, err := qe.mcinstance.Aggregate(nil, calldata)
 		if err != nil {
-			contractQueryEngineFatalLog(err, "StartContractQueryEngine", "failed to aggregate")
+			config.SetBackupRPC()
+			log.Error().Err(err).Msg("failed to call multicall contract, trying backup rpc")
+			continue
 		}
 
 		// decode results

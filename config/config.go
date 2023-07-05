@@ -104,3 +104,13 @@ func NewConfig(fpiJsonFile string, contractsJsonFile string) {
 	calls := append(fpiCalls, generalCalls...)
 	ContractCalls = calls
 }
+
+func SetBackupRPC() {
+	// Initialize eth client using backup rpc
+	rpcUrl := os.Getenv("CANTO_BACKUP_RPC_URL")
+	ethclient, err := ethclient.Dial(rpcUrl)
+	if err != nil {
+		log.Fatal().Msgf("Error initializing eth client: %v", err)
+	}
+	EthClient = ethclient
+}
