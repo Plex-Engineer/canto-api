@@ -58,14 +58,17 @@ func getCTokenContractCalls() []Contract {
 				"cTokens:" + token.Address + ":compSupplySpeeds",
 				"cTokens:" + token.Address + ":compBorrowSpeeds",
 				"cTokens:" + token.Address + ":borrowCaps",
+				"cTokens:" + token.Address + ":compSupplyState",
 			},
 			Methods: []string{
 				"markets(address)(bool, uint256, bool)",
 				"compSupplySpeeds(address)(uint256)",
 				"compBorrowSpeeds(address)(uint256)",
 				"borrowCaps(address)(uint256)",
+				"compSupplyState(address)(uint256)",
 			},
 			Args: [][]interface{}{
+				{token.Address},
 				{token.Address},
 				{token.Address},
 				{token.Address},

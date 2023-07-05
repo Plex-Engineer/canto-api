@@ -37,4 +37,5 @@ type ProcessedCToken struct {
 	SupplyApy        string            `json:"supplyApy"`
 	BorrowApy        string            `json:"borrowApy"`
 	DistApy          string            `json:"distApy"`
+	CompSupplyState  string            `json:"compSupplyState"`
 }
