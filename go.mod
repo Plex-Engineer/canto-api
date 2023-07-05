@@ -8,6 +8,7 @@ require (
 	github.com/ethereum/go-ethereum v1.10.19
 	github.com/gofiber/fiber/v2 v2.47.0
 	github.com/gofiber/swagger v0.1.12
+	github.com/joho/godotenv v1.5.1
 	github.com/redis/go-redis/v9 v9.0.5
 	github.com/rs/zerolog v1.29.1
 	github.com/swaggo/swag v1.16.1

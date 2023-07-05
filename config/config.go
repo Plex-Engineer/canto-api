@@ -1,8 +1,12 @@
 package config
 
 import (
+	"fmt"
+	"os"
+
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/ethclient"
+	"github.com/joho/godotenv"
 	"github.com/redis/go-redis/v9"
 	"github.com/rs/zerolog/log"
 	"google.golang.org/grpc"
@@ -43,15 +47,22 @@ var (
  */
 func NewConfig(fpiJsonFile string, contractsJsonFile string) {
 
+	err := godotenv.Load(".env")
+	if err != nil {
+		fmt.Println("Error loading .env file")
+	}
 	// Initialize redis client
+	dbHost := os.Getenv("DB_HOST")
+	dbPort := os.Getenv("DB_PORT")
 	RDB = redis.NewClient(&redis.Options{
-		Addr:     "localhost:6379",
+		Addr:     fmt.Sprintf("%s:%s", dbHost, dbPort),
 		Password: "",
 		DB:       0,
 	})
 
 	// Initialize eth client using mainnet rpc
-	ethclient, err := ethclient.Dial("https://mainnode.plexnode.org:8545")
+	rpcUrl := os.Getenv("CANTO_MAINNET_RPC_URL")
+	ethclient, err := ethclient.Dial(rpcUrl)
 	if err != nil {
 		log.Fatal().Msgf("Error initializing eth client: %v", err)
 	}

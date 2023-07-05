@@ -1,3 +1,4 @@
 *.rdb
 /canto-api
 canto-api
+.env
