@@ -1,13 +1,8 @@
 {
     "swagger": "2.0",
     "info": {
-        "description": "Swagger UI for Cantor API",
-        "title": "Canto API",
-        "contact": {},
-        "version": "1.0"
+        "contact": {}
     },
-    "host": "localhost:3000",
-    "basePath": "/v1",
     "paths": {
         "/csr": {
             "get": {
@@ -78,6 +73,26 @@
                 }
             }
         },
+        "/dex/pairs/{address}": {
+            "get": {
+                "description": "return json array of all pairs in Canto dex",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "Query a pair by address",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/requestengine.Pairs"
+                        }
+                    }
+                }
+            }
+        },
         "/gov/proposals": {
             "get": {
                 "description": "return json list of proposals",
@@ -137,6 +152,26 @@
                     "application/json"
                 ],
                 "summary": "Query all cTokens in CLM",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/lending/ctokens/{address}": {
+            "get": {
+                "description": "return json object of cToken",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "Query cToken by address",
                 "responses": {
                     "200": {
                         "description": "OK",

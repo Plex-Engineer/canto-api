@@ -3,6 +3,7 @@ package config
 import (
 	"fmt"
 	"os"
+	"strconv"
 
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/ethclient"
@@ -69,7 +70,8 @@ func NewConfig(fpiJsonFile string, contractsJsonFile string) {
 	EthClient = ethclient
 
 	// Initialize grpc client using mainnet rpc
-	GrpcClient, err = grpc.Dial("143.198.228.162:9090", grpc.WithInsecure())
+	grpcUrl := os.Getenv("CANTO_MAINNET_GRPC_URL")
+	GrpcClient, err = grpc.Dial(grpcUrl, grpc.WithInsecure())
 	if err != nil {
 		log.Fatal().Msgf("Error initializing grpc client: %v", err)
 	}
@@ -81,10 +83,15 @@ func NewConfig(fpiJsonFile string, contractsJsonFile string) {
 	}
 
 	// set multicall address
-	MulticallAddress = common.HexToAddress(FPIConfig.MulticallV3)
+	mcAddress := os.Getenv("MULTICALL_ADDRESS")
+	MulticallAddress = common.HexToAddress(mcAddress)
 
 	// set query interval per block (5 seconds)
-	QueryInterval = 5
+	queryInterval, err := strconv.Atoi(os.Getenv("QUERY_INTERVAL"))
+	if err != nil {
+		log.Fatal().Msgf("Error converting query interval to int: %v", err)
+	}
+	QueryInterval = uint(queryInterval)
 
 	// get general contracts from contracts.json
 	generalCalls, err := getContractsFromJson(contractsJsonFile)
@@ -96,4 +103,14 @@ func NewConfig(fpiJsonFile string, contractsJsonFile string) {
 	fpiCalls := getAllFPI()
 	calls := append(fpiCalls, generalCalls...)
 	ContractCalls = calls
+}
+
+func SetBackupRPC() {
+	// Initialize eth client using backup rpc
+	rpcUrl := os.Getenv("CANTO_BACKUP_RPC_URL")
+	ethclient, err := ethclient.Dial(rpcUrl)
+	if err != nil {
+		log.Fatal().Msgf("Error initializing eth client: %v", err)
+	}
+	EthClient = ethclient
 }

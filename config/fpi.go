@@ -1,5 +1,18 @@
 package config
 
+func getAllFPI() []Contract {
+	// Declare and initialize a list of Contracts
+	calls := []Contract{}
+
+	// add required contract calls for all cTokens
+	calls = append(calls, getCTokenContractCalls()...)
+
+	// add required contract calls for all pairs
+	calls = append(calls, getPairsContractsCalls()...)
+
+	return calls
+}
+
 // this function generates and returns required contract calls for all ctokens in TokensConfig
 func getCTokenContractCalls() []Contract {
 	// Declare and initialize a list of Contracts
@@ -137,17 +150,4 @@ func getPairsContractsCalls() []Contract {
 	}
 	return calls
 
-}
-
-func getAllFPI() []Contract {
-	// Declare and initialize a list of Contracts
-	calls := []Contract{}
-
-	// add required contract calls for all cTokens
-	calls = append(calls, getCTokenContractCalls()...)
-
-	// add required contract calls for all pairs
-	calls = append(calls, getPairsContractsCalls()...)
-
-	return calls
 }

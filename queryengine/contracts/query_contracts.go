@@ -24,6 +24,7 @@ type QueryEngine struct {
 	interval    time.Duration
 	mcinstance  *multicall.Multicall
 	viewcalls   multicall.ViewCalls
+	blockkey    string
 }
 
 // Returns a QueryEngine instance with all necessary objects for
@@ -44,6 +45,7 @@ func NewQueryEngine() *QueryEngine {
 		interval:    time.Duration(config.QueryInterval),
 		mcinstance:  mc,
 		viewcalls:   vcs,
+		blockkey:    config.BlockNumber,
 	}
 }
 
@@ -86,15 +88,17 @@ func ProcessContractCalls(contracts []config.Contract) (multicall.ViewCalls, err
 	return vcs, nil
 }
 
-func ProcessMulticallResults(ctx context.Context, results *multicall.Result) (TokensMap, PairsMap, map[string][]interface{}, error) {
+func ProcessMulticallResults(ctx context.Context, results *multicall.Result) (string, TokensMap, PairsMap, map[string][]interface{}, error) {
 	// Declare and initialize maps for ctokens, pairs and others
 	ctokens := make(TokensMap)
 	pairs := make(PairsMap)
 	others := make(map[string][]interface{})
 
 	if results == nil {
-		return nil, nil, nil, errors.New("ProcessMulticallResults: Empty multicall results")
+		return "", nil, nil, nil, errors.New("ProcessMulticallResults: Empty multicall results")
 	}
+
+	blocknumber := ResultToString(results.BlockNumber)
 
 	// Iterate the results to separate them into ctokens, pairs and other according to their keys
 	for key, value := range results.Calls {
@@ -102,7 +106,7 @@ func ProcessMulticallResults(ctx context.Context, results *multicall.Result) (To
 		keys := strings.Split(key, ":")
 		if keys[0] == "cTokens" {
 			if len(keys) < 3 {
-				return nil, nil, nil, errors.New("ProcessMulticallResults: invalid key for cTokens")
+				return "", nil, nil, nil, errors.New("ProcessMulticallResults: invalid key for cTokens")
 			}
 			// Check if the keys[1] map(ex: address of cCanto) is already initialized
 			if ctokens[keys[1]] == nil {
@@ -115,7 +119,7 @@ func ProcessMulticallResults(ctx context.Context, results *multicall.Result) (To
 
 		} else if keys[0] == "lpPairs" {
 			if len(keys) < 3 {
-				return nil, nil, nil, errors.New("ProcessMulticallResults: invalid key for lpPairs")
+				return "", nil, nil, nil, errors.New("ProcessMulticallResults: invalid key for lpPairs")
 			}
 			// Check if the keys[1] map(ex: address of CantoNoteLP) is already initialized
 			if pairs[keys[1]] == nil {
@@ -131,7 +135,7 @@ func ProcessMulticallResults(ctx context.Context, results *multicall.Result) (To
 		}
 
 	}
-	return ctokens, pairs, others, nil
+	return blocknumber, ctokens, pairs, others, nil
 }
 
 func contractQueryEngineFatalLog(err error, function string, msg string) {
@@ -157,7 +161,9 @@ func (qe *QueryEngine) StartContractQueryEngine(ctx context.Context) {
 		// call functions in multicall contract
 		res, err := qe.mcinstance.Aggregate(nil, calldata)
 		if err != nil {
-			contractQueryEngineFatalLog(err, "StartContractQueryEngine", "failed to aggregate")
+			config.SetBackupRPC()
+			log.Error().Err(err).Msg("failed to call multicall contract, trying backup rpc")
+			continue
 		}
 
 		// decode results
@@ -165,15 +171,9 @@ func (qe *QueryEngine) StartContractQueryEngine(ctx context.Context) {
 		if err != nil {
 			contractQueryEngineFatalLog(err, "StartContractQueryEngine", "failed to decode results")
 		}
-		// set blocknumber to redis
-		err = qe.SetJsonToCache(ctx, config.BlockNumber, ResultToString(ret.BlockNumber))
-
-		if err != nil {
-			contractQueryEngineFatalLog(err, "StartContractQueryEngine", "failed to set block number to redis cache")
-		}
 
 		// get ctokens, pairs and others from multicall results
-		ctokens, pairs, others, err := ProcessMulticallResults(ctx, ret)
+		blocknumber, ctokens, pairs, others, err := ProcessMulticallResults(ctx, ret)
 		if err != nil {
 			contractQueryEngineFatalLog(err, "StartContractQueryEngine", "failed to process multicall results")
 		}
@@ -185,13 +185,13 @@ func (qe *QueryEngine) StartContractQueryEngine(ctx context.Context) {
 		}
 
 		// process pairs data and set to redis
-		err = qe.SetCacheWithProcessedPairs(ctx, pairs)
+		err = qe.SetCacheWithProcessedPairs(ctx, blocknumber, pairs)
 		if err != nil {
 			contractQueryEngineFatalLog(err, "StartContractQueryEngine", "failed to set processed pairs to redis cache")
 		}
 
 		// process ctokens data and set to redis
-		err = qe.SetCacheWithProcessedCTokens(ctx, ctokens)
+		err = qe.SetCacheWithProcessedCTokens(ctx, blocknumber, ctokens)
 		if err != nil {
 			contractQueryEngineFatalLog(err, "StartContractQueryEngine", "failed to set processed ctokens to redis cache")
 		}

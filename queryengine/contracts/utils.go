@@ -131,9 +131,11 @@ func distributionAPY(compSupplySpeed float64, tokenSupply float64, tokenPrice fl
 }
 
 // This function takes unprocessed pairs data, calculates, adds additional required data and returns the processed pair data
-func GetProcessedPairs(ctx context.Context, pairs PairsMap) ([]ProcessedPair, map[string]string) {
+func GetProcessedPairs(ctx context.Context, blocknumber string, pairs PairsMap) ([]ProcessedPair, map[string]string) {
 	processedPairs := []ProcessedPair{}
 	processedPairsMap := make(map[string]string)
+
+	processedPairsMap["blocknumber"] = blocknumber
 
 	// loop over all pairs
 	// key is address of lp pair and value is a map of pair data
