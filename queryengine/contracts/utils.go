@@ -209,6 +209,7 @@ func GetProcessedCTokens(ctx context.Context, cTokens TokensMap) ([]ProcessedCTo
 		collateralFactor, _ := InterfaceToString(cToken["markets"][1])
 		price, _ := InterfaceToBigInt(cToken["underlyingPrice"][0])
 		borrowCap, _ := InterfaceToBigInt(cToken["borrowCaps"][0])
+		compSupplyState, _ := InterfaceToString(cToken["compSupplyState"][0])
 
 		if borrowCap.Cmp(big.NewInt(0)) == 0 {
 			borrowCap = big.NewInt(math.MaxInt64 - 1)
@@ -261,6 +262,7 @@ func GetProcessedCTokens(ctx context.Context, cTokens TokensMap) ([]ProcessedCTo
 			SupplyApy:        fmt.Sprintf("%.2f", supplyApy),
 			BorrowApy:        fmt.Sprintf("%.2f", borrowApy),
 			DistApy:          fmt.Sprintf("%.2f", distApy),
+			CompSupplyState:  compSupplyState,
 		}
 
 		processedCTokens = append(processedCTokens, processedCToken)
