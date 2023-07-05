@@ -4,6 +4,6 @@ WORKDIR /go/src/canto-api
 
 COPY . .
 
-RUN go build -o build/canto main.go
+RUN go build -o build/canto-api main.go
 
-CMD ["./build/canto"]
+CMD ["./build/canto-api"]

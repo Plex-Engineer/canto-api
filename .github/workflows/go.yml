@@ -9,11 +9,11 @@ on:
   pull_request:
     branches: [ "main" ]
 
-environment:
-  CANTO_MAINNET_RPC_URL=https://mainnode.plexnode.org:8545
-  PORT=:3000
-  DB_HOST=redis
-  DB_PORT=6379
+env:
+  CANTO_MAINNET_RPC_URL: https://mainnode.plexnode.org:8545
+  PORT: :3000
+  DB_HOST: redis
+  DB_PORT: 6379
   
 jobs:
 
