@@ -34,16 +34,16 @@ func GetGeneralContractRoutes() []string {
 	return routes
 }
 
-func routerCtokens(app *fiber.App) {
+func routerCTokens(app *fiber.App) {
 	lending := app.Group("/v1/lending")
 	lending.Get("/ctokens", QueryCTokens)
 	lending.Get("/ctoken/:address", QueryCTokenByAddress)
 }
 
-func routerLiquidityPool(app *fiber.App) {
+func routerPairs(app *fiber.App) {
 	liquidity := app.Group("/v1/dex")
 	liquidity.Get("/pairs", QueryPairs)
-	liquidity.Get("/pair/:address", QueryPairsByAddress)
+	liquidity.Get("/pair/:address", QueryPairByAddress)
 }
 
 func routerCSR(app *fiber.App) {
@@ -86,8 +86,8 @@ func Run(ctx context.Context) {
 	routerCSR(app)
 	routerGovernance(app)
 	routerStaking(app)
-	routerLiquidityPool(app)
-	routerCtokens(app)
+	routerPairs(app)
+	routerCTokens(app)
 
 	app.Get("/swagger/*", swagger.HandlerDefault) // default
 

@@ -52,7 +52,14 @@ func QueryPairs(ctx *fiber.Ctx) error {
 	return ctx.Status(StatusOkay).SendString(pairsString)
 }
 
-func QueryPairsByAddress(ctx *fiber.Ctx) error {
+// QueryPairByAddress godoc
+// @Summary      Query a pair by address
+// @Description  return json array of all pairs in Canto dex
+// @Accept       json
+// @Produce      json
+// @Success      200  {object}  Pairs
+// @Router       /dex/pairs/{address} [get]
+func QueryPairByAddress(ctx *fiber.Ctx) error {
 	// get block number from cache
 	blockNumber, err := GetBlockNumber()
 	if err != nil {
@@ -71,13 +78,13 @@ func QueryPairsByAddress(ctx *fiber.Ctx) error {
 
 	// generate json result string
 	result := queryengine.ResultToString(map[string]interface{}{
-		"blockNumber": blockNumber,
-		"pair":        pair,
+		"block": blockNumber,
+		"pair":  pair,
 	})
 	return ctx.Status(StatusOkay).SendString(result)
 }
 
-// QueryCtokens godoc
+// QueryCTokens godoc
 // @Summary      Query all cTokens in CLM
 // @Description  return json array of all pairs in CLM
 // @Accept       json
@@ -94,6 +101,13 @@ func QueryCTokens(ctx *fiber.Ctx) error {
 	return ctx.Status(StatusOkay).SendString(cTokensString)
 }
 
+// QueryCTokenByAddress godoc
+// @Summary      Query cToken by address
+// @Description  return json object of cToken
+// @Accept       json
+// @Produce      json
+// @Success      200  {object}  string
+// @Router       /lending/ctokens/{address} [get]
 func QueryCTokenByAddress(ctx *fiber.Ctx) error {
 	// get block number from cache
 	blockNumber, err := GetBlockNumber()
@@ -113,8 +127,8 @@ func QueryCTokenByAddress(ctx *fiber.Ctx) error {
 
 	// generate json result string
 	result := queryengine.ResultToString(map[string]interface{}{
-		"blockNumber": blockNumber,
-		"cToken":      cToken,
+		"block":  blockNumber,
+		"cToken": cToken,
 	})
 	return ctx.Status(StatusOkay).SendString(result)
 }
