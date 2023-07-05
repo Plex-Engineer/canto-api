@@ -9,16 +9,6 @@ Open-source backend for efficiently serving Canto data built using [Redis](https
 ## Quickstart
 
 ```bash
-CANTO_MAINNET_RPC_URL = 
-PORT = :3000
-DB_HOST = localhost
-DB_PORT = 6379
-CANTO_MAINNET_GRPC_URL = 
-MULTICALL_ADDRESS = 
-QUERY_INTERVAL = 3
-```
-
-```bash
 # clone repo
 git clone git@github.com:Plex-Engineer/canto-api.git
 
