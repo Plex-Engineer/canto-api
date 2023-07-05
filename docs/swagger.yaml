@@ -1,4 +1,3 @@
-basePath: /v1
 definitions:
   requestengine.Pairs:
     properties:
@@ -61,12 +60,8 @@ definitions:
       symbol:
         type: string
     type: object
-host: localhost:3000
 info:
   contact: {}
-  description: Swagger UI for Cantor API
-  title: Canto API
-  version: "1.0"
 paths:
   /csr:
     get:
@@ -113,6 +108,19 @@ paths:
           schema:
             $ref: '#/definitions/requestengine.Pairs'
       summary: Query all pairs in Canto dex
+  /dex/pairs/{address}:
+    get:
+      consumes:
+      - application/json
+      description: return json array of all pairs in Canto dex
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/requestengine.Pairs'
+      summary: Query a pair by address
   /gov/proposals:
     get:
       consumes:
@@ -158,6 +166,19 @@ paths:
           schema:
             type: string
       summary: Query all cTokens in CLM
+  /lending/ctokens/{address}:
+    get:
+      consumes:
+      - application/json
+      description: return json object of cToken
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: string
+      summary: Query cToken by address
   /staking/apr:
     get:
       consumes:

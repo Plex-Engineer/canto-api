@@ -85,6 +85,26 @@ const docTemplate = `{
                 }
             }
         },
+        "/dex/pairs/{address}": {
+            "get": {
+                "description": "return json array of all pairs in Canto dex",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "Query a pair by address",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/requestengine.Pairs"
+                        }
+                    }
+                }
+            }
+        },
         "/gov/proposals": {
             "get": {
                 "description": "return json list of proposals",
@@ -144,6 +164,26 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "summary": "Query all cTokens in CLM",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/lending/ctokens/{address}": {
+            "get": {
+                "description": "return json object of cToken",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "Query cToken by address",
                 "responses": {
                     "200": {
                         "description": "OK",
@@ -323,12 +363,12 @@ const docTemplate = `{
 
 // SwaggerInfo holds exported Swagger Info so clients can modify it
 var SwaggerInfo = &swag.Spec{
-	Version:          "1.0",
-	Host:             "localhost:3000",
-	BasePath:         "/v1",
+	Version:          "",
+	Host:             "",
+	BasePath:         "",
 	Schemes:          []string{},
-	Title:            "Canto API",
-	Description:      "Swagger UI for Cantor API",
+	Title:            "",
+	Description:      "",
 	InfoInstanceName: "swagger",
 	SwaggerTemplate:  docTemplate,
 	LeftDelim:        "{{",
