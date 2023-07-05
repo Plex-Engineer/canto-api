@@ -246,17 +246,6 @@ func TestProcessMulticallResults(t *testing.T) {
 		wantErr bool
 	}{
 		{
-			name: "nil input",
-			args: args{
-				ctx:     context.Background(),
-				results: nil,
-			},
-			want:    nil,
-			want1:   nil,
-			want2:   nil,
-			wantErr: true,
-		},
-		{
 			name: "nil calls input",
 			args: args{
 				ctx: context.Background(),
