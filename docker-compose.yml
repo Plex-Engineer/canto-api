@@ -14,11 +14,8 @@ services:
       context: .
     ports:
       - "3000:3000"
-    environment:
-     - CANTO_MAINNET_RPC_URL=https://mainnode.plexnode.org:8545
-     - PORT=:3000
-     - DB_HOST=redis
-     - DB_PORT=6379
+    env_file:
+     - .env
 
 
 volumes:
