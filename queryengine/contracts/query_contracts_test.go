@@ -233,9 +233,6 @@ func TestProcessContractCalls(t *testing.T) {
 }
 
 func TestProcessMulticallResults(t *testing.T) {
-	fpiJsonFile := "../../config/jsons/fpi_mainnet.json"
-	contractsJsonFile := "../../config/jsons/contracts.json"
-	config.NewConfig(fpiJsonFile, contractsJsonFile)
 	type args struct {
 		ctx     context.Context
 		results *multicall.Result
