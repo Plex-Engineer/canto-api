@@ -94,11 +94,11 @@ func ProcessMulticallResults(ctx context.Context, results *multicall.Result) (st
 	pairs := make(PairsMap)
 	others := make(map[string][]interface{})
 
-	blocknumber := ResultToString(results.BlockNumber)
-
 	if results == nil {
 		return "", nil, nil, nil, errors.New("ProcessMulticallResults: Empty multicall results")
 	}
+
+	blocknumber := ResultToString(results.BlockNumber)
 
 	// Iterate the results to separate them into ctokens, pairs and other according to their keys
 	for key, value := range results.Calls {
