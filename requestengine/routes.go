@@ -3,6 +3,7 @@ package requestengine
 import (
 	"context"
 	"fmt"
+	"os"
 	"strings"
 
 	"canto-api/config"
@@ -90,7 +91,8 @@ func Run(ctx context.Context) {
 
 	app.Get("/swagger/*", swagger.HandlerDefault) // default
 
-	err := app.Listen(":3000")
+	port := os.Getenv("PORT")
+	err := app.Listen(port)
 	if err != nil {
 		log.Fatal().Err(err).Msg("Error fiber server")
 	}

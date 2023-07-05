@@ -1,0 +1,26 @@
+version: "3.8"
+
+services:
+  redis:
+    image: redis:latest
+    ports:
+      - "6379:6379"
+    volumes: 
+      - redis-data:/data
+      - redis-conf:/usr/local/etc/redis/redis.conf
+
+  canto-api:
+    build:
+      context: .
+    ports:
+      - "3000:3000"
+    environment:
+     - CANTO_MAINNET_RPC_URL=https://mainnode.plexnode.org:8545
+     - PORT=:3000
+     - DB_HOST=redis
+     - DB_PORT=6379
+
+
+volumes:
+  redis-data:
+  redis-conf:
