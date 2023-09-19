@@ -46,8 +46,7 @@ var (
  * @return: none
  * @desc: initialize config variables (acts as a constructor)
  */
-func NewConfig(fpiJsonFile string, contractsJsonFile string) {
-
+func NewConfig() {
 	err := godotenv.Load(".env")
 	if err != nil {
 		fmt.Println("Error loading .env file")
@@ -75,11 +74,26 @@ func NewConfig(fpiJsonFile string, contractsJsonFile string) {
 	if err != nil {
 		log.Fatal().Msgf("Error initializing grpc client: %v", err)
 	}
-
+	// is testnet
+	isTestnet := os.Getenv("TESTNET")
+	var fpiFile string
+	var contractsFile string
+	if isTestnet == "true" {
+		fpiFile = "./config/jsons/fpi_testnet.json"
+		contractsFile = "./config/jsons/contracts_testnet.json"
+	} else {
+		fpiFile = "./config/jsons/fpi_mainnet.json"
+		contractsFile = "./config/jsons/contracts.json"
+	}
 	// get tokens data from tokens.json
-	FPIConfig, err = getFPIFromJson(fpiJsonFile)
+	FPIConfig, err = getFPIFromJson(fpiFile)
 	if err != nil {
 		log.Fatal().Msgf("Error getting tokens data from json: %v", err)
+	}
+	// get general contracts from contracts.json
+	generalCalls, err := getContractsFromJson(contractsFile)
+	if err != nil {
+		log.Fatal().Msgf("Error getting general contracts from json: %v", err)
 	}
 
 	// set multicall address
@@ -92,12 +106,6 @@ func NewConfig(fpiJsonFile string, contractsJsonFile string) {
 		log.Fatal().Msgf("Error converting query interval to int: %v", err)
 	}
 	QueryInterval = uint(queryInterval)
-
-	// get general contracts from contracts.json
-	generalCalls, err := getContractsFromJson(contractsJsonFile)
-	if err != nil {
-		log.Fatal().Msgf("Error getting general contracts from json: %v", err)
-	}
 
 	// get FPI contracts from tokens.json
 	fpiCalls := getAllFPI()

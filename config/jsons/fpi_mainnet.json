@@ -105,7 +105,7 @@
       "address": "0x4e71A2E537B7f9D9413D3991D37958c0b5e1e503",
       "symbol": "NOTE",
       "decimals": 18,
-      "logoURI": "https://canto.io/tokens/Note.svg",
+      "logoURI": "https://raw.githubusercontent.com/Plex-Engineer/public-assets/main/icons/tokens/note.svg",
       "chainId": "7700"
     },
     {
@@ -113,7 +113,7 @@
       "address": "0x80b5a32E4F032B2a058b4F29EC95EEfEEB87aDcd",
       "symbol": "USDC",
       "decimals": 6,
-      "logoURI": "https://canto.io/tokens/USDC.svg",
+      "logoURI": "https://raw.githubusercontent.com/cosmos/chain-registry/master/_non-cosmos/ethereum/images/usdc.svg",
       "chainId": "7700"
     },
     {
@@ -121,7 +121,7 @@
       "address": "0xd567B3d7B8FE3C79a1AD8dA978812cfC4Fa05e75",
       "symbol": "USDT",
       "decimals": 6,
-      "logoURI": "https://canto.io/tokens/USDT.svg",
+      "logoURI": "https://raw.githubusercontent.com/cosmos/chain-registry/master/_non-cosmos/ethereum/images/usdt.svg",
       "chainId": "7700"
     },
     {
@@ -129,7 +129,7 @@
       "address": "0xecEEEfCEE421D8062EF8d6b4D814efe4dc898265",
       "symbol": "ATOM",
       "decimals": 6,
-      "logoURI": "https://canto.io/tokens/ATOM.svg",
+      "logoURI": "https://raw.githubusercontent.com/cosmos/chain-registry/master/cosmoshub/images/atom.svg",
       "chainId": "7700"
     },
     {
@@ -137,7 +137,7 @@
       "address": "0x5FD55A1B9FC24967C4dB09C513C3BA0DFa7FF687",
       "symbol": "ETH",
       "decimals": 18,
-      "logoURI": "https://canto.io/tokens/ETH.svg",
+      "logoURI": "https://raw.githubusercontent.com/cosmos/chain-registry/master/_non-cosmos/ethereum/images/eth-white.svg",
       "chainId": "7700"
     },
     {
@@ -145,7 +145,7 @@
       "address": "0x826551890Dc65655a0Aceca109aB11AbDbD7a07B",
       "symbol": "wCANTO",
       "decimals": 18,
-      "logoURI": "https://canto.io/tokens/Canto.svg",
+      "logoURI": "https://raw.githubusercontent.com/cosmos/chain-registry/master/canto/images/canto.svg",
       "chainId": "7700"
     }
   ],
@@ -158,7 +158,8 @@
       "stable": false,
       "tokenA": "0x826551890Dc65655a0Aceca109aB11AbDbD7a07B",
       "tokenB": "0x4e71A2E537B7f9D9413D3991D37958c0b5e1e503",
-      "chainId": "7700"
+      "chainId": "7700",
+      "logoURI": "https://raw.githubusercontent.com/Plex-Engineer/public-assets/main/icons/tokens/LP/CantoNoteLP.svg"
     },
     {
       "name": "Canto Atom Liquidity Provider",
@@ -168,7 +169,8 @@
       "stable": false,
       "tokenA": "0x826551890Dc65655a0Aceca109aB11AbDbD7a07B",
       "tokenB": "0xecEEEfCEE421D8062EF8d6b4D814efe4dc898265",
-      "chainId": "7700"
+      "chainId": "7700",
+      "logoURI": "https://raw.githubusercontent.com/Plex-Engineer/public-assets/main/icons/tokens/LP/CantoAtomLP.svg"
     },
     {
       "name": "Note USC Coin Liquidity Provider",
@@ -178,7 +180,8 @@
       "stable": true,
       "tokenA": "0x4e71A2E537B7f9D9413D3991D37958c0b5e1e503",
       "tokenB": "0x80b5a32E4F032B2a058b4F29EC95EEfEEB87aDcd",
-      "chainId": "7700"
+      "chainId": "7700",
+      "logoURI": "https://raw.githubusercontent.com/Plex-Engineer/public-assets/main/icons/tokens/LP/NoteUSDCLP.svg"
     },
     {
       "name": "Note USD Tether Liquidity Provider",
@@ -188,7 +191,8 @@
       "stable": true,
       "tokenA": "0x4e71A2E537B7f9D9413D3991D37958c0b5e1e503",
       "tokenB": "0xd567B3d7B8FE3C79a1AD8dA978812cfC4Fa05e75",
-      "chainId": "7700"
+      "chainId": "7700",
+      "logoURI": "https://raw.githubusercontent.com/Plex-Engineer/public-assets/main/icons/tokens/LP/NoteUSDTLP.svg"
     },
     {
       "name": "Canto Ethereum Liquidity Provider",
@@ -198,7 +202,8 @@
       "stable": false,
       "tokenA": "0x826551890Dc65655a0Aceca109aB11AbDbD7a07B",
       "tokenB": "0x5FD55A1B9FC24967C4dB09C513C3BA0DFa7FF687",
-      "chainId": "7700"
+      "chainId": "7700",
+      "logoURI": "https://raw.githubusercontent.com/Plex-Engineer/public-assets/main/icons/tokens/LP/CantoETHLP.svg"
     }
   ]
 }

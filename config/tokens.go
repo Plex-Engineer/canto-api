@@ -33,6 +33,7 @@ type Underlying struct {
 	Symbol   string `json:"symbol"`
 	Name     string `json:"name"`
 	Decimals int64  `json:"decimals"`
+	LogoURI  string `json:"logoURI,omitempty"`
 }
 
 type Token struct {
@@ -54,6 +55,7 @@ type Pair struct {
 	TokenA   string `json:"tokenA"`
 	TokenB   string `json:"tokenB"`
 	ChainID  string `json:"chainId"`
+	LogoURI  string `json:"logoURI,omitempty"`
 }
 
 // parses tokens.json and returns tokens data
@@ -137,6 +139,7 @@ func GetUnderlyingData(address string) (result Underlying) {
 				Address:  token.Address,
 				Decimals: token.Decimals,
 				Symbol:   token.Symbol,
+				LogoURI:  token.LogoURI,
 			}
 			return
 		}
@@ -149,6 +152,7 @@ func GetUnderlyingData(address string) (result Underlying) {
 				Address:  pair.Address,
 				Decimals: pair.Decimals,
 				Symbol:   pair.Symbol,
+				LogoURI:  pair.LogoURI,
 			}
 			return
 		}

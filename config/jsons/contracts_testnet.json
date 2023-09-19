@@ -1,0 +1,54 @@
+[
+  {
+    "Name": "factory",
+    "Address": "0x760a17e00173339907505B38F95755d28810570C",
+    "Methods": [
+      "allPairsLength()(uint256)"
+    ],
+    "Args": [
+      []
+    ]
+  },
+  {
+    "Name": "pricefeed",
+    "Address": "0x463e7d4DF8fE5fb42D024cb57c77b76e6e74417a",
+    "Methods": [
+      "getUnderlyingPrice(address)(uint256)"
+    ],
+    "Args": [
+      [
+        "0x477eaF5DECf6299EE937954084f0d53EFc57346F"
+      ]
+    ]
+  },
+  {
+    "Name": "comptroller",
+    "Address": "0x9514c07bC6e80B652e4264E64f589C59065C231f",
+    "Methods": [
+      "markets(address)(bool, uint256, bool)",
+      "compSupplySpeeds(address)(uint256)",
+      "borrowCaps(address)(uint256)"
+    ],
+    "Args": [
+      [
+        "0x477eaF5DECf6299EE937954084f0d53EFc57346F"
+      ],
+      [
+        "0x477eaF5DECf6299EE937954084f0d53EFc57346F"
+      ],
+      [
+        "0x477eaF5DECf6299EE937954084f0d53EFc57346F"
+      ]
+    ]
+  },
+  {
+    "Name": "factorydetails",
+    "Address": "0x760a17e00173339907505B38F95755d28810570C",
+    "Methods": [
+      "admin()(address)"
+    ],
+    "Args": [
+      []
+    ]
+  }
+]

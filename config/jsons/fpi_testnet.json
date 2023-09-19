@@ -1,12 +1,15 @@
 {
   "name": "Canto Testnet Token List",
   "version": 0.1,
-  "keywords": ["canto", "testnet"],
+  "keywords": [
+    "canto",
+    "testnet"
+  ],
   "chainid": "7701",
-  "comptroller": "",
-  "router": "",
-  "reservoir": "",
-  "multicallV3": "",
+  "comptroller": "0x9514c07bC6e80B652e4264E64f589C59065C231f",
+  "router": "0x463e7d4DF8fE5fb42D024cb57c77b76e6e74417a",
+  "reservoir": "0xc481BCA47fa855e92d53a35C5ADA4bbbA3b0AC88",
+  "multicallV3": "0xcA11bde05977b3631167028862bE2a173976CA11",
   "ctokens": [
     {
       "name": "Collateral Note",
@@ -32,7 +35,6 @@
       "underlying": "0x4fC30060226c45D8948718C95a78dFB237e88b40",
       "chainId": "7701"
     },
-
     {
       "name": "Collateral ATOM",
       "address": "0x90FCcb79Ad6f013A4bf62Ad43577eed7a8eb961B",
@@ -73,7 +75,6 @@
       "underlying": "0x2bDF6c1302efc3c03D9C95f6fb5a4826A6bD964b",
       "chainId": "7701"
     },
-
     {
       "name": "Collateral Note USD Coin Liquidity Provider",
       "address": "0xB2C5512a8A70835Cb9aBe830C9e61FBDdcd1dC81",
@@ -99,6 +100,56 @@
       "chainId": "7701"
     }
   ],
+  "tokens": [
+    {
+      "name": "Note",
+      "address": "0x03F734Bd9847575fDbE9bEaDDf9C166F880B5E5f",
+      "symbol": "NOTE",
+      "decimals": 18,
+      "logoURI": "https://raw.githubusercontent.com/Plex-Engineer/public-assets/main/icons/tokens/note.svg",
+      "chainId": "7700"
+    },
+    {
+      "name": "USD Coin",
+      "address": "0xc51534568489f47949A828C8e3BF68463bdF3566",
+      "symbol": "USDC",
+      "decimals": 6,
+      "logoURI": "https://raw.githubusercontent.com/cosmos/chain-registry/master/_non-cosmos/ethereum/images/usdc.svg",
+      "chainId": "7700"
+    },
+    {
+      "name": "USD Tether",
+      "address": "0x4fC30060226c45D8948718C95a78dFB237e88b40",
+      "symbol": "USDT",
+      "decimals": 6,
+      "logoURI": "https://raw.githubusercontent.com/cosmos/chain-registry/master/_non-cosmos/ethereum/images/usdt.svg",
+      "chainId": "7700"
+    },
+    {
+      "name": "ATOM",
+      "address": "0x40E41DC5845619E7Ba73957449b31DFbfB9678b2",
+      "symbol": "ATOM",
+      "decimals": 6,
+      "logoURI": "https://raw.githubusercontent.com/cosmos/chain-registry/master/cosmoshub/images/atom.svg",
+      "chainId": "7700"
+    },
+    {
+      "name": "Ethereum",
+      "address": "0xCa03230E7FB13456326a234443aAd111AC96410A",
+      "symbol": "ETH",
+      "decimals": 18,
+      "logoURI": "https://raw.githubusercontent.com/cosmos/chain-registry/master/_non-cosmos/ethereum/images/eth-white.svg",
+      "chainId": "7700"
+    },
+    {
+      "name": "Wrapped Canto",
+      "address": "0x04a72466De69109889Db059Cb1A4460Ca0648d9D",
+      "symbol": "wCANTO",
+      "decimals": 18,
+      "logoURI": "https://raw.githubusercontent.com/cosmos/chain-registry/master/canto/images/canto.svg",
+      "chainId": "7700"
+    }
+  ],
   "pairs": [
     {
       "name": "Canto Note Liquidity Provider",
@@ -108,7 +159,8 @@
       "stable": false,
       "tokenA": "0x04a72466De69109889Db059Cb1A4460Ca0648d9D",
       "tokenB": "0x03F734Bd9847575fDbE9bEaDDf9C166F880B5E5f",
-      "chainId": "7701"
+      "chainId": "7701",
+      "logoURI": "https://raw.githubusercontent.com/Plex-Engineer/public-assets/main/icons/tokens/LP/CantoNoteLP.svg"
     },
     {
       "name": "Canto Atom Liquidity Provider",
@@ -118,7 +170,8 @@
       "stable": false,
       "tokenA": "0x04a72466De69109889Db059Cb1A4460Ca0648d9D",
       "tokenB": "0x40E41DC5845619E7Ba73957449b31DFbfB9678b2",
-      "chainId": "7701"
+      "chainId": "7701",
+      "logoURI": "https://raw.githubusercontent.com/Plex-Engineer/public-assets/main/icons/tokens/LP/CantoAtomLP.svg"
     },
     {
       "name": "Note USC Coin Liquidity Provider",
@@ -128,7 +181,8 @@
       "stable": true,
       "tokenA": "0x03F734Bd9847575fDbE9bEaDDf9C166F880B5E5f",
       "tokenB": "0xc51534568489f47949A828C8e3BF68463bdF3566",
-      "chainId": "7701"
+      "chainId": "7701",
+      "logoURI": "https://raw.githubusercontent.com/Plex-Engineer/public-assets/main/icons/tokens/LP/NoteUSDCLP.svg"
     },
     {
       "name": "Note USD Tether Liquidity Provider",
@@ -138,7 +192,8 @@
       "stable": true,
       "tokenA": "0x03F734Bd9847575fDbE9bEaDDf9C166F880B5E5f",
       "tokenB": "0x4fC30060226c45D8948718C95a78dFB237e88b40",
-      "chainId": "7701"
+      "chainId": "7701",
+      "logoURI": "https://raw.githubusercontent.com/Plex-Engineer/public-assets/main/icons/tokens/LP/NoteUSDTLP.svg"
     },
     {
       "name": "Canto Ethereum Liquidity Provider",
@@ -148,18 +203,8 @@
       "stable": false,
       "tokenA": "0x04a72466De69109889Db059Cb1A4460Ca0648d9D",
       "tokenB": "0x03F734Bd9847575fDbE9bEaDDf9C166F880B5E5f",
-      "chainId": "7701"
+      "chainId": "7701",
+      "logoURI": "https://raw.githubusercontent.com/Plex-Engineer/public-assets/main/icons/tokens/LP/CantoETHLP.svg"
     }
-  ],
-  "extra": {
-    "Comptroller": {
-      "address": "0x9514c07bC6e80B652e4264E64f589C59065C231f"
-    },
-    "Router": {
-      "address": "0x463e7d4DF8fE5fb42D024cb57c77b76e6e74417a"
-    },
-    "Reservoir": {
-      "address": "0x07C50Bf0804A06860AeACAcFaf029F9a1c014F91"
-    }
-  }
+  ]
 }
