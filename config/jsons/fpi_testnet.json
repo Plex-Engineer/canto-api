@@ -98,6 +98,14 @@
       "decimals": 18,
       "underlying": "0x905D3d7F4C892d535160f1E2BA55f23Cd306718b",
       "chainId": "7701"
+    },
+    {
+      "name": "Colleteral Hashnote RWA Test Token",
+      "address": "0xf8892860437674690fC34746d0e93d881d5b96B4",
+      "symbol": "cSYDC",
+      "decimals": 6,
+      "underlying": "0xd3D41C08a7e14129bF6Ec9A32697322C70af7E5a",
+      "chainId": "7701"
     }
   ],
   "tokens": [
@@ -107,7 +115,7 @@
       "symbol": "NOTE",
       "decimals": 18,
       "logoURI": "https://raw.githubusercontent.com/Plex-Engineer/public-assets/main/icons/tokens/note.svg",
-      "chainId": "7700"
+      "chainId": "7701"
     },
     {
       "name": "USD Coin",
@@ -115,7 +123,7 @@
       "symbol": "USDC",
       "decimals": 6,
       "logoURI": "https://raw.githubusercontent.com/cosmos/chain-registry/master/_non-cosmos/ethereum/images/usdc.svg",
-      "chainId": "7700"
+      "chainId": "7701"
     },
     {
       "name": "USD Tether",
@@ -123,7 +131,7 @@
       "symbol": "USDT",
       "decimals": 6,
       "logoURI": "https://raw.githubusercontent.com/cosmos/chain-registry/master/_non-cosmos/ethereum/images/usdt.svg",
-      "chainId": "7700"
+      "chainId": "7701"
     },
     {
       "name": "ATOM",
@@ -131,7 +139,7 @@
       "symbol": "ATOM",
       "decimals": 6,
       "logoURI": "https://raw.githubusercontent.com/cosmos/chain-registry/master/cosmoshub/images/atom.svg",
-      "chainId": "7700"
+      "chainId": "7701"
     },
     {
       "name": "Ethereum",
@@ -139,7 +147,7 @@
       "symbol": "ETH",
       "decimals": 18,
       "logoURI": "https://raw.githubusercontent.com/cosmos/chain-registry/master/_non-cosmos/ethereum/images/eth-white.svg",
-      "chainId": "7700"
+      "chainId": "7701"
     },
     {
       "name": "Wrapped Canto",
@@ -147,7 +155,15 @@
       "symbol": "wCANTO",
       "decimals": 18,
       "logoURI": "https://raw.githubusercontent.com/cosmos/chain-registry/master/canto/images/canto.svg",
-      "chainId": "7700"
+      "chainId": "7701"
+    },
+    {
+      "name": "Hashnote RWA Test Token",
+      "address": "0xd3D41C08a7e14129bF6Ec9A32697322C70af7E5a",
+      "symbol": "SYDC",
+      "decimals": 6,
+      "logoURI": "https://raw.githubusercontent.com/cosmos/chain-registry/master/canto/images/canto.svg",
+      "chainId": "7701"
     }
   ],
   "pairs": [
