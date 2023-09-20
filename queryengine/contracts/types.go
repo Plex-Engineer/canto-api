@@ -20,6 +20,7 @@ type ProcessedPair struct {
 	LpPrice     string       `json:"lpPrice"`
 	Reserve1    string       `json:"reserve1"`
 	Reserve2    string       `json:"reserve2"`
+	LogoURI  string `json:"logoURI,omitempty"`
 }
 type ProcessedCToken struct {
 	Address          string            `json:"address"`

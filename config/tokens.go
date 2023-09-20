@@ -161,7 +161,7 @@ func GetUnderlyingData(address string) (result Underlying) {
 }
 
 // get lp pair data (Address, Decimals, Token1, Token2, Stable, CDecimal, cLPaddress) from tokens config using pair symbol and return
-func GetLpPairData(address string) (symbol string, decimals int64, token1 Token, token2 Token, stable bool, cDecimals int64, cLpAddress string) {
+func GetLpPairData(address string) (symbol string, decimals int64, token1 Token, token2 Token, stable bool, cDecimals int64, cLpAddress string, logoUri string) {
 	for _, pair := range FPIConfig.Pairs {
 		if pair.Address == address {
 			symbol = pair.Symbol
@@ -171,6 +171,7 @@ func GetLpPairData(address string) (symbol string, decimals int64, token1 Token,
 			stable = pair.Stable
 			cDecimals = GetCTokenDecimals(address)
 			cLpAddress = GetCTokenAddress(pair.Address)
+			logoUri = pair.LogoURI
 			return
 		}
 	}

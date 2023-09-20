@@ -158,7 +158,7 @@ func GetProcessedPairs(ctx context.Context, blocknumber string, pairs PairsMap) 
 		ratio, aTob := GetLpPairRatio(reserve1, reserve2)
 
 		// get lp pair data
-		symbol, decimals, token1, token2, stable, cDecimals, cLpAddress := config.GetLpPairData(address)
+		symbol, decimals, token1, token2, stable, cDecimals, cLpAddress, logoURI := config.GetLpPairData(address)
 		processedPair := ProcessedPair{
 			Address:     address,
 			Symbol:      symbol,
@@ -177,6 +177,7 @@ func GetProcessedPairs(ctx context.Context, blocknumber string, pairs PairsMap) 
 			LpPrice:     lpPrice.String(),
 			Reserve1:    reserve1.String(),
 			Reserve2:    reserve2.String(),
+			LogoURI:     logoURI,
 		}
 
 		processedPairs = append(processedPairs, processedPair)
