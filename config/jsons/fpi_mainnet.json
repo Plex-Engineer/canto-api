@@ -1,12 +1,16 @@
 {
   "name": "Canto Mainnet Token List",
   "version": 0.1,
-  "keywords": ["canto", "mainnet"],
+  "keywords": [
+    "canto",
+    "mainnet"
+  ],
   "chainid": "7700",
   "comptroller": "0x5E23dC409Fc2F832f83CEc191E245A191a4bCc5C",
   "router": "0xa252eEE9BDe830Ca4793F054B506587027825a8e",
   "reservoir": "0x07C50Bf0804A06860AeACAcFaf029F9a1c014F91",
   "multicallV3": "0xcA11bde05977b3631167028862bE2a173976CA11",
+  "priceOracle": "0xa252eEE9BDe830Ca4793F054B506587027825a8e",
   "ctokens": [
     {
       "name": "Collateral Note",
@@ -32,7 +36,6 @@
       "underlying": "0xd567B3d7B8FE3C79a1AD8dA978812cfC4Fa05e75",
       "chainId": "7700"
     },
-
     {
       "name": "Collateral ATOM",
       "address": "0x617383F201076e7cE0f6E625D1a983b3D1bd277A",
@@ -73,7 +76,6 @@
       "underlying": "0x30838619C55B787BafC3A4cD9aEa851C1cfB7b19",
       "chainId": "7700"
     },
-
     {
       "name": "Collateral Note USD Coin Liquidity Provider",
       "address": "0xD6a97e43FC885A83E97d599796458A331E580800",

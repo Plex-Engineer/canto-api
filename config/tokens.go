@@ -21,6 +21,7 @@ type TokensInfo struct {
 	Comptroller string   `json:"comptroller"`
 	Router      string   `json:"router"`
 	Reservoir   string   `json:"reservoir"`
+	PriceOracle string   `json:"priceOracle"`
 	MulticallV3 string   `json:"multicallV3"`
 	CTokens     []Token  `json:"ctokens"`
 	Tokens      []Token  `json:"tokens"`

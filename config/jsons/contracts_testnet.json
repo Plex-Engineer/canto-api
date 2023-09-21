@@ -11,7 +11,7 @@
   },
   {
     "Name": "pricefeed",
-    "Address": "0x463e7d4DF8fE5fb42D024cb57c77b76e6e74417a",
+    "Address": "0x4F04048721A9D893839f9E7d88FA211a629cFB22",
     "Methods": [
       "getUnderlyingPrice(address)(uint256)"
     ],
