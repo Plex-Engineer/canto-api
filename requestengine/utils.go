@@ -47,10 +47,6 @@ func GetBlockNumber() (string, error) {
 	if err != nil {
 		return "", err
 	}
-	blockNumber, err = strconv.Unquote(blockNumber)
-	if err != nil {
-		return "", err
-	}
 	return blockNumber, nil
 }
 

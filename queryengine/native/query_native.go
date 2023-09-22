@@ -42,7 +42,11 @@ func NewNativeQueryEngine() *NativeQueryEngine {
 func (nqe *NativeQueryEngine) SetJsonToCache(ctx context.Context, key string, result interface{}) error {
 	// set key in redis
 	ret := GeneralResultToString(result)
-	err := nqe.redisclient.Set(ctx, key, ret, 0).Err()
+	// generate json result string
+	result = GeneralResultToString(map[string]interface{}{
+		"results": ret,
+	})
+	err := nqe.redisclient.Set(ctx, key, result, 0).Err()
 	if err != nil {
 		return errors.New("SetJsonToCache: " + err.Error())
 	}

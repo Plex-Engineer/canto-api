@@ -5,6 +5,7 @@ import (
 	"fmt"
 
 	"canto-api/config"
+	nativequeryengine "canto-api/queryengine/native"
 
 	"github.com/gofiber/fiber/v2"
 )
@@ -57,7 +58,11 @@ func QueryValidatorByAddress(ctx *fiber.Ctx) error {
 	if err != nil {
 		return RedisKeyNotFound(ctx, fmt.Sprintf("validator address: %s ", ctx.Params("address")))
 	}
-	return ctx.Status(StatusOkay).SendString(val)
+	// generate json result string
+	result := nativequeryengine.GeneralResultToString(map[string]interface{}{
+		"results": val,
+	})
+	return ctx.Status(StatusOkay).SendString(result)
 }
 
 // QueryCSRs godoc
@@ -92,7 +97,11 @@ func QueryCSRByID(ctx *fiber.Ctx) error {
 	if err != nil {
 		return RedisKeyNotFound(ctx, fmt.Sprintf("csr nft id: %s ", ctx.Params("id")))
 	}
-	return ctx.Status(StatusOkay).SendString(val)
+	// generate json result string
+	result := nativequeryengine.GeneralResultToString(map[string]interface{}{
+		"results": val,
+	})
+	return ctx.Status(StatusOkay).SendString(result)
 }
 
 // QueryProposals godoc
@@ -127,5 +136,9 @@ func QueryProposalByID(ctx *fiber.Ctx) error {
 	if err != nil {
 		return RedisKeyNotFound(ctx, fmt.Sprintf("proposal id: %s ", ctx.Params("id")))
 	}
-	return ctx.Status(StatusOkay).SendString(val)
+	// generate json result string
+	result := nativequeryengine.GeneralResultToString(map[string]interface{}{
+		"results": val,
+	})
+	return ctx.Status(StatusOkay).SendString(result)
 }

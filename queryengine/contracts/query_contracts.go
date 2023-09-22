@@ -178,6 +178,12 @@ func (qe *QueryEngine) StartContractQueryEngine(ctx context.Context) {
 			contractQueryEngineFatalLog(err, "StartContractQueryEngine", "failed to process multicall results")
 		}
 
+		// set blocknumber to redis
+		err = qe.redisclient.Set(ctx, config.BlockNumber, blocknumber, 0).Err()
+		if err != nil {
+			contractQueryEngineFatalLog(err, "StartContractQueryEngine", "failed to set blocknumber to redis")
+		}
+
 		// set general contracts to redis cache
 		err = qe.SetCacheWithGeneral(ctx, others)
 		if err != nil {
