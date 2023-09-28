@@ -249,6 +249,9 @@ func GetProcessedCTokens(ctx context.Context, cTokens TokensMap) ([]ProcessedCTo
 			price.Exp(big.NewInt(10), big.NewInt(36-underlying.Decimals), nil)
 		}
 
+		// get underlying total supply
+		underlyingTotalSupply, _ := InterfaceToString(cToken["underlyingSupply"][0])
+
 		processedCToken := ProcessedCToken{
 			Address:          address,
 			Symbol:           symbol,
@@ -266,6 +269,7 @@ func GetProcessedCTokens(ctx context.Context, cTokens TokensMap) ([]ProcessedCTo
 			BorrowApy:        fmt.Sprintf("%.2f", borrowApy),
 			DistApy:          fmt.Sprintf("%.2f", distApy),
 			CompSupplyState:  compSupplyState,
+			UnderlyingTotalSupply: underlyingTotalSupply,
 		}
 
 		processedCTokens = append(processedCTokens, processedCToken)

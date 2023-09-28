@@ -88,6 +88,21 @@ func getCTokenContractCalls() []Contract {
 				{token.Address},
 			},
 		})
+
+		// get total supply of underlying too, will help with calculating liquidity
+		calls = append(calls, Contract{
+			Name:    token.Symbol + "underlyingSupply",
+			Address: token.Underlying,
+			Keys: []string{
+				"cTokens:" + token.Address + ":underlyingSupply",
+			},
+			Methods: []string{
+				"totalSupply()(uint256)",
+			},
+			Args: [][]interface{}{
+				{},
+			},
+		})
 	}
 
 	return calls

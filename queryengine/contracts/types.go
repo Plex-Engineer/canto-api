@@ -20,23 +20,24 @@ type ProcessedPair struct {
 	LpPrice     string       `json:"lpPrice"`
 	Reserve1    string       `json:"reserve1"`
 	Reserve2    string       `json:"reserve2"`
-	LogoURI  string `json:"logoURI,omitempty"`
+	LogoURI     string       `json:"logoURI,omitempty"`
 }
 type ProcessedCToken struct {
-	Address          string            `json:"address"`
-	Symbol           string            `json:"symbol"`
-	Name             string            `json:"name"`
-	Decimals         int64             `json:"decimals"`
-	Underlying       config.Underlying `json:"underlying"`
-	Cash             string            `json:"cash"`
-	ExchangeRate     string            `json:"exchangeRate"`
-	CollateralFactor string            `json:"collateralFactor"`
-	Price            string            `json:"price"`
-	BorrowCap        string            `json:"borrowCap"`
-	IsListed         bool              `json:"isListed"`
-	Liquidity        string            `json:"liquidity"`
-	SupplyApy        string            `json:"supplyApy"`
-	BorrowApy        string            `json:"borrowApy"`
-	DistApy          string            `json:"distApy"`
-	CompSupplyState  string            `json:"compSupplyState"`
+	Address               string            `json:"address"`
+	Symbol                string            `json:"symbol"`
+	Name                  string            `json:"name"`
+	Decimals              int64             `json:"decimals"`
+	Underlying            config.Underlying `json:"underlying"`
+	Cash                  string            `json:"cash"`
+	ExchangeRate          string            `json:"exchangeRate"`
+	CollateralFactor      string            `json:"collateralFactor"`
+	Price                 string            `json:"price"`
+	BorrowCap             string            `json:"borrowCap"`
+	IsListed              bool              `json:"isListed"`
+	Liquidity             string            `json:"liquidity"`
+	SupplyApy             string            `json:"supplyApy"`
+	BorrowApy             string            `json:"borrowApy"`
+	DistApy               string            `json:"distApy"`
+	CompSupplyState       string            `json:"compSupplyState"`
+	UnderlyingTotalSupply string            `json:"underlyingTotalSupply"`
 }
