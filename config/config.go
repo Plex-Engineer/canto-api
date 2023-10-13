@@ -22,6 +22,7 @@ const (
 	CSRMap              = "CSR_MAP"
 	AllProposals        = "ALL_PROPOSALS"
 	ProposalMap         = "PROPOSAL_MAP"
+	AllProposalsHttp	= "ALL_PROPOSALS_HTTP"
 	Pairs               = "PAIRS"
 	ProcessedPairs      = "PROCESSED_PAIRS"
 	ProcessedPairsMap   = "PROCESSED_PAIRS_MAP"

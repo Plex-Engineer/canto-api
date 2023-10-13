@@ -2,6 +2,8 @@ package queryengine
 
 import (
 	"context"
+	"io"
+	"net/http"
 	"strconv"
 	"time"
 
@@ -97,10 +99,23 @@ type Proposal struct {
 
 // get all proposals from gov shuttle
 // will return full response string and mapping of proposal id to response string
-func GetAllProposals(ctx context.Context, queryClient gov.QueryClient) ([]Proposal, map[string]string, error) {
-	resp, err := queryClient.Proposals(ctx, &gov.QueryProposalsRequest{})
+func GetAllProposals(ctx context.Context, queryClient gov.QueryClient) ([]Proposal, map[string]string, string, error) {
+	httpString := ""
+	httpresp, err := http.Get("https://mainnode.plexnode.org:1317/cosmos/gov/v1beta1/proposals?pagination.limit=1000")
+	if err == nil {
+		defer httpresp.Body.Close()
+		body, err := io.ReadAll(httpresp.Body)
+		if err == nil {
+			httpString = string(body)
+		}
+	}
+	resp, err := queryClient.Proposals(ctx, &gov.QueryProposalsRequest{
+		Pagination: &query.PageRequest{
+			Limit: 1000,
+		},
+	})
 	if err != nil {
-		return nil, nil, err
+		return nil, nil, "", err
 	}
 	allProposals := new([]Proposal)
 	proposalMap := make(map[string]string)
@@ -119,7 +134,7 @@ func GetAllProposals(ctx context.Context, queryClient gov.QueryClient) ([]Propos
 		*allProposals = append(*allProposals, proposalResponse)
 		proposalMap[strconv.Itoa(int(proposal.ProposalId))] = GeneralResultToString(proposalResponse)
 	}
-	return *allProposals, proposalMap, nil
+	return *allProposals, proposalMap, httpString, nil
 }
 
 // CSR

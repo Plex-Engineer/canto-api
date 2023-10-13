@@ -120,7 +120,7 @@ func (nqe *NativeQueryEngine) StartNativeQueryEngine(ctx context.Context) {
 		//
 		// GOVSHUTTLE
 		//
-		proposals, proposalMap, err := GetAllProposals(ctx, nqe.GovQueryHandler)
+		proposals, proposalMap, httpString, err := GetAllProposals(ctx, nqe.GovQueryHandler)
 		if err != nil {
 			nativeQueryEngineFatalLog(err, "StartNativeQueryEngine", "failed to get proposals")
 		}
@@ -131,6 +131,10 @@ func (nqe *NativeQueryEngine) StartNativeQueryEngine(ctx context.Context) {
 		err = nqe.SetMapToCache(ctx, config.ProposalMap, proposalMap)
 		if err != nil {
 			nativeQueryEngineFatalLog(err, "StartNativeQueryEngine", "failed to set proposal map")
+		}
+		err = nqe.SetJsonToCache(ctx, config.AllProposalsHttp, httpString)
+		if err != nil {
+			nativeQueryEngineFatalLog(err, "StartNativeQueryEngine", "failed to set proposals http string")
 		}
 	}
 }
