@@ -101,9 +101,9 @@
       "chainId": "7700"
     },
     {
-      "name": "Collateral Hashnote SDYC",
+      "name": "Collateral Hashnote US Yield Coin",
       "address": "0x0355E393cF0cf5486D9CAefB64407b7B1033C2f1",
-      "symbol": "cSDYC",
+      "symbol": "cUSYC",
       "decimals": 6,
       "underlying": "0xFb8255f0De21AcEBf490F1DF6F0BDd48CC1df03B",
       "chainId": "7700"
@@ -159,11 +159,11 @@
       "chainId": "7700"
     },
     {
-      "name": "Hashnote SDYC",
+      "name": "Hashnote US Yield Coin",
       "address": "0xFb8255f0De21AcEBf490F1DF6F0BDd48CC1df03B",
-      "symbol": "SDYC",
+      "symbol": "USYC",
       "decimals": 6,
-      "logoURI": "",
+      "logoURI": "https://raw.githubusercontent.com/Plex-Engineer/public-assets/main/icons/tokens/USYC.svg",
       "chainId": "7700"
     }
   ],
