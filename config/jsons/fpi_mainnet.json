@@ -170,7 +170,7 @@
   "pairs": [
     {
       "name": "Canto Note Liquidity Provider",
-      "symbol": "Canto / Note",
+      "symbol": "CANTO / NOTE",
       "decimals": 18,
       "address": "0x1D20635535307208919f0b67c3B2065965A85aA9",
       "stable": false,
@@ -181,7 +181,7 @@
     },
     {
       "name": "Canto Atom Liquidity Provider",
-      "symbol": "Canto / Atom",
+      "symbol": "CANTO / ATOM",
       "decimals": 18,
       "address": "0x30838619C55B787BafC3A4cD9aEa851C1cfB7b19",
       "stable": false,
@@ -192,7 +192,7 @@
     },
     {
       "name": "Note USC Coin Liquidity Provider",
-      "symbol": "Note / USDC",
+      "symbol": "NOTE / USDC",
       "decimals": 18,
       "address": "0x9571997a66D63958e1B3De9647C22bD6b9e7228c",
       "stable": true,
@@ -203,7 +203,7 @@
     },
     {
       "name": "Note USD Tether Liquidity Provider",
-      "symbol": "Note / USDT",
+      "symbol": "NOTE / USDT",
       "decimals": 18,
       "address": "0x35DB1f3a6A6F07f82C76fCC415dB6cFB1a7df833",
       "stable": true,
@@ -214,7 +214,7 @@
     },
     {
       "name": "Canto Ethereum Liquidity Provider",
-      "symbol": "Canto / ETH",
+      "symbol": "CANTO / ETH",
       "decimals": 18,
       "address": "0x216400ba362d8FCE640085755e47075109718C8B",
       "stable": false,
