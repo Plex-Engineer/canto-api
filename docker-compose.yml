@@ -7,10 +7,12 @@ services:
       - "6379:6379"
     expose:
       - "6379"
-    command: --port 6379
+    command: /bin/sh -c "redis-server --port 6379 --requirepass $$REDIS_HOST_PASSWORD"
     volumes:
       - redis-data:/data
       - redis-conf:/usr/local/etc/redis/redis.conf
+    env_file:
+      - .env
 
   canto-api:
     restart: unless-stopped

@@ -55,9 +55,10 @@ func NewConfig() {
 	// Initialize redis client
 	dbHost := os.Getenv("DB_HOST")
 	dbPort := os.Getenv("DB_PORT")
+	dbPassword := os.Getenv("REDIS_HOST_PASSWORD")
 	RDB = redis.NewClient(&redis.Options{
 		Addr:     fmt.Sprintf("%s:%s", dbHost, dbPort),
-		Password: "",
+		Password: dbPassword,
 		DB:       0,
 	})
 
