@@ -163,6 +163,11 @@ func (qe *QueryEngine) StartContractQueryEngine(ctx context.Context) {
 		if err != nil {
 			config.SetBackupRPC()
 			log.Error().Err(err).Msg("failed to call multicall contract, trying backup rpc")
+			mc, err := multicall.NewMulticall(config.MulticallAddress, config.EthClient)
+			if err != nil {
+				contractQueryEngineFatalLog(err, "NewQueryEngine", "failed to create multicall instance with backup rpc")
+			}
+			qe.mcinstance = mc
 			continue
 		}
 
