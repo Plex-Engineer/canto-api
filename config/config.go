@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 	"strconv"
+	"strings"
 
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/ethclient"
@@ -39,6 +40,7 @@ var (
 	MulticallAddress common.Address
 	QueryInterval    uint
 	FPIConfig        TokensInfo
+	BackupRpcIndex   int // index of backup rpc url
 )
 
 /*
@@ -113,11 +115,32 @@ func NewConfig() {
 	fpiCalls := getAllFPI()
 	calls := append(fpiCalls, generalCalls...)
 	ContractCalls = calls
+
+	// Backup RPC Index starts at -1 since we increment it before using it
+	BackupRpcIndex = -1
+
 }
 
 func SetBackupRPC() {
-	// Initialize eth client using backup rpc
-	rpcUrl := os.Getenv("CANTO_BACKUP_RPC_URL")
+	// get backup rpc urls from env
+	rpcUrls := os.Getenv("CANTO_BACKUP_RPC_URLS")
+	// split rpc urls into array
+	rpcUrlsArr := strings.Split(rpcUrls, ",")
+	// get length of rpc urls array
+	rpcUrlsArrLen := len(rpcUrlsArr)
+	// increment backup rpc index
+	BackupRpcIndex++
+	// check if backup rpc index is greater than or equal to length of rpc urls array
+	if BackupRpcIndex >= rpcUrlsArrLen {
+		log.Log().Msg("Used all backup rpc urls, resetting index to 0")
+		// reset backup rpc index
+		BackupRpcIndex = 0
+	}
+	// get backup rpc url
+	rpcUrl := rpcUrlsArr[BackupRpcIndex]
+	// log
+	log.Log().Msgf("Using backup rpc url: %s", rpcUrl)
+	// initialize eth client using backup rpc
 	ethclient, err := ethclient.Dial(rpcUrl)
 	if err != nil {
 		log.Fatal().Msgf("Error initializing eth client: %v", err)

@@ -81,6 +81,8 @@ type Proposal struct {
 	ProposalId uint64 `json:"proposal_id"`
 	// typeUrl indentifies the type of the proposal by a serialized protocol buffer message
 	TypeUrl string `json:"type_url"`
+	// description of the proposal
+	Description string `json:"description"`
 	// status defines the current status of the proposal.
 	Status string `json:"status"`
 	// finalVote defined the result of the proposal
@@ -120,11 +122,25 @@ func GetAllProposals(ctx context.Context, queryClient gov.QueryClient) ([]Propos
 	allProposals := new([]Proposal)
 	proposalMap := make(map[string]string)
 	for _, proposal := range resp.GetProposals() {
+		// deal with votes
+		var votes gov.TallyResult
+		// if vote is still ongoing, query the current tally
+		if proposal.Status == 2 {
+			resp, err := queryClient.TallyResult(ctx, &gov.QueryTallyResultRequest{
+				ProposalId: proposal.ProposalId,
+			})
+			if err == nil {
+				votes = resp.Tally
+			}
+		} else {
+			votes = proposal.FinalTallyResult
+		}
 		proposalResponse := Proposal{
 			ProposalId:      proposal.ProposalId,
 			TypeUrl:         proposal.Content.TypeUrl,
+			Description:     string(proposal.Content.Value),
 			Status:          proposal.Status.String(),
-			FinalVote:       proposal.FinalTallyResult,
+			FinalVote:       votes,
 			SubmitTime:      proposal.SubmitTime,
 			DepositEndTime:  proposal.DepositEndTime,
 			TotalDeposit:    proposal.TotalDeposit,
