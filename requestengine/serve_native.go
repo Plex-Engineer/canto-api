@@ -119,21 +119,6 @@ func QueryProposals(ctx *fiber.Ctx) error {
 	return ctx.Status(StatusOkay).SendString(val)
 }
 
-// QueryProposalsHttp godoc
-// @Summary      Query proposal list from http
-// @Description  return json list of proposals
-// @Accept       json
-// @Produce      json
-// @Success      200  {object}  string
-// @Router       /gov/proposals/http [get]
-func QueryProposalsHttp(ctx *fiber.Ctx) error {
-	val, err := GetStoreValueFromKey(config.AllProposalsHttp)
-	if err != nil {
-		return RedisKeyNotFound(ctx, config.AllProposalsHttp)
-	}
-	return ctx.Status(StatusOkay).SendString(val)
-}
-
 // QueryProposals godoc
 // @Summary      Query proposal by id
 // @Description  return json object of proposal

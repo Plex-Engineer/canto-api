@@ -2,8 +2,6 @@ package queryengine
 
 import (
 	"context"
-	"io"
-	"net/http"
 	"strconv"
 	"time"
 
@@ -13,6 +11,7 @@ import (
 	query "github.com/cosmos/cosmos-sdk/types/query"
 	gov "github.com/cosmos/cosmos-sdk/x/gov/types"
 	staking "github.com/cosmos/cosmos-sdk/x/staking/types"
+	"github.com/rs/zerolog/log"
 )
 
 // STAKING
@@ -81,6 +80,8 @@ type Proposal struct {
 	ProposalId uint64 `json:"proposal_id"`
 	// typeUrl indentifies the type of the proposal by a serialized protocol buffer message
 	TypeUrl string `json:"type_url"`
+	// title of the proposal
+	Title string `json:"title"`
 	// description of the proposal
 	Description string `json:"description"`
 	// status defines the current status of the proposal.
@@ -101,23 +102,14 @@ type Proposal struct {
 
 // get all proposals from gov shuttle
 // will return full response string and mapping of proposal id to response string
-func GetAllProposals(ctx context.Context, queryClient gov.QueryClient) ([]Proposal, map[string]string, string, error) {
-	httpString := ""
-	httpresp, err := http.Get("https://mainnode.plexnode.org:1317/cosmos/gov/v1beta1/proposals?pagination.limit=1000")
-	if err == nil {
-		defer httpresp.Body.Close()
-		body, err := io.ReadAll(httpresp.Body)
-		if err == nil {
-			httpString = string(body)
-		}
-	}
+func GetAllProposals(ctx context.Context, queryClient gov.QueryClient) ([]Proposal, map[string]string, error) {
 	resp, err := queryClient.Proposals(ctx, &gov.QueryProposalsRequest{
 		Pagination: &query.PageRequest{
 			Limit: 1000,
 		},
 	})
 	if err != nil {
-		return nil, nil, "", err
+		return nil, nil, err
 	}
 	allProposals := new([]Proposal)
 	proposalMap := make(map[string]string)
@@ -135,10 +127,23 @@ func GetAllProposals(ctx context.Context, queryClient gov.QueryClient) ([]Propos
 		} else {
 			votes = proposal.FinalTallyResult
 		}
+
+		// get proposal metadata
+		title := ""
+		description := ""
+		metadata, err := GetProposalMetadata(proposal.Content)
+		if err != nil {
+			log.Log().Msgf("Error getting proposal metadata: %v", err)
+		} else {
+			title = metadata.Title
+			description = metadata.Description
+		}
+
 		proposalResponse := Proposal{
 			ProposalId:      proposal.ProposalId,
 			TypeUrl:         proposal.Content.TypeUrl,
-			Description:     string(proposal.Content.Value),
+			Title:           title,
+			Description:     description,
 			Status:          proposal.Status.String(),
 			FinalVote:       votes,
 			SubmitTime:      proposal.SubmitTime,
@@ -150,7 +155,7 @@ func GetAllProposals(ctx context.Context, queryClient gov.QueryClient) ([]Propos
 		*allProposals = append(*allProposals, proposalResponse)
 		proposalMap[strconv.Itoa(int(proposal.ProposalId))] = GeneralResultToString(proposalResponse)
 	}
-	return *allProposals, proposalMap, httpString, nil
+	return *allProposals, proposalMap, nil
 }
 
 // CSR

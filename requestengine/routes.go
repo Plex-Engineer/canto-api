@@ -54,7 +54,6 @@ func routerCSR(app *fiber.App) {
 
 func routerGovernance(app *fiber.App) {
 	gov := app.Group("/v1/gov")
-	gov.Get("/proposals/http", QueryProposalsHttp)
 	gov.Get("/proposals", QueryProposals)
 	gov.Get("/proposals/:id", QueryProposalByID)
 }
