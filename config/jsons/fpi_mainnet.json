@@ -107,6 +107,22 @@
       "decimals": 6,
       "underlying": "0xFb8255f0De21AcEBf490F1DF6F0BDd48CC1df03B",
       "chainId": "7700"
+    },
+    {
+      "name": "Collateral Treasury Bills",
+      "address": "0x8f72e641ff18CF1EE4e0f68809130BE267fC2Ac5",
+      "symbol": "cfBill",
+      "decimals": 18,
+      "underlying": "0x79ECCE8E2D17603877Ff15BC29804CbCB590EC08",
+      "chainId": "7700"
+    },
+    {
+      "name": "Collateral International Treasury Bills",
+      "address": "0x4158bcAaF0FE965622Be181f1F16Dc857b435646",
+      "symbol": "cifBill",
+      "decimals": 18,
+      "underlying": "0x45bafad5a6a531Bc18Cf6CE5B02C58eA4D20589b",
+      "chainId": "7700"
     }
   ],
   "tokens": [
@@ -164,6 +180,22 @@
       "symbol": "USYC",
       "decimals": 6,
       "logoURI": "https://raw.githubusercontent.com/Plex-Engineer/public-assets/main/icons/tokens/USYC.svg",
+      "chainId": "7700"
+    },
+    {
+      "name": "Treasury Bills",
+      "address": "0x79ECCE8E2D17603877Ff15BC29804CbCB590EC08",
+      "symbol": "fBILL",
+      "decimals": 18,
+      "logoURI": "",
+      "chainId": "7700"
+    },
+    {
+      "name": "International Treasury Bills",
+      "address": "0x45bafad5a6a531Bc18Cf6CE5B02C58eA4D20589b",
+      "symbol": "ifBILL",
+      "decimals": 18,
+      "logoURI": "",
       "chainId": "7700"
     }
   ],

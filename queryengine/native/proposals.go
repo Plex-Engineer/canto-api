@@ -1,7 +1,6 @@
 package queryengine
 
 import (
-	"errors"
 	"fmt"
 
 	erc20 "github.com/Canto-Network/Canto/v6/x/erc20/types"
@@ -64,6 +63,6 @@ func GetProposalMetadata(content *types1.Any) (BasicMetadata, error) {
 			Description: metadata.GetDescription(),
 		}, nil
 	default:
-		return BasicMetadata{}, errors.New(fmt.Sprintf("Proposal type: %s not found", typeUrl))
+		return BasicMetadata{}, fmt.Errorf("Proposal type: %s not found", typeUrl)
 	}
 }
