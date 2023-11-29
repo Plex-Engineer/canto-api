@@ -187,7 +187,7 @@
       "address": "0x79ECCE8E2D17603877Ff15BC29804CbCB590EC08",
       "symbol": "fBILL",
       "decimals": 18,
-      "logoURI": "",
+      "logoURI": "https://raw.githubusercontent.com/Plex-Engineer/public-assets/main/icons/tokens/fBill.svg",
       "chainId": "7700"
     },
     {
@@ -195,7 +195,7 @@
       "address": "0x45bafad5a6a531Bc18Cf6CE5B02C58eA4D20589b",
       "symbol": "ifBILL",
       "decimals": 18,
-      "logoURI": "",
+      "logoURI": "https://raw.githubusercontent.com/Plex-Engineer/public-assets/main/icons/tokens/fBill.svg",
       "chainId": "7700"
     }
   ],
