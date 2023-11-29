@@ -110,18 +110,18 @@
     },
     {
       "name": "Collateral Treasury Bills",
-      "address": "0x8f72e641ff18CF1EE4e0f68809130BE267fC2Ac5",
+      "address": "0xF1F89dF149bc5f2b6B29783915D1F9FE2d24459c",
       "symbol": "cfBill",
       "decimals": 18,
-      "underlying": "0x79ECCE8E2D17603877Ff15BC29804CbCB590EC08",
+      "underlying": "0x79ecce8e2d17603877ff15bc29804cbcb590ec08",
       "chainId": "7700"
     },
     {
       "name": "Collateral International Treasury Bills",
-      "address": "0x4158bcAaF0FE965622Be181f1F16Dc857b435646",
+      "address": "0x897709FC83ba7a4271d22Ed4C01278cc1Da8d6F8",
       "symbol": "cifBill",
       "decimals": 18,
-      "underlying": "0x45bafad5a6a531Bc18Cf6CE5B02C58eA4D20589b",
+      "underlying": "0x45bafad5a6a531bc18cf6ce5b02c58ea4d20589b",
       "chainId": "7700"
     }
   ],
@@ -184,7 +184,7 @@
     },
     {
       "name": "Treasury Bills",
-      "address": "0x79ECCE8E2D17603877Ff15BC29804CbCB590EC08",
+      "address": "0x79ecce8e2d17603877ff15bc29804cbcb590ec08",
       "symbol": "fBILL",
       "decimals": 18,
       "logoURI": "https://raw.githubusercontent.com/Plex-Engineer/public-assets/main/icons/tokens/fBill.svg",
@@ -192,7 +192,7 @@
     },
     {
       "name": "International Treasury Bills",
-      "address": "0x45bafad5a6a531Bc18Cf6CE5B02C58eA4D20589b",
+      "address": "0x45bafad5a6a531bc18cf6ce5b02c58ea4d20589b",
       "symbol": "ifBILL",
       "decimals": 18,
       "logoURI": "https://raw.githubusercontent.com/Plex-Engineer/public-assets/main/icons/tokens/fBill.svg",
