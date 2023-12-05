@@ -77,6 +77,12 @@ func Run(ctx context.Context) {
 			ServerHeader: "Fiber",
 		})
 
+	// add header to response
+	app.Use("/*", func(c *fiber.Ctx) error {
+		c.Set("Access-Control-Allow-Origin", "*")
+		return c.Next()
+	})
+
 	// get all general contract routes
 	routes := GetGeneralContractRoutes()
 	for _, route := range routes {

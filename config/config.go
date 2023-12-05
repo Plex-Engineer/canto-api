@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 	"strconv"
+	"strings"
 
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/ethclient"
@@ -22,6 +23,7 @@ const (
 	CSRMap              = "CSR_MAP"
 	AllProposals        = "ALL_PROPOSALS"
 	ProposalMap         = "PROPOSAL_MAP"
+	AllProposalsHttp    = "ALL_PROPOSALS_HTTP"
 	Pairs               = "PAIRS"
 	ProcessedPairs      = "PROCESSED_PAIRS"
 	ProcessedPairsMap   = "PROCESSED_PAIRS_MAP"
@@ -38,6 +40,7 @@ var (
 	MulticallAddress common.Address
 	QueryInterval    uint
 	FPIConfig        TokensInfo
+	BackupRpcIndex   int // index of backup rpc url
 )
 
 /*
@@ -46,8 +49,7 @@ var (
  * @return: none
  * @desc: initialize config variables (acts as a constructor)
  */
-func NewConfig(fpiJsonFile string, contractsJsonFile string) {
-
+func NewConfig() {
 	err := godotenv.Load(".env")
 	if err != nil {
 		fmt.Println("Error loading .env file")
@@ -55,9 +57,10 @@ func NewConfig(fpiJsonFile string, contractsJsonFile string) {
 	// Initialize redis client
 	dbHost := os.Getenv("DB_HOST")
 	dbPort := os.Getenv("DB_PORT")
+	dbPassword := os.Getenv("REDIS_HOST_PASSWORD")
 	RDB = redis.NewClient(&redis.Options{
 		Addr:     fmt.Sprintf("%s:%s", dbHost, dbPort),
-		Password: "",
+		Password: dbPassword,
 		DB:       0,
 	})
 
@@ -75,11 +78,26 @@ func NewConfig(fpiJsonFile string, contractsJsonFile string) {
 	if err != nil {
 		log.Fatal().Msgf("Error initializing grpc client: %v", err)
 	}
-
+	// is testnet
+	isTestnet := os.Getenv("TESTNET")
+	var fpiFile string
+	var contractsFile string
+	if isTestnet == "true" {
+		fpiFile = "./config/jsons/fpi_testnet.json"
+		contractsFile = "./config/jsons/contracts_testnet.json"
+	} else {
+		fpiFile = "./config/jsons/fpi_mainnet.json"
+		contractsFile = "./config/jsons/contracts.json"
+	}
 	// get tokens data from tokens.json
-	FPIConfig, err = getFPIFromJson(fpiJsonFile)
+	FPIConfig, err = getFPIFromJson(fpiFile)
 	if err != nil {
 		log.Fatal().Msgf("Error getting tokens data from json: %v", err)
+	}
+	// get general contracts from contracts.json
+	generalCalls, err := getContractsFromJson(contractsFile)
+	if err != nil {
+		log.Fatal().Msgf("Error getting general contracts from json: %v", err)
 	}
 
 	// set multicall address
@@ -93,21 +111,36 @@ func NewConfig(fpiJsonFile string, contractsJsonFile string) {
 	}
 	QueryInterval = uint(queryInterval)
 
-	// get general contracts from contracts.json
-	generalCalls, err := getContractsFromJson(contractsJsonFile)
-	if err != nil {
-		log.Fatal().Msgf("Error getting general contracts from json: %v", err)
-	}
-
 	// get FPI contracts from tokens.json
 	fpiCalls := getAllFPI()
 	calls := append(fpiCalls, generalCalls...)
 	ContractCalls = calls
+
+	// Backup RPC Index starts at -1 since we increment it before using it
+	BackupRpcIndex = -1
+
 }
 
 func SetBackupRPC() {
-	// Initialize eth client using backup rpc
-	rpcUrl := os.Getenv("CANTO_BACKUP_RPC_URL")
+	// get backup rpc urls from env
+	rpcUrls := os.Getenv("CANTO_BACKUP_RPC_URLS")
+	// split rpc urls into array
+	rpcUrlsArr := strings.Split(rpcUrls, ",")
+	// get length of rpc urls array
+	rpcUrlsArrLen := len(rpcUrlsArr)
+	// increment backup rpc index
+	BackupRpcIndex++
+	// check if backup rpc index is greater than or equal to length of rpc urls array
+	if BackupRpcIndex >= rpcUrlsArrLen {
+		log.Log().Msg("Used all backup rpc urls, resetting index to 0")
+		// reset backup rpc index
+		BackupRpcIndex = 0
+	}
+	// get backup rpc url
+	rpcUrl := rpcUrlsArr[BackupRpcIndex]
+	// log
+	log.Log().Msgf("Using backup rpc url: %s", rpcUrl)
+	// initialize eth client using backup rpc
 	ethclient, err := ethclient.Dial(rpcUrl)
 	if err != nil {
 		log.Fatal().Msgf("Error initializing eth client: %v", err)

@@ -79,7 +79,7 @@ func QueryPairByAddress(ctx *fiber.Ctx) error {
 	// generate json result string
 	result := queryengine.ResultToString(map[string]interface{}{
 		"block": blockNumber,
-		"pair":  pair,
+		"results":  pair,
 	})
 	return ctx.Status(StatusOkay).SendString(result)
 }
@@ -128,7 +128,7 @@ func QueryCTokenByAddress(ctx *fiber.Ctx) error {
 	// generate json result string
 	result := queryengine.ResultToString(map[string]interface{}{
 		"block":  blockNumber,
-		"cToken": cToken,
+		"results": cToken,
 	})
 	return ctx.Status(StatusOkay).SendString(result)
 }

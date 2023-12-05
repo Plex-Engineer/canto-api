@@ -163,6 +163,11 @@ func (qe *QueryEngine) StartContractQueryEngine(ctx context.Context) {
 		if err != nil {
 			config.SetBackupRPC()
 			log.Error().Err(err).Msg("failed to call multicall contract, trying backup rpc")
+			mc, err := multicall.NewMulticall(config.MulticallAddress, config.EthClient)
+			if err != nil {
+				contractQueryEngineFatalLog(err, "NewQueryEngine", "failed to create multicall instance with backup rpc")
+			}
+			qe.mcinstance = mc
 			continue
 		}
 
@@ -176,6 +181,12 @@ func (qe *QueryEngine) StartContractQueryEngine(ctx context.Context) {
 		blocknumber, ctokens, pairs, others, err := ProcessMulticallResults(ctx, ret)
 		if err != nil {
 			contractQueryEngineFatalLog(err, "StartContractQueryEngine", "failed to process multicall results")
+		}
+
+		// set blocknumber to redis
+		err = qe.redisclient.Set(ctx, config.BlockNumber, blocknumber, 0).Err()
+		if err != nil {
+			contractQueryEngineFatalLog(err, "StartContractQueryEngine", "failed to set blocknumber to redis")
 		}
 
 		// set general contracts to redis cache

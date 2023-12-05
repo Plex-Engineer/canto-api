@@ -11,6 +11,7 @@ import (
 	query "github.com/cosmos/cosmos-sdk/types/query"
 	gov "github.com/cosmos/cosmos-sdk/x/gov/types"
 	staking "github.com/cosmos/cosmos-sdk/x/staking/types"
+	"github.com/rs/zerolog/log"
 )
 
 // STAKING
@@ -79,6 +80,10 @@ type Proposal struct {
 	ProposalId uint64 `json:"proposal_id"`
 	// typeUrl indentifies the type of the proposal by a serialized protocol buffer message
 	TypeUrl string `json:"type_url"`
+	// title of the proposal
+	Title string `json:"title"`
+	// description of the proposal
+	Description string `json:"description"`
 	// status defines the current status of the proposal.
 	Status string `json:"status"`
 	// finalVote defined the result of the proposal
@@ -98,18 +103,49 @@ type Proposal struct {
 // get all proposals from gov shuttle
 // will return full response string and mapping of proposal id to response string
 func GetAllProposals(ctx context.Context, queryClient gov.QueryClient) ([]Proposal, map[string]string, error) {
-	resp, err := queryClient.Proposals(ctx, &gov.QueryProposalsRequest{})
+	resp, err := queryClient.Proposals(ctx, &gov.QueryProposalsRequest{
+		Pagination: &query.PageRequest{
+			Limit: 1000,
+		},
+	})
 	if err != nil {
 		return nil, nil, err
 	}
 	allProposals := new([]Proposal)
 	proposalMap := make(map[string]string)
 	for _, proposal := range resp.GetProposals() {
+		// deal with votes
+		var votes gov.TallyResult
+		// if vote is still ongoing, query the current tally
+		if proposal.Status == 2 {
+			resp, err := queryClient.TallyResult(ctx, &gov.QueryTallyResultRequest{
+				ProposalId: proposal.ProposalId,
+			})
+			if err == nil {
+				votes = resp.Tally
+			}
+		} else {
+			votes = proposal.FinalTallyResult
+		}
+
+		// get proposal metadata
+		title := ""
+		description := ""
+		metadata, err := GetProposalMetadata(proposal.Content)
+		if err != nil {
+			log.Log().Msgf("Error getting proposal metadata: %v", err)
+		} else {
+			title = metadata.Title
+			description = metadata.Description
+		}
+
 		proposalResponse := Proposal{
 			ProposalId:      proposal.ProposalId,
 			TypeUrl:         proposal.Content.TypeUrl,
+			Title:           title,
+			Description:     description,
 			Status:          proposal.Status.String(),
-			FinalVote:       proposal.FinalTallyResult,
+			FinalVote:       votes,
 			SubmitTime:      proposal.SubmitTime,
 			DepositEndTime:  proposal.DepositEndTime,
 			TotalDeposit:    proposal.TotalDeposit,

@@ -158,7 +158,7 @@ func GetProcessedPairs(ctx context.Context, blocknumber string, pairs PairsMap) 
 		ratio, aTob := GetLpPairRatio(reserve1, reserve2)
 
 		// get lp pair data
-		symbol, decimals, token1, token2, stable, cDecimals, cLpAddress := config.GetLpPairData(address)
+		symbol, decimals, token1, token2, stable, cDecimals, cLpAddress, logoURI := config.GetLpPairData(address)
 		processedPair := ProcessedPair{
 			Address:     address,
 			Symbol:      symbol,
@@ -177,6 +177,7 @@ func GetProcessedPairs(ctx context.Context, blocknumber string, pairs PairsMap) 
 			LpPrice:     lpPrice.String(),
 			Reserve1:    reserve1.String(),
 			Reserve2:    reserve2.String(),
+			LogoURI:     logoURI,
 		}
 
 		processedPairs = append(processedPairs, processedPair)
@@ -248,6 +249,9 @@ func GetProcessedCTokens(ctx context.Context, cTokens TokensMap) ([]ProcessedCTo
 			price.Exp(big.NewInt(10), big.NewInt(36-underlying.Decimals), nil)
 		}
 
+		// get underlying total supply
+		underlyingTotalSupply, _ := InterfaceToString(cToken["underlyingSupply"][0])
+
 		processedCToken := ProcessedCToken{
 			Address:          address,
 			Symbol:           symbol,
@@ -265,6 +269,7 @@ func GetProcessedCTokens(ctx context.Context, cTokens TokensMap) ([]ProcessedCTo
 			BorrowApy:        fmt.Sprintf("%.2f", borrowApy),
 			DistApy:          fmt.Sprintf("%.2f", distApy),
 			CompSupplyState:  compSupplyState,
+			UnderlyingTotalSupply: underlyingTotalSupply,
 		}
 
 		processedCTokens = append(processedCTokens, processedCToken)

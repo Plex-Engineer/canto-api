@@ -21,6 +21,7 @@ type TokensInfo struct {
 	Comptroller string   `json:"comptroller"`
 	Router      string   `json:"router"`
 	Reservoir   string   `json:"reservoir"`
+	PriceOracle string   `json:"priceOracle"`
 	MulticallV3 string   `json:"multicallV3"`
 	CTokens     []Token  `json:"ctokens"`
 	Tokens      []Token  `json:"tokens"`
@@ -33,6 +34,7 @@ type Underlying struct {
 	Symbol   string `json:"symbol"`
 	Name     string `json:"name"`
 	Decimals int64  `json:"decimals"`
+	LogoURI  string `json:"logoURI,omitempty"`
 }
 
 type Token struct {
@@ -54,6 +56,7 @@ type Pair struct {
 	TokenA   string `json:"tokenA"`
 	TokenB   string `json:"tokenB"`
 	ChainID  string `json:"chainId"`
+	LogoURI  string `json:"logoURI,omitempty"`
 }
 
 // parses tokens.json and returns tokens data
@@ -137,6 +140,7 @@ func GetUnderlyingData(address string) (result Underlying) {
 				Address:  token.Address,
 				Decimals: token.Decimals,
 				Symbol:   token.Symbol,
+				LogoURI:  token.LogoURI,
 			}
 			return
 		}
@@ -149,6 +153,7 @@ func GetUnderlyingData(address string) (result Underlying) {
 				Address:  pair.Address,
 				Decimals: pair.Decimals,
 				Symbol:   pair.Symbol,
+				LogoURI:  pair.LogoURI,
 			}
 			return
 		}
@@ -157,7 +162,7 @@ func GetUnderlyingData(address string) (result Underlying) {
 }
 
 // get lp pair data (Address, Decimals, Token1, Token2, Stable, CDecimal, cLPaddress) from tokens config using pair symbol and return
-func GetLpPairData(address string) (symbol string, decimals int64, token1 Token, token2 Token, stable bool, cDecimals int64, cLpAddress string) {
+func GetLpPairData(address string) (symbol string, decimals int64, token1 Token, token2 Token, stable bool, cDecimals int64, cLpAddress string, logoUri string) {
 	for _, pair := range FPIConfig.Pairs {
 		if pair.Address == address {
 			symbol = pair.Symbol
@@ -167,6 +172,7 @@ func GetLpPairData(address string) (symbol string, decimals int64, token1 Token,
 			stable = pair.Stable
 			cDecimals = GetCTokenDecimals(address)
 			cLpAddress = GetCTokenAddress(pair.Address)
+			logoUri = pair.LogoURI
 			return
 		}
 	}

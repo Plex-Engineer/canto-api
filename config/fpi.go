@@ -47,10 +47,10 @@ func getCTokenContractCalls() []Contract {
 			},
 		})
 
-		// getUnderlyingPrice data of ctoken from router contract
+		// getUnderlyingPrice data of ctoken from price oracle contract
 		calls = append(calls, Contract{
 			Name:    token.Symbol + "pricefeed",
-			Address: FPIConfig.Router,
+			Address: FPIConfig.PriceOracle,
 			Keys: []string{
 				"cTokens:" + token.Address + ":underlyingPrice",
 			},
@@ -88,6 +88,21 @@ func getCTokenContractCalls() []Contract {
 				{token.Address},
 			},
 		})
+
+		// get total supply of underlying too, will help with calculating liquidity
+		calls = append(calls, Contract{
+			Name:    token.Symbol + "underlyingSupply",
+			Address: token.Underlying,
+			Keys: []string{
+				"cTokens:" + token.Address + ":underlyingSupply",
+			},
+			Methods: []string{
+				"totalSupply()(uint256)",
+			},
+			Args: [][]interface{}{
+				{},
+			},
+		})
 	}
 
 	return calls
@@ -123,25 +138,36 @@ func getPairsContractsCalls() []Contract {
 				{},
 			},
 		})
-
-		// get reserves, underlying prices of tokenA, tokenB and Lp from router contract
+		// get reserves
 		calls = append(calls, Contract{
-			Name:    pair.Symbol + "pricefeed",
+			Name:    pair.Symbol + "reserves",
 			Address: FPIConfig.Router,
 			Keys: []string{
 				"lpPairs:" + pair.Address + ":reserves",
+			},
+			Methods: []string{
+				"getReserves(address,address,bool)(uint256, uint256)",
+			},
+			Args: [][]interface{}{
+				{pair.TokenA, pair.TokenB, pair.Stable},
+			},
+		})
+
+		// get underlying prices of tokenA, tokenB and Lp from price oracle contract
+		calls = append(calls, Contract{
+			Name:    pair.Symbol + "pricefeed",
+			Address: FPIConfig.PriceOracle,
+			Keys: []string{
 				"lpPairs:" + pair.Address + ":underlyingPriceTokenA",
 				"lpPairs:" + pair.Address + ":underlyingPriceTokenB",
 				"lpPairs:" + pair.Address + ":underlyingPriceLp",
 			},
 			Methods: []string{
-				"getReserves(address,address,bool)(uint256, uint256)",
 				"getUnderlyingPrice(address)(uint256)",
 				"getUnderlyingPrice(address)(uint256)",
 				"getUnderlyingPrice(address)(uint256)",
 			},
 			Args: [][]interface{}{
-				{pair.TokenA, pair.TokenB, pair.Stable},
 				{GetCTokenAddress(pair.TokenA)},
 				{GetCTokenAddress(pair.TokenB)},
 				{GetCTokenAddress(pair.Address)},

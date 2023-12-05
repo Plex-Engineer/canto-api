@@ -34,6 +34,7 @@ func Test_getFPIFromJson(t *testing.T) {
 				Comptroller: "0x5E23dC409Fc2F832f83CEc191E245A191a4bCc5C",
 				Router:      "0xa252eEE9BDe830Ca4793F054B506587027825a8e",
 				Reservoir:   "0x07C50Bf0804A06860AeACAcFaf029F9a1c014F91",
+				PriceOracle: "0xa252eEE9BDe830Ca4793F054B506587027825a8e",
 				MulticallV3: "0xcA11bde05977b3631167028862bE2a173976CA11",
 				CTokens: []Token{
 					{
@@ -62,6 +63,7 @@ func Test_getFPIFromJson(t *testing.T) {
 				ChainID:     "7700",
 				Comptroller: "0x5E23dC409Fc2F832f83CEc191E245A191a4bCc5C",
 				Router:      "0xa252eEE9BDe830Ca4793F054B506587027825a8e",
+				PriceOracle: "0xa252eEE9BDe830Ca4793F054B506587027825a8e",
 				Reservoir:   "0x07C50Bf0804A06860AeACAcFaf029F9a1c014F91",
 				MulticallV3: "0xcA11bde05977b3631167028862bE2a173976CA11",
 				CTokens:     []Token{},
@@ -91,6 +93,7 @@ func Test_getFPIFromJson(t *testing.T) {
 				ChainID:     "7700",
 				Comptroller: "0x5E23dC409Fc2F832f83CEc191E245A191a4bCc5C",
 				Router:      "0xa252eEE9BDe830Ca4793F054B506587027825a8e",
+				PriceOracle: "0xa252eEE9BDe830Ca4793F054B506587027825a8e",
 				Reservoir:   "0x07C50Bf0804A06860AeACAcFaf029F9a1c014F91",
 				MulticallV3: "0xcA11bde05977b3631167028862bE2a173976CA11",
 				CTokens:     []Token{},
@@ -122,6 +125,7 @@ func Test_getFPIFromJson(t *testing.T) {
 				ChainID:     "7700",
 				Comptroller: "0x5E23dC409Fc2F832f83CEc191E245A191a4bCc5C",
 				Router:      "0xa252eEE9BDe830Ca4793F054B506587027825a8e",
+				PriceOracle: "0xa252eEE9BDe830Ca4793F054B506587027825a8e",
 				Reservoir:   "0x07C50Bf0804A06860AeACAcFaf029F9a1c014F91",
 				MulticallV3: "0xcA11bde05977b3631167028862bE2a173976CA11",
 				CTokens: []Token{
