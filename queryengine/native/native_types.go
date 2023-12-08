@@ -33,6 +33,12 @@ type Validator struct {
 	Delegators int `json:"delegators"`
 }
 
+type ValidatorDelegationsResponse struct {
+	Validator   string
+	Delegations int
+	Error       error
+}
+
 // get all Validators for staking
 // will return full response string and mapping of operator address to response string
 func GetValidators(ctx context.Context, queryClient staking.QueryClient) ([]Validator, map[string]string, error) {
@@ -45,29 +51,36 @@ func GetValidators(ctx context.Context, queryClient staking.QueryClient) ([]Vali
 		return nil, nil, err
 	}
 	allValidators := []Validator{}
-	validatorDelegationsMap := make(map[string]int)
-	validatorMap := make(map[string]string)
+	validatorMap := make(map[string]Validator)
+	validatorToResultStringMap := make(map[string]string)
 
 	var wg sync.WaitGroup
 	wg.Add(len(respValidators.Validators))
-	var validatorDelegationsErr error
+	resultChan := make(chan ValidatorDelegationsResponse, len(respValidators.Validators))
 
 	for _, validator := range respValidators.Validators {
-		go func() {
+		go func(valAddress string) {
 			defer wg.Done()
 			delegations, err := queryClient.ValidatorDelegations(ctx, &staking.QueryValidatorDelegationsRequest{
-				ValidatorAddr: validator.OperatorAddress,
+				ValidatorAddr: valAddress,
 				Pagination: &query.PageRequest{
 					Limit: 1000,
 				},
 			})
 
-			if err == nil {
-				validatorDelegationsMap[validator.OperatorAddress] = len(delegations.DelegationResponses)
-			} else {
-				validatorDelegationsErr = err
+			if err != nil {
+				resultChan <- ValidatorDelegationsResponse{
+					Validator: valAddress,
+					Error:     err,
+				}
+				return
 			}
-		}()
+			resultChan <- ValidatorDelegationsResponse{
+				Validator:   valAddress,
+				Delegations: len(delegations.DelegationResponses),
+			}
+
+		}(validator.OperatorAddress)
 
 		valResponse := Validator{
 			OperatorAddress: validator.OperatorAddress,
@@ -77,21 +90,24 @@ func GetValidators(ctx context.Context, queryClient staking.QueryClient) ([]Vali
 			Description:     validator.Description,
 			Commission:      validator.Commission.CommissionRates.Rate.String(),
 		}
-		allValidators = append(allValidators, valResponse)
+		validatorMap[valResponse.OperatorAddress] = valResponse
 	}
+
 	wg.Wait()
+	close(resultChan)
 
-	if validatorDelegationsErr != nil {
-		return nil, nil, err
+	for result := range resultChan {
+		if result.Error != nil {
+			return nil, nil, result.Error
+		} else {
+			validator := validatorMap[result.Validator]
+			validator.Delegators = result.Delegations
+			validatorMap[result.Validator] = validator
+			validatorToResultStringMap[result.Validator] = GeneralResultToString(validator)
+			allValidators = append(allValidators, validator)
+		}
 	}
-
-	for index, validator := range allValidators {
-		validator.Delegators = validatorDelegationsMap[validator.OperatorAddress]
-		allValidators[index] = validator
-		validatorMap[validator.OperatorAddress] = GeneralResultToString(validator)
-	}
-
-	return allValidators, validatorMap, nil
+	return allValidators, validatorToResultStringMap, nil
 }
 func GetStakingAPR(ctx context.Context, stakingQueryClient staking.QueryClient, inflationQueryClient inflation.QueryClient) (string, error) {
 	//get pool
