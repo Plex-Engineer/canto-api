@@ -10,6 +10,7 @@ import (
 	gov "github.com/cosmos/cosmos-sdk/x/gov/types"
 	params "github.com/cosmos/cosmos-sdk/x/params/types/proposal"
 	upgrade "github.com/cosmos/cosmos-sdk/x/upgrade/types"
+	clienttypes "github.com/cosmos/ibc-go/v3/modules/core/02-client/types"
 )
 
 type BasicMetadata struct {
@@ -57,6 +58,13 @@ func GetProposalMetadata(content *types1.Any) (BasicMetadata, error) {
 		}, nil
 	case "/cosmos.upgrade.v1beta1.SoftwareUpgradeProposal":
 		var metadata upgrade.SoftwareUpgradeProposal
+		metadata.Unmarshal(content.Value)
+		return BasicMetadata{
+			Title:       metadata.GetTitle(),
+			Description: metadata.GetDescription(),
+		}, nil
+	case "/ibc.core.client.v1.ClientUpdateProposal":
+		var metadata clienttypes.ClientUpdateProposal
 		metadata.Unmarshal(content.Value)
 		return BasicMetadata{
 			Title:       metadata.GetTitle(),
