@@ -101,7 +101,6 @@ func decodeHelper(s string) []byte {
 	if err != nil {
 		fmt.Println(err)
 	}
-	fmt.Println("return value: ", ret)
 	return ret
 }
 
