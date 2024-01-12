@@ -106,7 +106,10 @@
       "symbol": "cUSYC",
       "decimals": 6,
       "underlying": "0xFb8255f0De21AcEBf490F1DF6F0BDd48CC1df03B",
-      "chainId": "7700"
+      "chainId": "7700",
+      "tags": [
+        "hashnote"
+      ]
     },
     {
       "name": "Collateral Treasury Bills",
@@ -114,7 +117,10 @@
       "symbol": "cfBill",
       "decimals": 18,
       "underlying": "0x79ecce8e2d17603877ff15bc29804cbcb590ec08",
-      "chainId": "7700"
+      "chainId": "7700",
+      "tags": [
+        "fbill"
+      ]
     },
     {
       "name": "Collateral International Treasury Bills",
@@ -122,7 +128,10 @@
       "symbol": "cifBill",
       "decimals": 18,
       "underlying": "0x45bafad5a6a531bc18cf6ce5b02c58ea4d20589b",
-      "chainId": "7700"
+      "chainId": "7700",
+      "tags": [
+        "fbill"
+      ]
     }
   ],
   "tokens": [

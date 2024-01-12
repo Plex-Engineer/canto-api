@@ -38,13 +38,14 @@ type Underlying struct {
 }
 
 type Token struct {
-	Name       string `json:"name"`
-	Address    string `json:"address"`
-	Symbol     string `json:"symbol"`
-	Decimals   int64  `json:"decimals"`
-	Underlying string `json:"underlying,omitempty"`
-	ChainID    string `json:"chainId"`
-	LogoURI    string `json:"logoURI,omitempty"`
+	Name       string   `json:"name"`
+	Address    string   `json:"address"`
+	Symbol     string   `json:"symbol"`
+	Decimals   int64    `json:"decimals"`
+	Underlying string   `json:"underlying,omitempty"`
+	ChainID    string   `json:"chainId"`
+	LogoURI    string   `json:"logoURI,omitempty"`
+	Tags       []string `json:"tags,omitempty"`
 }
 
 type Pair struct {
@@ -180,13 +181,17 @@ func GetLpPairData(address string) (symbol string, decimals int64, token1 Token,
 }
 
 // get ctoken data (Symbol, Name, Decimals, Underlying) from tokens config using cToken address
-func GetCTokenData(address string) (symbol string, name string, decimals int64, underlying Underlying) {
+func GetCTokenData(address string) (symbol string, name string, decimals int64, tags []string, underlying Underlying) {
 	for _, cToken := range FPIConfig.CTokens {
 		if cToken.Address == address {
 			symbol = cToken.Symbol
 			name = cToken.Name
 			decimals = cToken.Decimals
 			underlying = GetUnderlyingData(cToken.Underlying)
+			tags = []string{}
+			if cToken.Tags != nil {
+				tags = cToken.Tags
+			}
 			return
 		}
 	}
