@@ -103,6 +103,27 @@ func getCTokenContractCalls() []Contract {
 				{},
 			},
 		})
+
+		// check token tags and add calls accordingly
+		if token.Tags != nil {
+			for _, tag := range token.Tags {
+				if tag == "hashnote" {
+					calls = append(calls, Contract{
+						Name:    token.Symbol + "latestRoundDetails",
+						Address: "0x1d18c02bC80b1921255E71cF2939C03258d75470",
+						Keys: []string{
+							"cTokens:" + token.Address + ":latestRoundDetails",
+						},
+						Methods: []string{
+							"latestRoundDetails()(uint80,uint256,uint256,uint256,uint256)",
+						},
+						Args: [][]interface{}{
+							{},
+						},
+					})
+				}
+			}
+		}
 	}
 
 	return calls

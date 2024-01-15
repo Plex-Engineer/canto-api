@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"math"
 	"math/big"
+	"time"
 
 	"canto-api/config"
 	"canto-api/multicall"
@@ -115,6 +116,43 @@ func GetLpPairRatio(reserve1 *big.Int, reserve2 *big.Int) (*big.Int, bool) {
 	}
 }
 
+// convert big.Int to big.float
+func BigIntToFloat64(value *big.Int) *big.Float {
+	return new(big.Float).SetInt(value)
+}
+
+// holiday mapping for day to days interest update
+var holidayMap = map[string]float64{
+	"30" + time.December.String(): 4,
+	"13" + time.January.String():  4,
+	"17" + time.February.String(): 4,
+	"25" + time.May.String():      4,
+}
+
+// get amount of days passed for hashnote interest update (includes holidy schedule)
+func GetInterestDaysPassed(updatedAt int64) float64 {
+	// get time from UNIX timestamp
+	unixTime := time.Unix(updatedAt, 0)
+	// check for holidays
+	daysOffset := holidayMap[fmt.Sprintf("%d%s", unixTime.Day(), unixTime.Month().String())]
+	if daysOffset != 0 {
+		return daysOffset
+	}
+	// check if saturday reporting (for three days)
+	if unixTime.Weekday() == time.Saturday {
+		return 3
+	}
+	return 1
+}
+
+// get hashnote apy
+func HashnoteAPY(balance *big.Int, interest *big.Int, updatedAt *big.Int) float64 {
+	prevBalance := new(big.Float).Sub(BigIntToFloat64(balance), BigIntToFloat64(interest))
+	spotAPY, _ := new(big.Float).Quo(BigIntToFloat64(interest), prevBalance).Float64()
+	dayOffset := GetInterestDaysPassed(updatedAt.Int64())
+	return (spotAPY * 365 * 100) / dayOffset
+}
+
 // APY takes the block rate, calculates APY and returns
 func APY(blockRate *big.Int) float64 {
 	// format blockRate by 1e18
@@ -203,7 +241,7 @@ func GetProcessedCTokens(ctx context.Context, cTokens TokensMap) ([]ProcessedCTo
 	// key is address of cToken and value is a map of cToken data
 	for address, cToken := range cTokens {
 		// get cToken data
-		symbol, name, decimals, underlying := config.GetCTokenData(address)
+		symbol, name, decimals, tags, underlying := config.GetCTokenData(address)
 
 		// process data
 		cash, _ := InterfaceToBigInt(cToken["cash"][0])
@@ -227,6 +265,20 @@ func GetProcessedCTokens(ctx context.Context, cTokens TokensMap) ([]ProcessedCTo
 		// get supplyApy using APY()
 		supplyBlockRate, _ := InterfaceToBigInt(cToken["supplyRatePerBlock"][0])
 		supplyApy := APY(supplyBlockRate)
+
+		// check tags that may affect this supply rate number
+		for _, tag := range tags {
+			if tag == "hashnote" {
+				// use latest round details to calculate supplyApy
+				balance, _ := InterfaceToBigInt(cToken["latestRoundDetails"][1])
+				interest, _ := InterfaceToBigInt(cToken["latestRoundDetails"][2])
+				updatedAt, _ := InterfaceToBigInt(cToken["latestRoundDetails"][4])
+				supplyApy = HashnoteAPY(balance, interest, updatedAt)
+			}
+			if tag == "fbill" {
+				supplyApy = 4.90
+			}
+		}
 
 		// get borrowApy using APY()
 		borrowBlockRate, _ := InterfaceToBigInt(cToken["borrowRatePerBlock"][0])
@@ -253,22 +305,22 @@ func GetProcessedCTokens(ctx context.Context, cTokens TokensMap) ([]ProcessedCTo
 		underlyingTotalSupply, _ := InterfaceToString(cToken["underlyingSupply"][0])
 
 		processedCToken := ProcessedCToken{
-			Address:          address,
-			Symbol:           symbol,
-			Name:             name,
-			Decimals:         decimals,
-			Underlying:       underlying,
-			Cash:             cash.String(),
-			ExchangeRate:     exchangeRate,
-			IsListed:         isListed,
-			CollateralFactor: collateralFactor,
-			Price:            price.String(),
-			BorrowCap:        borrowCap.String(),
-			Liquidity:        fmt.Sprintf("%.2f", liquidity),
-			SupplyApy:        fmt.Sprintf("%.2f", supplyApy),
-			BorrowApy:        fmt.Sprintf("%.2f", borrowApy),
-			DistApy:          fmt.Sprintf("%.2f", distApy),
-			CompSupplyState:  compSupplyState,
+			Address:               address,
+			Symbol:                symbol,
+			Name:                  name,
+			Decimals:              decimals,
+			Underlying:            underlying,
+			Cash:                  cash.String(),
+			ExchangeRate:          exchangeRate,
+			IsListed:              isListed,
+			CollateralFactor:      collateralFactor,
+			Price:                 price.String(),
+			BorrowCap:             borrowCap.String(),
+			Liquidity:             fmt.Sprintf("%.2f", liquidity),
+			SupplyApy:             fmt.Sprintf("%.2f", supplyApy),
+			BorrowApy:             fmt.Sprintf("%.2f", borrowApy),
+			DistApy:               fmt.Sprintf("%.2f", distApy),
+			CompSupplyState:       compSupplyState,
 			UnderlyingTotalSupply: underlyingTotalSupply,
 		}
 
