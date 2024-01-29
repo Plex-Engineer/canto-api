@@ -139,7 +139,7 @@ func GetInterestDaysPassed(updatedAt int64) float64 {
 		return daysOffset
 	}
 	// check if saturday reporting (for three days)
-	if unixTime.Weekday() == time.Saturday {
+	if unixTime.Weekday() == time.Saturday || unixTime.Weekday() == time.Sunday {
 		return 3
 	}
 	return 1
