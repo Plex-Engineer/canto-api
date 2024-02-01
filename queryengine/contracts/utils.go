@@ -17,6 +17,7 @@ import (
 var SecondsPerBlock float64 = 5.8
 var BlocksPerDay float64 = 86400 / SecondsPerBlock
 var DaysPerYear float64 = 365
+var BlocksPerYear float64 = BlocksPerDay * DaysPerYear
 
 func ResultToString(results interface{}) string {
 	ret, err := json.Marshal(results)
@@ -120,6 +121,13 @@ func APY(blockRate *big.Int) float64 {
 	// format blockRate by 1e18
 	formattedBlockRate := FormatUnits(blockRate, 18)
 	return (math.Pow(formattedBlockRate*BlocksPerDay+1, float64(DaysPerYear)) - 1) * 100
+}
+
+// APR takes the block rate, calculates APR and returns
+func APR(blockRate *big.Int) float64 {
+	// format blockRate by 1e18
+	formattedBlockRate := FormatUnits(blockRate, 18)
+	return (formattedBlockRate * BlocksPerYear) * 100
 }
 
 // distributionAPY takes the block rate, calculates distAPY and returns
@@ -227,11 +235,11 @@ func GetProcessedCTokens(ctx context.Context, cTokens TokensMap) ([]ProcessedCTo
 		// get supplyApy using APY()
 		supplyBlockRate, _ := InterfaceToBigInt(cToken["supplyRatePerBlock"][0])
 		supplyApy := APY(supplyBlockRate)
-
+		supplyApr := APR(supplyBlockRate)
 		// get borrowApy using APY()
 		borrowBlockRate, _ := InterfaceToBigInt(cToken["borrowRatePerBlock"][0])
 		borrowApy := APY(borrowBlockRate)
-
+		borrowApr := APR(borrowBlockRate)
 		compSupplySpeed, _ := InterfaceToBigInt(cToken["compSupplySpeeds"][0])
 		// format compSupplySpeed by 1e18
 		formattedCompSupplySpeed := FormatUnits(compSupplySpeed, 18)
@@ -253,22 +261,24 @@ func GetProcessedCTokens(ctx context.Context, cTokens TokensMap) ([]ProcessedCTo
 		underlyingTotalSupply, _ := InterfaceToString(cToken["underlyingSupply"][0])
 
 		processedCToken := ProcessedCToken{
-			Address:          address,
-			Symbol:           symbol,
-			Name:             name,
-			Decimals:         decimals,
-			Underlying:       underlying,
-			Cash:             cash.String(),
-			ExchangeRate:     exchangeRate,
-			IsListed:         isListed,
-			CollateralFactor: collateralFactor,
-			Price:            price.String(),
-			BorrowCap:        borrowCap.String(),
-			Liquidity:        fmt.Sprintf("%.2f", liquidity),
-			SupplyApy:        fmt.Sprintf("%.2f", supplyApy),
-			BorrowApy:        fmt.Sprintf("%.2f", borrowApy),
-			DistApy:          fmt.Sprintf("%.2f", distApy),
-			CompSupplyState:  compSupplyState,
+			Address:               address,
+			Symbol:                symbol,
+			Name:                  name,
+			Decimals:              decimals,
+			Underlying:            underlying,
+			Cash:                  cash.String(),
+			ExchangeRate:          exchangeRate,
+			IsListed:              isListed,
+			CollateralFactor:      collateralFactor,
+			Price:                 price.String(),
+			BorrowCap:             borrowCap.String(),
+			Liquidity:             fmt.Sprintf("%.2f", liquidity),
+			SupplyApy:             fmt.Sprintf("%.2f", supplyApy),
+			SupplyApr:             fmt.Sprintf("%.2f", supplyApr),
+			BorrowApy:             fmt.Sprintf("%.2f", borrowApy),
+			BorrowApr:             fmt.Sprintf("%.2f", borrowApr),
+			DistApy:               fmt.Sprintf("%.2f", distApy),
+			CompSupplyState:       compSupplyState,
 			UnderlyingTotalSupply: underlyingTotalSupply,
 		}
 

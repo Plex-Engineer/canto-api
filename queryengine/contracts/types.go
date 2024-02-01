@@ -36,7 +36,9 @@ type ProcessedCToken struct {
 	IsListed              bool              `json:"isListed"`
 	Liquidity             string            `json:"liquidity"`
 	SupplyApy             string            `json:"supplyApy"`
+	SupplyApr             string            `json:"supplyApr"`
 	BorrowApy             string            `json:"borrowApy"`
+	BorrowApr             string            `json:"borrowApr"`
 	DistApy               string            `json:"distApy"`
 	CompSupplyState       string            `json:"compSupplyState"`
 	UnderlyingTotalSupply string            `json:"underlyingTotalSupply"`
