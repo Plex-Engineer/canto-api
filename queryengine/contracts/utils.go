@@ -18,6 +18,7 @@ import (
 var SecondsPerBlock float64 = 5.8
 var BlocksPerDay float64 = 86400 / SecondsPerBlock
 var DaysPerYear float64 = 365
+var BlocksPerYear float64 = BlocksPerDay * DaysPerYear
 
 func ResultToString(results interface{}) string {
 	ret, err := json.Marshal(results)
@@ -160,6 +161,13 @@ func APY(blockRate *big.Int) float64 {
 	return (math.Pow(formattedBlockRate*BlocksPerDay+1, float64(DaysPerYear)) - 1) * 100
 }
 
+// APR takes the block rate, calculates APR and returns
+func APR(blockRate *big.Int) float64 {
+	// format blockRate by 1e18
+	formattedBlockRate := FormatUnits(blockRate, 18)
+	return (formattedBlockRate * BlocksPerYear) * 100
+}
+
 // distributionAPY takes the block rate, calculates distAPY and returns
 func distributionAPY(compSupplySpeed float64, tokenSupply float64, tokenPrice float64, cantoPrice float64) float64 {
 	if tokenSupply == 0 || tokenPrice == 0 {
@@ -265,6 +273,7 @@ func GetProcessedCTokens(ctx context.Context, cTokens TokensMap) ([]ProcessedCTo
 		// get supplyApy using APY()
 		supplyBlockRate, _ := InterfaceToBigInt(cToken["supplyRatePerBlock"][0])
 		supplyApy := APY(supplyBlockRate)
+		supplyApr := APR(supplyBlockRate)
 
 		// check tags that may affect this supply rate number
 		for _, tag := range tags {
@@ -274,16 +283,18 @@ func GetProcessedCTokens(ctx context.Context, cTokens TokensMap) ([]ProcessedCTo
 				interest, _ := InterfaceToBigInt(cToken["latestRoundDetails"][2])
 				updatedAt, _ := InterfaceToBigInt(cToken["latestRoundDetails"][4])
 				supplyApy = HashnoteAPY(balance, interest, updatedAt) - 0.5
+				supplyApr = HashnoteAPY(balance, interest, updatedAt) - 0.5
 			}
 			if tag == "fbill" {
 				supplyApy = 4.90
+				supplyApr = 4.90
 			}
 		}
 
 		// get borrowApy using APY()
 		borrowBlockRate, _ := InterfaceToBigInt(cToken["borrowRatePerBlock"][0])
 		borrowApy := APY(borrowBlockRate)
-
+		borrowApr := APR(borrowBlockRate)
 		compSupplySpeed, _ := InterfaceToBigInt(cToken["compSupplySpeeds"][0])
 		// format compSupplySpeed by 1e18
 		formattedCompSupplySpeed := FormatUnits(compSupplySpeed, 18)
@@ -295,7 +306,7 @@ func GetProcessedCTokens(ctx context.Context, cTokens TokensMap) ([]ProcessedCTo
 		formattedTokenPrice := FormatUnits(price, int64(36)-underlying.Decimals)
 
 		distApy := distributionAPY(formattedCompSupplySpeed, formattedTokenSupply, formattedTokenPrice, formattedCantoPrice)
-
+		distApr := distributionAPY(formattedCompSupplySpeed, formattedTokenSupply, formattedTokenPrice, formattedCantoPrice)
 		// Set price of cNOTE, cUSDC, cUSDT to exactly 1USD scaled by 1e(36-decimals)
 		if symbol == "cNOTE" || symbol == "cUSDC" || symbol == "cUSDT" {
 			price.Exp(big.NewInt(10), big.NewInt(36-underlying.Decimals), nil)
@@ -318,8 +329,11 @@ func GetProcessedCTokens(ctx context.Context, cTokens TokensMap) ([]ProcessedCTo
 			BorrowCap:             borrowCap.String(),
 			Liquidity:             fmt.Sprintf("%.2f", liquidity),
 			SupplyApy:             fmt.Sprintf("%.2f", supplyApy),
+			SupplyApr:             fmt.Sprintf("%.2f", supplyApr),
 			BorrowApy:             fmt.Sprintf("%.2f", borrowApy),
+			BorrowApr:             fmt.Sprintf("%.2f", borrowApr),
 			DistApy:               fmt.Sprintf("%.2f", distApy),
+			DistApr:               fmt.Sprintf("%.2f", distApr),
 			CompSupplyState:       compSupplyState,
 			UnderlyingTotalSupply: underlyingTotalSupply,
 		}
