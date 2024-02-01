@@ -306,7 +306,7 @@ func GetProcessedCTokens(ctx context.Context, cTokens TokensMap) ([]ProcessedCTo
 		formattedTokenPrice := FormatUnits(price, int64(36)-underlying.Decimals)
 
 		distApy := distributionAPY(formattedCompSupplySpeed, formattedTokenSupply, formattedTokenPrice, formattedCantoPrice)
-
+		distApr := distributionAPY(formattedCompSupplySpeed, formattedTokenSupply, formattedTokenPrice, formattedCantoPrice)
 		// Set price of cNOTE, cUSDC, cUSDT to exactly 1USD scaled by 1e(36-decimals)
 		if symbol == "cNOTE" || symbol == "cUSDC" || symbol == "cUSDT" {
 			price.Exp(big.NewInt(10), big.NewInt(36-underlying.Decimals), nil)
@@ -333,6 +333,7 @@ func GetProcessedCTokens(ctx context.Context, cTokens TokensMap) ([]ProcessedCTo
 			BorrowApy:             fmt.Sprintf("%.2f", borrowApy),
 			BorrowApr:             fmt.Sprintf("%.2f", borrowApr),
 			DistApy:               fmt.Sprintf("%.2f", distApy),
+			DistApr:               fmt.Sprintf("%.2f", distApr),
 			CompSupplyState:       compSupplyState,
 			UnderlyingTotalSupply: underlyingTotalSupply,
 		}
