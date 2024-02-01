@@ -283,9 +283,11 @@ func GetProcessedCTokens(ctx context.Context, cTokens TokensMap) ([]ProcessedCTo
 				interest, _ := InterfaceToBigInt(cToken["latestRoundDetails"][2])
 				updatedAt, _ := InterfaceToBigInt(cToken["latestRoundDetails"][4])
 				supplyApy = HashnoteAPY(balance, interest, updatedAt) - 0.5
+				supplyApr = HashnoteAPY(balance, interest, updatedAt) - 0.5
 			}
 			if tag == "fbill" {
 				supplyApy = 4.90
+				supplyApr = 4.90
 			}
 		}
 
