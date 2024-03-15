@@ -3,6 +3,7 @@ package queryengine
 import (
 	"context"
 	"strconv"
+	"sync"
 	"time"
 
 	csr "github.com/Canto-Network/Canto/v6/x/csr/types"
@@ -28,6 +29,14 @@ type Validator struct {
 	Description staking.Description `json:"description"`
 	// commission defines the commission rate.
 	Commission string `json:"commission"`
+	// number of delegators.
+	Delegators int `json:"delegators"`
+}
+
+type ValidatorDelegationsResponse struct {
+	Validator   string
+	Delegations int
+	Error       error
 }
 
 // get all Validators for staking
@@ -41,9 +50,38 @@ func GetValidators(ctx context.Context, queryClient staking.QueryClient) ([]Vali
 	if err != nil {
 		return nil, nil, err
 	}
-	allValidators := new([]Validator)
-	validatorMap := make(map[string]string)
+	allValidators := []Validator{}
+	validatorMap := make(map[string]Validator)
+	validatorToResultStringMap := make(map[string]string)
+
+	var wg sync.WaitGroup
+	wg.Add(len(respValidators.Validators))
+	resultChan := make(chan ValidatorDelegationsResponse, len(respValidators.Validators))
+
 	for _, validator := range respValidators.Validators {
+		go func(valAddress string) {
+			defer wg.Done()
+			delegations, err := queryClient.ValidatorDelegations(ctx, &staking.QueryValidatorDelegationsRequest{
+				ValidatorAddr: valAddress,
+				Pagination: &query.PageRequest{
+					Limit: 1000,
+				},
+			})
+
+			if err != nil {
+				resultChan <- ValidatorDelegationsResponse{
+					Validator: valAddress,
+					Error:     err,
+				}
+				return
+			}
+			resultChan <- ValidatorDelegationsResponse{
+				Validator:   valAddress,
+				Delegations: len(delegations.DelegationResponses),
+			}
+
+		}(validator.OperatorAddress)
+
 		valResponse := Validator{
 			OperatorAddress: validator.OperatorAddress,
 			Jailed:          validator.Jailed,
@@ -52,10 +90,24 @@ func GetValidators(ctx context.Context, queryClient staking.QueryClient) ([]Vali
 			Description:     validator.Description,
 			Commission:      validator.Commission.CommissionRates.Rate.String(),
 		}
-		*allValidators = append(*allValidators, valResponse)
-		validatorMap[validator.OperatorAddress] = GeneralResultToString(valResponse)
+		validatorMap[valResponse.OperatorAddress] = valResponse
 	}
-	return *allValidators, validatorMap, nil
+
+	wg.Wait()
+	close(resultChan)
+
+	for result := range resultChan {
+		if result.Error != nil {
+			return nil, nil, result.Error
+		} else {
+			validator := validatorMap[result.Validator]
+			validator.Delegators = result.Delegations
+			validatorMap[result.Validator] = validator
+			validatorToResultStringMap[result.Validator] = GeneralResultToString(validator)
+			allValidators = append(allValidators, validator)
+		}
+	}
+	return allValidators, validatorToResultStringMap, nil
 }
 func GetStakingAPR(ctx context.Context, stakingQueryClient staking.QueryClient, inflationQueryClient inflation.QueryClient) (string, error) {
 	//get pool
